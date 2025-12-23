@@ -569,29 +569,58 @@ def patient_ticket(patient_id):
 @login_required
 def next_patient():
     if current_user.role != 'doctor':
-        return redirect(url_for('main.home'))
+        return jsonify({'error': 'Unauthorized'}), 403
     
     try:
         doctor_profile = current_user.doctor_profile
-        doctor_profile.waiting_room_count += 1
 
-        current_appointment = Appointment.query.filter_by(
+        # 1. Terminer le patient précédent (si applicable)
+        if doctor_profile.waiting_room_count > 0:
+            previous_appointment = Appointment.query.filter_by(
+                doctor_id=doctor_profile.id,
+                appointment_date=date.today(),
+                queue_number=doctor_profile.waiting_room_count
+            ).first()
+
+            if previous_appointment and previous_appointment.status == 'waiting':
+                previous_appointment.status = 'completed'
+                current_app.logger.info(f"Doctor {current_user.id} auto-completed appointment {previous_appointment.id}")
+
+        # 2. Passer au suivant
+        doctor_profile.waiting_room_count += 1
+        new_count = doctor_profile.waiting_room_count
+
+        # 3. Récupérer le nouveau patient
+        next_appointment = Appointment.query.filter_by(
             doctor_id=doctor_profile.id,
             appointment_date=date.today(),
-            queue_number=doctor_profile.waiting_room_count
+            queue_number=new_count
         ).first()
 
-        if current_appointment and current_appointment.status in ['confirmed', 'waiting']:
-            current_appointment.status = 'completed'
-            current_app.logger.info(f"Doctor {current_user.id} completed appointment {current_appointment.id}")
+        next_patient_data = None
+        if next_appointment:
+            next_patient_data = {
+                'id': next_appointment.id,
+                'patient_name': next_appointment.patient.name,
+                'patient_id': next_appointment.patient.id,
+                'status': next_appointment.status,
+                'queue_number': next_appointment.queue_number
+            }
+            # Optionnel: on pourrait passer le statut à 'waiting' si ce n'est pas fait,
+            # mais généralement le patient check-in avant.
 
         db.session.commit()
+
+        return jsonify({
+            'success': True,
+            'waiting_room_count': new_count,
+            'next_patient': next_patient_data
+        })
+
     except Exception as e:
         db.session.rollback()
         current_app.logger.error(f"Error in next_patient for doctor {current_user.id}: {str(e)}", exc_info=True)
-        flash("Erreur lors du passage au patient suivant.", "error")
-
-    return redirect(url_for('main.doctor_dashboard'))
+        return jsonify({'error': 'Internal Server Error'}), 500
 
 @main_bp.route('/doctor/no-show/<int:appointment_id>', methods=['POST'])
 @login_required

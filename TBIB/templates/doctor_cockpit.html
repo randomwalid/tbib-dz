@@ -38,7 +38,12 @@
             </a>
         </nav>
         
-        <div class="p-4 border-t border-white/10">
+        <div class="p-4 border-t border-white/10 space-y-3">
+            <button onclick="nextPatient()" class="w-full bg-white text-[#0d9479] hover:bg-gray-100 font-bold py-3 px-4 rounded-xl flex items-center justify-center gap-2 transition shadow-lg">
+                <span>🔔</span>
+                <span>Patient Suivant</span>
+            </button>
+
             <div class="bg-white/10 rounded-xl p-3 text-center">
                 <p class="text-xs text-white/70 uppercase tracking-wide mb-1">File d'attente</p>
                 <p class="text-3xl font-bold" id="waiting-count">{{ waiting_count }}</p>
@@ -490,6 +495,40 @@ function refreshWaitingCount() {
             document.getElementById('waiting-count').textContent = data.waiting_count;
         })
         .catch(error => console.error('Error:', error));
+}
+
+function nextPatient() {
+    if (!confirm("Passer au patient suivant ? Le patient actuel sera marqué comme 'Terminé'.")) {
+        return;
+    }
+
+    fetch('/doctor/next-patient', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            refreshWaitingCount();
+            calendar.refetchEvents(); // Refresh calendar to see status changes
+
+            if (data.next_patient) {
+                // Find the event in calendar and select it
+                // Note: might need to wait for refetch or find it manually
+                // For now, let's just notify
+                // We could use a global toast function if available
+                alert(`Patient suivant: ${data.next_patient.patient_name}`);
+            } else {
+                alert("Aucun autre patient en attente pour le moment.");
+            }
+        } else {
+            alert("Erreur: " + (data.error || "Impossible de passer au suivant"));
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert("Erreur réseau");
+    });
 }
 
 setInterval(refreshWaitingCount, 10000);
