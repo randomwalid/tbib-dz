@@ -2,6 +2,7 @@ from flask import Blueprint, render_template, redirect, url_for, request, flash,
 from flask_login import login_user, logout_user, login_required, current_user
 from extensions import db
 from models import User, DoctorProfile, Appointment, HealthRecord, DoctorAvailability, ConsultationType, DoctorAbsence, Relative
+from utils.engine import calculate_wait_time, shift_appointments
 from datetime import date, datetime, timedelta, time
 
 main_bp = Blueprint('main', __name__)
@@ -525,6 +526,39 @@ def doctor_dashboard():
                            t=get_t(),
                            lang=session.get('lang', 'fr'))
 
+@main_bp.route('/dashboard')
+@login_required
+def dashboard():
+    if current_user.role != 'doctor':
+        return redirect(url_for('main.home'))
+
+    doctor_profile = current_user.doctor_profile
+    wait_time = calculate_wait_time(doctor_profile.id)
+
+    return render_template('doctor_dashboard.html',
+                           doctor=doctor_profile,
+                           wait_time=wait_time,
+                           t=get_t(),
+                           lang=session.get('lang', 'fr'))
+
+@main_bp.route('/ticket/<int:patient_id>')
+def patient_ticket(patient_id):
+    # Simulation: find the doctor for this patient today
+    # We look for a confirmed or waiting appointment for today
+    appointment = Appointment.query.filter_by(
+        patient_id=patient_id,
+        appointment_date=date.today()
+    ).first()
+
+    wait_time = "--"
+    if appointment:
+        wait_time = calculate_wait_time(appointment.doctor_id)
+
+    return render_template('patient_ticket.html',
+                           wait_time=wait_time,
+                           t=get_t(),
+                           lang=session.get('lang', 'fr'))
+
 @main_bp.route('/doctor/next-patient', methods=['POST'])
 @login_required
 def next_patient():
@@ -571,6 +605,27 @@ def cancel_appointment(appointment_id):
         db.session.commit()
     
     return redirect(url_for('main.my_appointments'))
+
+@main_bp.route('/api/emergency/shift', methods=['POST'])
+@login_required
+def shift_appointments_api():
+    if current_user.role != 'doctor':
+        return jsonify({'error': 'Unauthorized'}), 403
+
+    data = request.get_json()
+    urgency_duration = data.get('urgency_duration')
+
+    if not urgency_duration:
+        return jsonify({'error': 'Missing urgency_duration'}), 400
+
+    try:
+        urgency_duration = int(urgency_duration)
+    except ValueError:
+         return jsonify({'error': 'Invalid urgency_duration'}), 400
+
+    shift_appointments(current_user.doctor_profile.id, urgency_duration)
+
+    return jsonify({'success': True})
 
 @main_bp.route('/api/queue_status/<int:doctor_id>')
 def get_queue_status(doctor_id):
