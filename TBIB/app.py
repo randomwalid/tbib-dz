@@ -2,7 +2,7 @@ import os
 import logging
 from logging.handlers import RotatingFileHandler
 from flask import Flask, session, render_template, request, jsonify
-from TBIB.extensions import db, migrate, login_manager
+from extensions import db, migrate, login_manager
 
 def configure_logging(app):
     if not app.debug:
@@ -33,7 +33,7 @@ def create_app():
     
     configure_logging(app)
 
-    from TBIB.models import User
+    from models import User
     
     @login_manager.user_loader
     def load_user(user_id):

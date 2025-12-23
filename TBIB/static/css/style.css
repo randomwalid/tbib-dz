@@ -1,0 +1,96 @@
+/* Custom Animations & Optimizations */
+
+/* 1. Global Page Transitions */
+.fade-in-up {
+    animation: fadeInUp 0.5s ease-out forwards;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* 2. Optimized Feedback for Slow Connections */
+/* Top Progress Bar */
+#nprogress-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 3px;
+    background: #14b999;
+    z-index: 9999;
+    transition: width 0.2s ease;
+    width: 0%;
+    box-shadow: 0 0 10px rgba(20, 185, 153, 0.5);
+}
+
+/* Connection Status Banner */
+.network-banner {
+    transform: translateY(-100%);
+    transition: transform 0.3s ease-in-out;
+}
+.network-banner.show {
+    transform: translateY(0);
+}
+
+/* 3. Skeleton Loading (for async content) */
+.skeleton {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+    border-radius: 0.375rem; /* Tailwind rounded-md */
+}
+
+@keyframes shimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+/* 4. Button Loading State */
+.btn-spinner {
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top: 2px solid white;
+    width: 1em;
+    height: 1em;
+    animation: spin 0.8s linear infinite;
+    display: inline-block;
+    vertical-align: middle;
+    margin-right: 0.5rem;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* 5. Micro-interactions */
+.hover-lift {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.hover-lift:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+/* Flash Message Animation */
+.toast-enter {
+    animation: slideInRight 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes slideInRight {
+    from {
+        opacity: 0;
+        transform: translateX(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
