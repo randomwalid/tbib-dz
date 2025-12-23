@@ -60,6 +60,16 @@ class DoctorProfile(db.Model):
     documents_encrypted_path = db.Column(db.String(500), nullable=True)
 
     appointments = db.relationship('Appointment', backref='doctor_profile', foreign_keys='Appointment.doctor_id', lazy='dynamic')
+    queues = db.relationship('Queue', backref='doctor_profile', lazy='dynamic')
+
+    def get_or_create_daily_queue(self):
+        today = date.today()
+        queue = Queue.query.filter_by(doctor_id=self.id, date=today).first()
+        if not queue:
+            queue = Queue(doctor_id=self.id, date=today, status='open')
+            db.session.add(queue)
+            db.session.commit()
+        return queue
 
 class DoctorAvailability(db.Model):
     __tablename__ = 'doctor_availability'
@@ -89,6 +99,17 @@ class HealthRecord(db.Model):
     
     patient = db.relationship('User', backref=db.backref('health_record', uselist=False))
 
+class Queue(db.Model):
+    __tablename__ = 'queues'
+
+    id = db.Column(db.Integer, primary_key=True)
+    doctor_id = db.Column(db.Integer, db.ForeignKey('doctor_profiles.id'), nullable=False)
+    date = db.Column(db.Date, nullable=False, default=date.today)
+    current_number = db.Column(db.Integer, default=0)
+    status = db.Column(db.String(20), default='open')  # open, closed, paused
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
 class Appointment(db.Model):
     __tablename__ = 'appointments'
     __table_args__ = (
@@ -112,6 +133,32 @@ class Appointment(db.Model):
     consultation_type_id = db.Column(db.Integer, db.ForeignKey('consultation_types.id'), nullable=True)
     consultation_type = db.relationship('ConsultationType', backref='appointments')
     doctor_notes = db.Column(db.Text)
+
+    @classmethod
+    def join_queue(cls, doctor_id, patient_id):
+        doctor = DoctorProfile.query.get(doctor_id)
+        if not doctor:
+            return None
+
+        queue = doctor.get_or_create_daily_queue()
+
+        # Get max queue number for today
+        max_num = db.session.query(db.func.max(cls.queue_number)).filter(
+            cls.doctor_id == doctor_id,
+            cls.appointment_date == date.today()
+        ).scalar() or 0
+
+        new_appointment = cls(
+            patient_id=patient_id,
+            doctor_id=doctor_id,
+            appointment_date=date.today(),
+            queue_number=max_num + 1,
+            booking_type='walk_in',
+            status='waiting'
+        )
+        db.session.add(new_appointment)
+        db.session.commit()
+        return new_appointment
 
 
 class ConsultationType(db.Model):
