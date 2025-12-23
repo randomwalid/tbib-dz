@@ -1,6 +1,6 @@
 import os
 from flask import Flask, session
-from extensions import db, migrate, login_manager
+from TBIB.extensions import db, migrate, login_manager
 
 def create_app():
     app = Flask(__name__)
