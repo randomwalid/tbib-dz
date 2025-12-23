@@ -2,7 +2,7 @@ from flask import Blueprint, render_template, redirect, url_for, request, flash,
 from flask_login import login_user, logout_user, login_required, current_user
 from extensions import db
 from models import User, DoctorProfile, Appointment, HealthRecord, DoctorAvailability, ConsultationType, DoctorAbsence, Relative
-from utils.engine import calculate_wait_time, shift_appointments
+from utils.engine import calculate_wait_time, shift_appointments, get_conflicting_appointments, cancel_appointments_in_range
 from datetime import date, datetime, timedelta, time
 
 main_bp = Blueprint('main', __name__)
@@ -1140,8 +1140,22 @@ def add_absence():
     except:
         return jsonify({'error': 'Invalid dates'}), 400
     
+    force = data.get('force', False)
+    doctor_id = current_user.doctor_profile.id
+
+    if not force:
+        conflicts = get_conflicting_appointments(doctor_id, start_date, end_date)
+        if conflicts > 0:
+            return jsonify({
+                'error': 'Conflict',
+                'conflict_count': conflicts
+            }), 409
+
+    # Cancel appointments if they exist
+    cancel_appointments_in_range(doctor_id, start_date, end_date, data.get('reason', ''))
+
     absence = DoctorAbsence(
-        doctor_id=current_user.doctor_profile.id,
+        doctor_id=doctor_id,
         start_date=start_date,
         end_date=end_date,
         reason=data.get('reason', '')
