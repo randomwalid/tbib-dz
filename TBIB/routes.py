@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, redirect, url_for, request, flash, session, jsonify
+from flask import Blueprint, render_template, redirect, url_for, request, flash, session, jsonify, current_app
 from flask_login import login_user, logout_user, login_required, current_user
 from extensions import db
 from models import User, DoctorProfile, Appointment, HealthRecord, DoctorAvailability, ConsultationType, DoctorAbsence, Relative
@@ -511,20 +511,26 @@ def doctor_dashboard():
     if current_user.role != 'doctor':
         return redirect(url_for('main.home'))
     
-    doctor_profile = current_user.doctor_profile
-    
-    waiting_count = Appointment.query.filter(
-        Appointment.doctor_id == doctor_profile.id,
-        Appointment.appointment_date == date.today(),
-        Appointment.queue_number.isnot(None),
-        Appointment.status.in_(['confirmed', 'waiting'])
-    ).count()
-    
-    return render_template('doctor_cockpit.html',
-                           doctor_profile=doctor_profile,
-                           waiting_count=waiting_count,
-                           t=get_t(),
-                           lang=session.get('lang', 'fr'))
+    try:
+        current_app.logger.info(f"Dashboard access by Doctor {current_user.id}")
+        doctor_profile = current_user.doctor_profile
+
+        waiting_count = Appointment.query.filter(
+            Appointment.doctor_id == doctor_profile.id,
+            Appointment.appointment_date == date.today(),
+            Appointment.queue_number.isnot(None),
+            Appointment.status.in_(['confirmed', 'waiting'])
+        ).count()
+
+        return render_template('doctor_cockpit.html',
+                            doctor_profile=doctor_profile,
+                            waiting_count=waiting_count,
+                            t=get_t(),
+                            lang=session.get('lang', 'fr'))
+    except Exception as e:
+        current_app.logger.error(f"Error accessing doctor dashboard for user {current_user.id}: {str(e)}", exc_info=True)
+        flash("Une erreur est survenue lors du chargement du tableau de bord.", "error")
+        return redirect(url_for('main.home'))
 
 @main_bp.route('/dashboard')
 @login_required
@@ -565,19 +571,26 @@ def next_patient():
     if current_user.role != 'doctor':
         return redirect(url_for('main.home'))
     
-    doctor_profile = current_user.doctor_profile
-    doctor_profile.waiting_room_count += 1
-    
-    current_appointment = Appointment.query.filter_by(
-        doctor_id=doctor_profile.id,
-        appointment_date=date.today(),
-        queue_number=doctor_profile.waiting_room_count
-    ).first()
-    
-    if current_appointment and current_appointment.status in ['confirmed', 'waiting']:
-        current_appointment.status = 'completed'
-    
-    db.session.commit()
+    try:
+        doctor_profile = current_user.doctor_profile
+        doctor_profile.waiting_room_count += 1
+
+        current_appointment = Appointment.query.filter_by(
+            doctor_id=doctor_profile.id,
+            appointment_date=date.today(),
+            queue_number=doctor_profile.waiting_room_count
+        ).first()
+
+        if current_appointment and current_appointment.status in ['confirmed', 'waiting']:
+            current_appointment.status = 'completed'
+            current_app.logger.info(f"Doctor {current_user.id} completed appointment {current_appointment.id}")
+
+        db.session.commit()
+    except Exception as e:
+        db.session.rollback()
+        current_app.logger.error(f"Error in next_patient for doctor {current_user.id}: {str(e)}", exc_info=True)
+        flash("Erreur lors du passage au patient suivant.", "error")
+
     return redirect(url_for('main.doctor_dashboard'))
 
 @main_bp.route('/doctor/no-show/<int:appointment_id>', methods=['POST'])
@@ -586,10 +599,16 @@ def mark_no_show(appointment_id):
     if current_user.role != 'doctor':
         return redirect(url_for('main.home'))
     
-    appointment = Appointment.query.get_or_404(appointment_id)
-    if appointment.doctor_id == current_user.doctor_profile.id:
-        appointment.status = 'no_show'
-        db.session.commit()
+    try:
+        appointment = Appointment.query.get_or_404(appointment_id)
+        if appointment.doctor_id == current_user.doctor_profile.id:
+            appointment.status = 'no_show'
+            db.session.commit()
+            current_app.logger.info(f"Appointment {appointment_id} marked as no-show by doctor {current_user.id}")
+    except Exception as e:
+        db.session.rollback()
+        current_app.logger.error(f"Error in mark_no_show for appointment {appointment_id}: {str(e)}", exc_info=True)
+        flash("Impossible de marquer l'absence.", "error")
     
     return redirect(url_for('main.doctor_dashboard'))
 
@@ -612,20 +631,25 @@ def shift_appointments_api():
     if current_user.role != 'doctor':
         return jsonify({'error': 'Unauthorized'}), 403
 
-    data = request.get_json()
-    urgency_duration = data.get('urgency_duration')
-
-    if not urgency_duration:
-        return jsonify({'error': 'Missing urgency_duration'}), 400
-
     try:
-        urgency_duration = int(urgency_duration)
-    except ValueError:
-         return jsonify({'error': 'Invalid urgency_duration'}), 400
+        data = request.get_json()
+        urgency_duration = data.get('urgency_duration')
 
-    shift_appointments(current_user.doctor_profile.id, urgency_duration)
+        if not urgency_duration:
+            return jsonify({'error': 'Missing urgency_duration'}), 400
 
-    return jsonify({'success': True})
+        try:
+            urgency_duration = int(urgency_duration)
+        except ValueError:
+            return jsonify({'error': 'Invalid urgency_duration'}), 400
+
+        current_app.logger.info(f"Doctor {current_user.id} shifting appointments by {urgency_duration} mins")
+        shift_appointments(current_user.doctor_profile.id, urgency_duration)
+
+        return jsonify({'success': True})
+    except Exception as e:
+        current_app.logger.error(f"Error shifting appointments for doctor {current_user.id}: {str(e)}", exc_info=True)
+        return jsonify({'error': 'Internal Server Error'}), 500
 
 @main_bp.route('/api/queue_status/<int:doctor_id>')
 def get_queue_status(doctor_id):
@@ -838,44 +862,50 @@ def update_appointment_status(appointment_id):
     if current_user.role != 'doctor':
         return jsonify({'error': 'Unauthorized'}), 403
     
-    appointment = Appointment.query.get_or_404(appointment_id)
-    if appointment.doctor_id != current_user.doctor_profile.id:
-        return jsonify({'error': 'Unauthorized'}), 403
-    
-    data = request.get_json()
-    new_status = data.get('status')
-    diagnosis = data.get('diagnosis', '')
-    
-    if new_status not in ['confirmed', 'waiting', 'completed', 'no_show', 'cancelled']:
-        return jsonify({'error': 'Invalid status'}), 400
-    
-    old_status = appointment.status
-    appointment.status = new_status
-    
-    if new_status == 'completed' and diagnosis:
-        existing_notes = appointment.doctor_notes or ''
-        appointment.doctor_notes = f"DIAGNOSTIC: {diagnosis}\n\n{existing_notes}".strip()
-    
-    if new_status == 'waiting' and appointment.queue_number is None:
-        max_queue = db.session.query(db.func.max(Appointment.queue_number)).filter(
-            Appointment.doctor_id == current_user.doctor_profile.id,
-            Appointment.appointment_date == date.today()
-        ).scalar() or 0
-        appointment.queue_number = max_queue + 1
-    
-    if new_status == 'no_show':
-        appointment.patient.no_show_count = (appointment.patient.no_show_count or 0) + 1
-        if appointment.patient.no_show_count >= 3:
-            appointment.patient.is_blocked = True
-    
-    db.session.commit()
-    
-    return jsonify({
-        'success': True,
-        'appointment_id': appointment.id,
-        'new_status': new_status,
-        'queue_number': appointment.queue_number
-    })
+    try:
+        appointment = Appointment.query.get_or_404(appointment_id)
+        if appointment.doctor_id != current_user.doctor_profile.id:
+            return jsonify({'error': 'Unauthorized'}), 403
+
+        data = request.get_json()
+        new_status = data.get('status')
+        diagnosis = data.get('diagnosis', '')
+
+        if new_status not in ['confirmed', 'waiting', 'completed', 'no_show', 'cancelled']:
+            return jsonify({'error': 'Invalid status'}), 400
+
+        old_status = appointment.status
+        appointment.status = new_status
+
+        if new_status == 'completed' and diagnosis:
+            existing_notes = appointment.doctor_notes or ''
+            appointment.doctor_notes = f"DIAGNOSTIC: {diagnosis}\n\n{existing_notes}".strip()
+
+        if new_status == 'waiting' and appointment.queue_number is None:
+            max_queue = db.session.query(db.func.max(Appointment.queue_number)).filter(
+                Appointment.doctor_id == current_user.doctor_profile.id,
+                Appointment.appointment_date == date.today()
+            ).scalar() or 0
+            appointment.queue_number = max_queue + 1
+
+        if new_status == 'no_show':
+            appointment.patient.no_show_count = (appointment.patient.no_show_count or 0) + 1
+            if appointment.patient.no_show_count >= 3:
+                appointment.patient.is_blocked = True
+
+        db.session.commit()
+        current_app.logger.info(f"Status update for appt {appointment_id}: {old_status} -> {new_status} by doctor {current_user.id}")
+
+        return jsonify({
+            'success': True,
+            'appointment_id': appointment.id,
+            'new_status': new_status,
+            'queue_number': appointment.queue_number
+        })
+    except Exception as e:
+        db.session.rollback()
+        current_app.logger.error(f"Error updating status for appointment {appointment_id}: {str(e)}", exc_info=True)
+        return jsonify({'error': 'Internal Server Error'}), 500
 
 
 @main_bp.route('/api/doctor/appointments/<int:appointment_id>/notes', methods=['POST'])

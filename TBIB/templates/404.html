@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% block title %}Page non trouvée{% endblock %}
+
+{% block content %}
+<div class="flex items-center justify-center min-h-[60vh] text-center">
+    <div>
+        <h1 class="text-6xl font-bold text-[#14b999] mb-4">404</h1>
+        <p class="text-xl text-gray-600 mb-8">Oups ! Cette page n'existe pas.</p>
+        <a href="{{ url_for('main.home') }}" class="bg-[#14b999] text-white px-6 py-3 rounded-lg hover:bg-[#0d9479] transition">
+            Retour à l'accueil
+        </a>
+    </div>
+</div>
+{% endblock %}

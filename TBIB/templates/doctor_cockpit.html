@@ -278,9 +278,14 @@ function updateStatusSimple(newStatus) {
             if (newStatus === 'waiting' || newStatus === 'completed') {
                 refreshWaitingCount();
             }
+        } else {
+            alert('Erreur: ' + (data.error || 'Action échouée'));
         }
     })
-    .catch(error => console.error('Error:', error));
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Une erreur système est survenue. Veuillez consulter les logs ou réessayer.');
+    });
 }
 
 function completeWithDiagnosis() {
@@ -306,9 +311,14 @@ function completeWithDiagnosis() {
                 selectedAppointment.setExtendedProp('doctor_notes', `DIAGNOSTIC: ${diagnosis}\n\n${existingNotes}`.trim());
                 document.getElementById('doctor-notes').value = selectedAppointment.extendedProps.doctor_notes;
             }
+        } else {
+            alert('Erreur: ' + (data.error || 'Action échouée'));
         }
     })
-    .catch(error => console.error('Error:', error));
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Une erreur système est survenue. Veuillez consulter les logs ou réessayer.');
+    });
 }
 
 function updateStatus(newStatus) {
