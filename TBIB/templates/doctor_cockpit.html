@@ -38,11 +38,16 @@
             </a>
         </nav>
         
-        <div class="p-4 border-t border-white/10">
+        <div class="p-4 border-t border-white/10 space-y-3">
             <div class="bg-white/10 rounded-xl p-3 text-center">
                 <p class="text-xs text-white/70 uppercase tracking-wide mb-1">File d'attente</p>
                 <p class="text-3xl font-bold" id="waiting-count">{{ waiting_count }}</p>
             </div>
+
+            <button onclick="callNextPatient()" class="w-full py-3 bg-white text-[#0d9479] font-bold rounded-xl shadow-lg hover:bg-gray-100 transition flex items-center justify-center gap-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
+                <span class="sidebar-text">Patient Suivant</span>
+            </button>
         </div>
         
         <button onclick="toggleSidebar()" class="p-3 border-t border-white/10 hover:bg-white/10 transition flex items-center justify-center">
@@ -341,6 +346,29 @@ function refreshWaitingCount() {
             document.getElementById('waiting-count').textContent = data.waiting_count;
         })
         .catch(error => console.error('Error:', error));
+}
+
+function callNextPatient() {
+    fetch('/api/doctor/next_patient', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            refreshWaitingCount();
+            calendar.refetchEvents();
+
+            // If we have a next patient, show a notification or handle it
+            if (data.next_patient) {
+                // Ideally select the event in calendar or show a toast
+                alert(`Patient appelé : ${data.next_patient.name} (Ticket #${data.next_patient.queue_number})`);
+            } else {
+                alert("Aucun patient en attente.");
+            }
+        }
+    })
+    .catch(error => console.error('Error:', error));
 }
 
 setInterval(refreshWaitingCount, 10000);

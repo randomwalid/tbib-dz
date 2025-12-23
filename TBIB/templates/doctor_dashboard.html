@@ -108,33 +108,40 @@
             </div>
 
             <div class="overflow-x-auto">
-                <table class="w-full text-left border-collapse">
+                <table class="w-full text-left border-collapse" id="appointments-table">
                     <thead>
                         <tr class="bg-gray-50/50 border-b border-gray-100">
-                            <th class="px-6 py-4 font-bold text-gray-400 text-xs uppercase tracking-wider">Heure</th>
+                            <th class="px-6 py-4 font-bold text-gray-400 text-xs uppercase tracking-wider">Heure / N°</th>
                             <th class="px-6 py-4 font-bold text-gray-400 text-xs uppercase tracking-wider">Patient</th>
                             <th class="px-6 py-4 font-bold text-gray-400 text-xs uppercase tracking-wider">Statut</th>
                             <th class="px-6 py-4 font-bold text-gray-400 text-xs uppercase tracking-wider text-right">Actions</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-50">
-                        <!-- Row 1: In Progress -->
-                        <tr class="bg-[#3cc7a7]/5">
+                        {% for appt in appointments %}
+                        <tr class="transition-colors group {{ 'bg-[#3cc7a7]/5' if appt.status == 'in_progress' else 'hover:bg-gray-50' }}">
                             <td class="px-6 py-4 whitespace-nowrap">
-                                <span class="font-mono text-[#3cc7a7] font-bold">09:00</span>
+                                <span class="font-mono {{ 'text-[#3cc7a7] font-bold' if appt.status == 'in_progress' else 'text-gray-500 font-medium' }}">
+                                    {% if appt.appointment_time %}
+                                        {{ appt.appointment_time.strftime('%H:%M') }}
+                                    {% else %}
+                                        #{{ appt.queue_number }}
+                                    {% endif %}
+                                </span>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="flex items-center">
-                                    <div class="h-9 w-9 rounded-full bg-white border-2 border-[#3cc7a7] flex items-center justify-center text-[#3cc7a7] font-bold text-xs mr-3 shadow-sm">
-                                        JD
+                                    <div class="h-9 w-9 rounded-full {{ 'bg-white border-2 border-[#3cc7a7] text-[#3cc7a7]' if appt.status == 'in_progress' else 'bg-gray-100 text-gray-500 group-hover:bg-white group-hover:shadow-sm' }} flex items-center justify-center font-bold text-xs mr-3 transition-all">
+                                        {{ appt.patient.name[:2].upper() }}
                                     </div>
                                     <div>
-                                        <p class="font-bold text-[#333333]">John Doe <span class="font-normal text-gray-400 text-xs">(Anonymisé)</span></p>
-                                        <p class="text-xs text-gray-400">Motif: Consultation Généraliste</p>
+                                        <p class="font-bold text-[#333333]">{{ appt.patient.name }}</p>
+                                        <p class="text-xs text-gray-400">{{ appt.consultation_reason or 'Consultation' }}</p>
                                     </div>
                                 </div>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
+                                {% if appt.status == 'in_progress' %}
                                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-[#3cc7a7]/10 text-[#3cc7a7] border border-[#3cc7a7]/20">
                                     <span class="relative flex h-2 w-2 mr-2">
                                       <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#3cc7a7] opacity-75"></span>
@@ -142,98 +149,33 @@
                                     </span>
                                     En cours
                                 </span>
+                                {% elif appt.status == 'completed' %}
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-blue-50 text-blue-600 border border-blue-100">
+                                    Terminé
+                                </span>
+                                {% elif appt.status == 'waiting' or appt.status == 'confirmed' %}
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-gray-100 text-gray-600 border border-gray-200">
+                                    En attente
+                                </span>
+                                {% else %}
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-red-50 text-red-600 border border-red-200">
+                                    {{ appt.status }}
+                                </span>
+                                {% endif %}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                <button class="text-[#3cc7a7] hover:text-[#2da88d] bg-white border border-[#3cc7a7]/30 hover:border-[#3cc7a7] px-3 py-1.5 rounded-lg transition-all shadow-sm">
+                                {% if appt.status == 'in_progress' %}
+                                <button onclick="updateStatus({{ appt.id }}, 'completed')" class="text-[#3cc7a7] hover:text-[#2da88d] bg-white border border-[#3cc7a7]/30 hover:border-[#3cc7a7] px-3 py-1.5 rounded-lg transition-all shadow-sm">
                                     Terminer
                                 </button>
-                            </td>
-                        </tr>
-
-                        <!-- Row 2: Waiting -->
-                        <tr class="hover:bg-gray-50 transition-colors group">
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <span class="font-mono text-gray-500 font-medium">09:30</span>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="flex items-center">
-                                    <div class="h-9 w-9 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 font-bold text-xs mr-3 group-hover:bg-white group-hover:shadow-sm transition-all">
-                                        AS
-                                    </div>
-                                    <div>
-                                        <p class="font-medium text-gray-700">Alice Smith <span class="font-normal text-gray-400 text-xs">(Anonymisé)</span></p>
-                                        <p class="text-xs text-gray-400">Motif: Renouvellement</p>
-                                    </div>
-                                </div>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-gray-100 text-gray-600 border border-gray-200">
-                                    En attente
-                                </span>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                {% else %}
                                 <button class="text-gray-400 hover:text-gray-600 hover:bg-gray-100 px-3 py-1.5 rounded-lg transition-all">
                                     Détails
                                 </button>
+                                {% endif %}
                             </td>
                         </tr>
-
-                        <!-- Row 3: Waiting -->
-                        <tr class="hover:bg-gray-50 transition-colors group">
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <span class="font-mono text-gray-500 font-medium">10:00</span>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="flex items-center">
-                                    <div class="h-9 w-9 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 font-bold text-xs mr-3 group-hover:bg-white group-hover:shadow-sm transition-all">
-                                        MK
-                                    </div>
-                                    <div>
-                                        <p class="font-medium text-gray-700">Mohamed K. <span class="font-normal text-gray-400 text-xs">(Anonymisé)</span></p>
-                                        <p class="text-xs text-gray-400">Motif: Urgence bénigne</p>
-                                    </div>
-                                </div>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-gray-100 text-gray-600 border border-gray-200">
-                                    En attente
-                                </span>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                <button class="text-gray-400 hover:text-gray-600 hover:bg-gray-100 px-3 py-1.5 rounded-lg transition-all">
-                                    Détails
-                                </button>
-                            </td>
-                        </tr>
-
-                         <!-- Row 4: Waiting -->
-                        <tr class="hover:bg-gray-50 transition-colors group">
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <span class="font-mono text-gray-500 font-medium">10:30</span>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="flex items-center">
-                                    <div class="h-9 w-9 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 font-bold text-xs mr-3 group-hover:bg-white group-hover:shadow-sm transition-all">
-                                        NB
-                                    </div>
-                                    <div>
-                                        <p class="font-medium text-gray-700">Nadia B. <span class="font-normal text-gray-400 text-xs">(Anonymisé)</span></p>
-                                        <p class="text-xs text-gray-400">Motif: Suivi</p>
-                                    </div>
-                                </div>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-gray-100 text-gray-600 border border-gray-200">
-                                    En attente
-                                </span>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                <button class="text-gray-400 hover:text-gray-600 hover:bg-gray-100 px-3 py-1.5 rounded-lg transition-all">
-                                    Détails
-                                </button>
-                            </td>
-                        </tr>
-
+                        {% endfor %}
                     </tbody>
                 </table>
             </div>
@@ -243,4 +185,23 @@
         </div>
     </div>
 </div>
+
+<script>
+function updateStatus(apptId, status) {
+    fetch(`/api/doctor/appointments/${apptId}/status`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: status })
+    }).then(() => window.location.reload());
+}
+
+// Simple polling for real-time updates (every 10 seconds)
+setInterval(() => {
+    // Ideally we would fetch just JSON and update DOM, but for simplicity reloading works to show new state
+    // To avoid disrupting user interaction, we only reload if no modal is open (checking active element)
+    if (document.activeElement === document.body) {
+        window.location.reload();
+    }
+}, 10000);
+</script>
 {% endblock %}

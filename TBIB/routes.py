@@ -535,9 +535,28 @@ def dashboard():
     doctor_profile = current_user.doctor_profile
     wait_time = calculate_wait_time(doctor_profile.id)
 
+    # Fetch appointments for the dashboard list
+    appointments = Appointment.query.filter(
+        Appointment.doctor_id == doctor_profile.id,
+        Appointment.appointment_date == date.today()
+    ).all()
+
+    # Custom sort
+    # We want 'in_progress' first.
+    # Then 'waiting'/'confirmed'.
+    # Then 'completed'/'no_show' at the bottom.
+
+    def status_rank(appt):
+        if appt.status == 'in_progress': return 0
+        if appt.status in ['waiting', 'confirmed']: return 1
+        return 2
+
+    appointments.sort(key=lambda x: (status_rank(x), x.queue_number or 9999, x.appointment_time or time(23, 59)))
+
     return render_template('doctor_dashboard.html',
                            doctor=doctor_profile,
                            wait_time=wait_time,
+                           appointments=appointments,
                            t=get_t(),
                            lang=session.get('lang', 'fr'))
 
@@ -559,26 +578,60 @@ def patient_ticket(patient_id):
                            t=get_t(),
                            lang=session.get('lang', 'fr'))
 
-@main_bp.route('/doctor/next-patient', methods=['POST'])
+@main_bp.route('/api/doctor/next_patient', methods=['POST'])
 @login_required
-def next_patient():
+def next_patient_api():
     if current_user.role != 'doctor':
-        return redirect(url_for('main.home'))
+        return jsonify({'error': 'Unauthorized'}), 403
     
     doctor_profile = current_user.doctor_profile
-    doctor_profile.waiting_room_count += 1
+    today = date.today()
     
-    current_appointment = Appointment.query.filter_by(
+    # 1. Mark current IN_PROGRESS as COMPLETED
+    current_in_progress = Appointment.query.filter_by(
         doctor_id=doctor_profile.id,
-        appointment_date=date.today(),
-        queue_number=doctor_profile.waiting_room_count
+        appointment_date=today,
+        status='in_progress'
+    ).first()
+
+    if current_in_progress:
+        current_in_progress.status = 'completed'
+
+    # 2. Find next WAITING or CONFIRMED appointment
+    # Priority: Queue Number (if exists), then Time
+    next_appt = Appointment.query.filter(
+        Appointment.doctor_id == doctor_profile.id,
+        Appointment.appointment_date == today,
+        Appointment.status.in_(['waiting', 'confirmed'])
+    ).order_by(
+        Appointment.queue_number.asc().nulls_last(),
+        Appointment.appointment_time.asc()
     ).first()
     
-    if current_appointment and current_appointment.status in ['confirmed', 'waiting']:
-        current_appointment.status = 'completed'
+    if next_appt:
+        next_appt.status = 'in_progress'
+
+        # Ensure it has a queue number if it didn't have one
+        if next_appt.queue_number is None:
+             max_queue = db.session.query(db.func.max(Appointment.queue_number)).filter(
+                Appointment.doctor_id == doctor_profile.id,
+                Appointment.appointment_date == today
+            ).scalar() or 0
+             next_appt.queue_number = max_queue + 1
+
+        doctor_profile.waiting_room_count = next_appt.queue_number
     
     db.session.commit()
-    return redirect(url_for('main.doctor_dashboard'))
+
+    return jsonify({
+        'success': True,
+        'completed_id': current_in_progress.id if current_in_progress else None,
+        'next_patient': {
+            'id': next_appt.id,
+            'name': next_appt.patient.name,
+            'queue_number': next_appt.queue_number
+        } if next_appt else None
+    })
 
 @main_bp.route('/doctor/no-show/<int:appointment_id>', methods=['POST'])
 @login_required
@@ -846,7 +899,7 @@ def update_appointment_status(appointment_id):
     new_status = data.get('status')
     diagnosis = data.get('diagnosis', '')
     
-    if new_status not in ['confirmed', 'waiting', 'completed', 'no_show', 'cancelled']:
+    if new_status not in ['confirmed', 'waiting', 'in_progress', 'completed', 'no_show', 'cancelled']:
         return jsonify({'error': 'Invalid status'}), 400
     
     old_status = appointment.status
