@@ -1,10 +1,11 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="{{ lang }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Votre Ticket Patient</title>
+    <title>{{ t.your_turn_message }} - TBIB</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
@@ -15,7 +16,7 @@
                     colors: {
                         mint: {
                             DEFAULT: '#3cc7a7',
-                            hover: '#34b396' // A slightly darker shade for hover states
+                            hover: '#34b396'
                         },
                         text: {
                             main: '#333333'
@@ -25,13 +26,18 @@
                         sans: ['Inter', 'Cairo', 'sans-serif'],
                     },
                     animation: {
-                        'spin-slow': 'spin 3s linear infinite',
-                        'pulse-ring': 'pulse-ring 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'fade-in': 'fadeIn 0.8s ease-out forwards',
+                        'slide-up': 'slideUp 0.8s ease-out forwards',
+                        'pulse-slow': 'pulse 3s infinite',
                     },
                     keyframes: {
-                        'pulse-ring': {
-                            '0%, 100%': { opacity: 1 },
-                            '50%': { opacity: .7 },
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' },
+                        },
+                        slideUp: {
+                            '0%': { opacity: '0', transform: 'translateY(20px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
                         }
                     }
                 }
@@ -40,72 +46,95 @@
     </script>
     <style>
         body { font-family: 'Inter', sans-serif; }
-        /* Smooth circle progress animation logic if needed later, using spin for now as 'animated' */
-        .progress-ring-circle {
-            transition: stroke-dashoffset 0.35s;
+
+        /* Circle Animation */
+        .progress-ring__circle {
+            transition: stroke-dashoffset 1.5s ease-in-out;
             transform: rotate(-90deg);
             transform-origin: 50% 50%;
         }
+
+        .breathing-ring {
+            animation: breathe 3s ease-in-out infinite;
+        }
+
+        @keyframes breathe {
+            0%, 100% { stroke-opacity: 1; stroke-width: 12; }
+            50% { stroke-opacity: 0.8; stroke-width: 14; }
+        }
     </style>
 </head>
-<body class="bg-gray-50 text-[#333333] min-h-screen flex flex-col justify-between overflow-hidden relative">
+<body class="bg-[#F8F9FA] text-[#333333] min-h-screen flex flex-col items-center justify-center relative overflow-hidden"
+      x-data="{ mounted: false, progress: 0 }"
+      x-init="setTimeout(() => { mounted = true; progress = 250; }, 300)">
 
-    <!-- Top Spacer / Optional Header placeholder -->
-    <div class="h-12 w-full"></div>
+    <!-- Background Elements (optional subtle decoration) -->
+    <div class="absolute top-0 left-0 w-full h-full overflow-hidden -z-10">
+        <div class="absolute -top-40 -right-40 w-80 h-80 bg-mint/5 rounded-full blur-3xl"></div>
+        <div class="absolute -bottom-40 -left-40 w-80 h-80 bg-blue-50 rounded-full blur-3xl"></div>
+    </div>
 
-    <!-- Central Content -->
-    <div class="flex-grow flex flex-col items-center justify-center px-6 -mt-20">
+    <!-- Main Content Container -->
+    <div class="flex flex-col items-center justify-center w-full max-w-md px-6 space-y-10"
+         :class="mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'"
+         class="transition-all duration-700 ease-out transform">
 
-        <!-- Progress Ring Container -->
-        <div class="relative w-72 h-72 flex items-center justify-center mb-8">
-            <!-- Background Ring -->
-            <svg class="w-full h-full absolute top-0 left-0 transform -rotate-90">
+        <!-- Circular Progress Indicator -->
+        <div class="relative w-64 h-64 flex items-center justify-center">
+            <!-- SVG Ring -->
+            <svg class="w-full h-full">
+                <!-- Track -->
                 <circle
-                    cx="144"
-                    cy="144"
-                    r="130"
+                    cx="128"
+                    cy="128"
+                    r="120"
                     fill="none"
                     stroke="#e5e7eb"
                     stroke-width="12"
+                    class="opacity-50"
                 />
-            </svg>
-
-            <!-- Active Progress Ring (Animated) -->
-            <!-- Using stroke-dasharray to simulate a partial ring or loading state -->
-            <svg class="w-full h-full absolute top-0 left-0 animate-spin-slow">
+                <!-- Progress Arc -->
+                <!-- Circumference = 2 * PI * 120 ≈ 754 -->
                 <circle
-                    cx="144"
-                    cy="144"
-                    r="130"
+                    class="progress-ring__circle breathing-ring text-mint"
+                    cx="128"
+                    cy="128"
+                    r="120"
                     fill="none"
-                    stroke="#3cc7a7"
+                    stroke="currentColor"
                     stroke-width="12"
-                    stroke-dasharray="200 816"
                     stroke-linecap="round"
+                    stroke-dasharray="754"
+                    :stroke-dashoffset="754 - progress"
                 />
             </svg>
 
             <!-- Center Text -->
-            <div class="absolute inset-0 flex flex-col items-center justify-center z-10 p-4 text-center">
-                <span class="text-xl font-bold text-[#333333] leading-tight">
-                    Votre tour<br>arrive
-                </span>
+            <div class="absolute inset-0 flex flex-col items-center justify-center text-center animate-fade-in" style="animation-delay: 0.5s;">
+                <h2 class="text-xl font-bold text-gray-800 leading-tight" style="white-space: pre-line;">
+                    {{ t.your_turn_message }}
+                </h2>
             </div>
         </div>
 
-        <!-- Information Key -->
-        <div class="text-center space-y-2 animate-pulse">
-            <p class="text-lg font-medium text-gray-500">Temps d'attente estimé</p>
-            <p class="text-4xl font-bold text-[#3cc7a7]">25 min</p>
+        <!-- Time Estimate -->
+        <div class="text-center space-y-1 animate-slide-up" style="animation-delay: 0.7s; opacity: 0; animation-fill-mode: forwards;">
+            <p class="text-gray-500 text-lg">{{ t.estimated_wait_time }}</p>
+            <p class="text-5xl font-bold text-mint tracking-tight animate-pulse-slow">
+                {{ wait_time }}
+            </p>
         </div>
 
     </div>
 
-    <!-- Action Button (Bottom) -->
-    <div class="w-full p-6 bg-white/50 backdrop-blur-sm border-t border-gray-100 pb-8">
-        <button class="w-full bg-[#3cc7a7] hover:bg-[#34b396] text-white font-bold text-lg py-5 rounded-2xl shadow-lg shadow-mint/30 transform transition active:scale-95 focus:outline-none focus:ring-4 focus:ring-mint/20">
-            Je confirme ma présence
-        </button>
+    <!-- Bottom Action Button -->
+    <div class="fixed bottom-0 left-0 w-full p-6 bg-white border-t border-gray-100 shadow-[0_-4px_20px_rgba(0,0,0,0.05)] animate-slide-up"
+         style="animation-delay: 1s; opacity: 0; animation-fill-mode: forwards; z-index: 50;">
+        <div class="max-w-md mx-auto">
+            <button class="w-full bg-[#3cc7a7] hover:bg-[#34b396] text-white font-bold text-lg py-4 rounded-xl shadow-lg shadow-mint/30 transform transition-all duration-200 active:scale-95 focus:outline-none focus:ring-4 focus:ring-mint/20">
+                {{ t.confirm_presence }}
+            </button>
+        </div>
     </div>
 
 </body>
