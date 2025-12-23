@@ -278,6 +278,9 @@ function updateStatusSimple(newStatus) {
             if (newStatus === 'waiting' || newStatus === 'completed') {
                 refreshWaitingCount();
             }
+            if (data.message) {
+                showFlashMessage(data.message, 'success');
+            }
         }
     })
     .catch(error => console.error('Error:', error));
@@ -306,6 +309,9 @@ function completeWithDiagnosis() {
                 selectedAppointment.setExtendedProp('doctor_notes', `DIAGNOSTIC: ${diagnosis}\n\n${existingNotes}`.trim());
                 document.getElementById('doctor-notes').value = selectedAppointment.extendedProps.doctor_notes;
             }
+            if (data.message) {
+                showFlashMessage(data.message, 'success');
+            }
         }
     })
     .catch(error => console.error('Error:', error));
@@ -329,6 +335,9 @@ function saveNotes() {
     .then(data => {
         if (data.success) {
             selectedAppointment.setExtendedProp('doctor_notes', notes);
+            if (data.message) {
+                showFlashMessage(data.message, 'success');
+            }
         }
     })
     .catch(error => console.error('Error:', error));

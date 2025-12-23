@@ -578,6 +578,7 @@ def next_patient():
         current_appointment.status = 'completed'
     
     db.session.commit()
+    flash('Patient suivant appelé', 'success')
     return redirect(url_for('main.doctor_dashboard'))
 
 @main_bp.route('/doctor/no-show/<int:appointment_id>', methods=['POST'])
@@ -590,6 +591,7 @@ def mark_no_show(appointment_id):
     if appointment.doctor_id == current_user.doctor_profile.id:
         appointment.status = 'no_show'
         db.session.commit()
+        flash('Rendez-vous marqué comme Absent', 'warning')
     
     return redirect(url_for('main.doctor_dashboard'))
 
@@ -603,6 +605,7 @@ def cancel_appointment(appointment_id):
     if appointment.patient_id == current_user.id:
         appointment.status = 'cancelled'
         db.session.commit()
+        flash('Rendez-vous annulé', 'success')
     
     return redirect(url_for('main.my_appointments'))
 
@@ -625,7 +628,7 @@ def shift_appointments_api():
 
     shift_appointments(current_user.doctor_profile.id, urgency_duration)
 
-    return jsonify({'success': True})
+    return jsonify({'success': True, 'message': f'Agenda décalé de {urgency_duration} minutes.'})
 
 @main_bp.route('/api/queue_status/<int:doctor_id>')
 def get_queue_status(doctor_id):
@@ -677,7 +680,8 @@ def check_in_patient(appointment_id):
     return jsonify({
         'success': True,
         'queue_number': appointment.queue_number,
-        'patient_name': appointment.patient.name
+        'patient_name': appointment.patient.name,
+        'message': f'Patient {appointment.patient.name} enregistré (Ticket #{appointment.queue_number})'
     })
 
 @main_bp.route('/api/doctors/<int:doctor_id>/slots')
@@ -870,11 +874,20 @@ def update_appointment_status(appointment_id):
     
     db.session.commit()
     
+    status_msg_map = {
+        'waiting': 'Statut mis à jour : En cours',
+        'completed': 'Consultation terminée',
+        'no_show': 'Rendez-vous marqué comme Absent',
+        'cancelled': 'Rendez-vous annulé',
+        'confirmed': 'Rendez-vous confirmé'
+    }
+
     return jsonify({
         'success': True,
         'appointment_id': appointment.id,
         'new_status': new_status,
-        'queue_number': appointment.queue_number
+        'queue_number': appointment.queue_number,
+        'message': status_msg_map.get(new_status, 'Statut mis à jour')
     })
 
 
@@ -892,7 +905,7 @@ def update_appointment_notes(appointment_id):
     appointment.doctor_notes = data.get('notes', '')
     db.session.commit()
     
-    return jsonify({'success': True})
+    return jsonify({'success': True, 'message': 'Notes enregistrées'})
 
 
 @main_bp.route('/doctor/patients')

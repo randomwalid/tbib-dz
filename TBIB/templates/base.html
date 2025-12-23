@@ -95,21 +95,45 @@
     </nav>
     
     <main class="flex-grow">
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                <div class="max-w-6xl mx-auto px-4 mt-4">
+        <div id="flash-messages" class="max-w-6xl mx-auto px-4 mt-4">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
                     {% for category, message in messages %}
                         <div class="p-3 rounded-lg mb-2 text-sm {% if category == 'error' %}bg-red-50 text-red-600{% elif category == 'success' %}bg-[#14b999]/10 text-[#14b999]{% else %}bg-yellow-50 text-yellow-600{% endif %}">
                             {{ message }}
                         </div>
                     {% endfor %}
-                </div>
-            {% endif %}
-        {% endwith %}
+                {% endif %}
+            {% endwith %}
+        </div>
         
         {% block content %}{% endblock %}
     </main>
     
+    <script>
+        window.showFlashMessage = function(message, category) {
+            const container = document.getElementById('flash-messages');
+            if (!container) return;
+
+            const div = document.createElement('div');
+            let classes = 'p-3 rounded-lg mb-2 text-sm transition-opacity duration-500 ';
+            if (category === 'error') classes += 'bg-red-50 text-red-600';
+            else if (category === 'success') classes += 'bg-[#14b999]/10 text-[#14b999]';
+            else classes += 'bg-yellow-50 text-yellow-600';
+
+            div.className = classes;
+            div.textContent = message;
+
+            container.appendChild(div);
+
+            // Auto remove
+            setTimeout(() => {
+                div.style.opacity = '0';
+                setTimeout(() => div.remove(), 500);
+            }, 5000);
+        }
+    </script>
+
     {% block scripts %}{% endblock %}
 </body>
 </html>
