@@ -386,7 +386,7 @@ function settingsApp() {
             });
         },
         
-        addAbsence() {
+        addAbsence(force = false) {
             if (!this.newAbsence.start_date || !this.newAbsence.end_date) {
                 alert('Veuillez sélectionner les dates');
                 return;
@@ -394,7 +394,8 @@ function settingsApp() {
             const data = {
                 start_date: this.newAbsence.start_date + 'T00:00:00',
                 end_date: this.newAbsence.end_date + 'T23:59:59',
-                reason: this.newAbsence.reason
+                reason: this.newAbsence.reason,
+                force: force
             };
             
             fetch('/doctor/settings/absence', {
@@ -402,9 +403,18 @@ function settingsApp() {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(data)
             })
-            .then(response => response.json())
+            .then(async response => {
+                if (response.status === 409) {
+                    const errorData = await response.json();
+                    if (confirm(`Attention: Cette absence entrera en conflit avec ${errorData.conflict_count} rendez-vous existant(s).\n\nVoulez-vous annuler ces rendez-vous et créer l'absence quand même ?`)) {
+                        this.addAbsence(true);
+                    }
+                    return null;
+                }
+                return response.json();
+            })
             .then(data => {
-                if (data.success) {
+                if (data && data.success) {
                     location.reload();
                 }
             });
