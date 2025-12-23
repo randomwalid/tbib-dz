@@ -63,6 +63,9 @@ TRANSLATIONS = {
         'allergies': 'Allergies & Contre-indications',
         'vaccines': 'Vaccins',
         'dob': 'Date de naissance',
+        'your_turn_message': 'Votre tour arrive',
+        'estimated_wait_time': "Temps d'attente estimé",
+        'confirm_presence': 'Je confirme ma présence',
     },
     'ar': {
         'brand': 'طبيب',
@@ -119,6 +122,9 @@ TRANSLATIONS = {
         'allergies': 'الحساسية',
         'vaccines': 'اللقاحات',
         'dob': 'تاريخ الميلاد',
+        'your_turn_message': 'دورك يقترب',
+        'estimated_wait_time': 'وقت الانتظار المقدر',
+        'confirm_presence': 'أؤكد حضوري',
     }
 }
 
