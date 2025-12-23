@@ -2,8 +2,8 @@
 {% block title %}{{ t.dashboard }} - Cockpit{% endblock %}
 
 {% block content %}
-<div class="h-[calc(100vh-56px)] flex overflow-hidden">
-    <aside id="sidebar" class="w-64 bg-gradient-to-b from-[#0d9479] to-[#134d43] text-white flex flex-col transition-all duration-300 flex-shrink-0">
+<div class="h-[calc(100vh-56px)] flex flex-col md:flex-row overflow-hidden relative">
+    <aside id="sidebar" class="w-64 bg-gradient-to-b from-[#0d9479] to-[#134d43] text-white hidden md:flex flex-col transition-all duration-300 flex-shrink-0">
         <div class="p-4 border-b border-white/10">
             <div class="flex items-center gap-3">
                 <div class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center font-bold">
@@ -52,15 +52,47 @@
         </button>
     </aside>
     
-    <main class="flex-1 bg-gray-50 overflow-hidden flex min-w-0">
+    <main class="flex-1 bg-gray-50 overflow-hidden flex min-w-0 mb-16 md:mb-0">
         <div class="flex-1 flex flex-col p-4 overflow-hidden min-w-0">
             <div class="bg-white rounded-xl shadow-sm border border-gray-100 flex-1 overflow-hidden">
                 <div id="calendar" class="h-full w-full"></div>
             </div>
         </div>
+
+        <!-- Mobile Bottom Nav -->
+        <nav class="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-40 flex justify-around items-center h-16 pb-safe">
+            <a href="{{ url_for('main.doctor_dashboard') }}" class="flex flex-col items-center justify-center w-full h-full text-[#0d9479]">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                </svg>
+                <span class="text-[10px] mt-1 font-medium">Agenda</span>
+            </a>
+            <a href="{{ url_for('main.doctor_patients') }}" class="flex flex-col items-center justify-center w-full h-full text-gray-500 hover:text-[#0d9479] transition">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+                </svg>
+                <span class="text-[10px] mt-1 font-medium">Patients</span>
+            </a>
+            <div class="relative flex flex-col items-center justify-center w-full h-full text-gray-500">
+                 <div class="absolute -top-3 bg-[#14b999] text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full border-2 border-white">
+                    {{ waiting_count }}
+                </div>
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                <span class="text-[10px] mt-1 font-medium">File</span>
+            </div>
+            <a href="{{ url_for('main.doctor_settings') }}" class="flex flex-col items-center justify-center w-full h-full text-gray-500 hover:text-[#0d9479] transition">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                </svg>
+                <span class="text-[10px] mt-1 font-medium">Config</span>
+            </a>
+        </nav>
         
-        <aside id="right-panel" class="w-96 flex-shrink-0 bg-white border-l border-gray-100 flex flex-col overflow-hidden transition-all duration-300">
-            <div id="panel-empty" class="flex-1 flex items-center justify-center text-gray-400">
+        <aside id="right-panel" class="hidden md:flex w-full md:w-96 fixed md:static inset-0 z-50 bg-white md:border-l border-gray-100 flex-col overflow-hidden transition-all duration-300">
+            <div id="panel-empty" class="flex-1 flex items-center justify-center text-gray-400 hidden md:flex">
                 <div class="text-center">
                     <svg class="w-16 h-16 mx-auto mb-3 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
@@ -69,8 +101,16 @@
                 </div>
             </div>
             
-            <div id="panel-content" class="flex-1 flex flex-col overflow-hidden hidden">
+            <div id="panel-content" class="flex-1 flex flex-col overflow-hidden hidden w-full h-full">
                 <div class="p-4 border-b border-gray-100">
+                    <div class="flex items-center justify-between mb-2 md:hidden">
+                        <h3 class="font-bold text-lg">Détails du rendez-vous</h3>
+                        <button onclick="closePanel()" class="p-2 -mr-2 text-gray-500 hover:text-gray-700">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                            </svg>
+                        </button>
+                    </div>
                     <div class="flex items-center gap-3">
                         <div id="patient-avatar" class="w-12 h-12 bg-[#14b999]/10 rounded-full flex items-center justify-center text-[#14b999] font-bold text-lg">
                             ?
@@ -173,14 +213,15 @@ let selectedAppointment = null;
 
 document.addEventListener('DOMContentLoaded', function() {
     const calendarEl = document.getElementById('calendar');
+    const isMobile = window.innerWidth < 768;
     
     calendar = new FullCalendar.Calendar(calendarEl, {
-        initialView: 'timeGridWeek',
+        initialView: isMobile ? 'timeGridDay' : 'timeGridWeek',
         locale: 'fr',
         headerToolbar: {
-            left: 'prev,next today',
+            left: isMobile ? 'prev,next' : 'prev,next today',
             center: 'title',
-            right: 'timeGridWeek,timeGridDay'
+            right: isMobile ? 'timeGridDay' : 'timeGridWeek,timeGridDay'
         },
         slotDuration: '00:15:00',
         slotMinTime: '08:00:00',
@@ -188,6 +229,8 @@ document.addEventListener('DOMContentLoaded', function() {
         allDaySlot: false,
         weekends: true,
         nowIndicator: true,
+        height: '100%',
+        expandRows: true,
         eventClick: function(info) {
             selectAppointment(info.event);
         },
@@ -215,12 +258,38 @@ function toggleSidebar() {
     document.body.classList.toggle('sidebar-collapsed');
 }
 
+function closePanel() {
+    const rightPanel = document.getElementById('right-panel');
+    const panelContent = document.getElementById('panel-content');
+    const panelEmpty = document.getElementById('panel-empty');
+
+    // On mobile, hide the entire panel
+    if (window.innerWidth < 768) {
+        rightPanel.classList.add('hidden');
+        rightPanel.classList.remove('flex');
+    }
+
+    // Reset content visibility for when it's shown again or resized
+    panelContent.classList.add('hidden');
+    panelEmpty.classList.remove('hidden');
+    panelEmpty.classList.add('flex'); // Ensure flex is restored
+
+    selectedAppointment = null;
+}
+
 function selectAppointment(event) {
     selectedAppointment = event;
-    
     const props = event.extendedProps;
+    const rightPanel = document.getElementById('right-panel');
+
+    // Show panel on mobile
+    if (window.innerWidth < 768) {
+        rightPanel.classList.remove('hidden');
+        rightPanel.classList.add('flex');
+    }
     
     document.getElementById('panel-empty').classList.add('hidden');
+    document.getElementById('panel-empty').classList.remove('flex'); // Remove flex to properly hide
     document.getElementById('panel-content').classList.remove('hidden');
     
     document.getElementById('patient-avatar').textContent = props.patient_name.charAt(0);
