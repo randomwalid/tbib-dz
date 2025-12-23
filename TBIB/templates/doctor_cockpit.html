@@ -125,7 +125,13 @@
                     </div>
                     
                     <div>
-                        <p class="text-xs text-gray-400 uppercase tracking-wide mb-2">Notes (privées)</p>
+                        <div class="flex justify-between items-center mb-2">
+                            <p class="text-xs text-gray-400 uppercase tracking-wide">Notes (privées)</p>
+                            <button onclick="openConsultationModal()" class="text-xs flex items-center gap-1 text-[#14b999] hover:bg-[#14b999]/10 px-2 py-1 rounded transition">
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path></svg>
+                                Mode Focus
+                            </button>
+                        </div>
                         <textarea id="doctor-notes" 
                                   rows="4" 
                                   class="w-full border border-gray-200 rounded-lg p-3 text-sm resize-none focus:ring-2 focus:ring-[#14b999]/20 focus:border-[#14b999] transition"
@@ -138,6 +144,69 @@
             </div>
         </aside>
     </main>
+</div>
+
+<!-- Consultation Modal -->
+<div id="consultation-modal" class="fixed inset-0 bg-gray-900/50 z-50 hidden flex items-center justify-center backdrop-blur-sm transition-opacity opacity-0">
+    <div class="bg-white w-full max-w-4xl h-[90vh] rounded-xl shadow-2xl flex flex-col transform transition-transform scale-95 duration-200" id="consultation-modal-content">
+        <!-- Modal Header -->
+        <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gradient-to-r from-[#0d9479] to-[#14b999] text-white rounded-t-xl">
+            <div>
+                <h2 class="text-xl font-bold flex items-center gap-2">
+                    <span id="modal-patient-name">Patient Name</span>
+                    <span class="text-sm font-normal opacity-80 bg-white/20 px-2 py-0.5 rounded-full" id="modal-patient-age">-- ans</span>
+                </h2>
+                <p class="text-xs opacity-80 mt-1" id="modal-consultation-info">Consultation</p>
+            </div>
+            <div class="flex items-center gap-3">
+                <span id="save-indicator" class="text-xs font-medium bg-white/20 px-2 py-1 rounded transition-opacity opacity-0">Enregistré</span>
+                <button onclick="closeConsultationModal()" class="p-2 hover:bg-white/10 rounded-full transition">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Modal Body -->
+        <div class="flex-1 flex overflow-hidden">
+             <!-- Left: Notes -->
+             <div class="flex-1 flex flex-col p-6 overflow-hidden">
+                <div class="mb-4 flex gap-2 overflow-x-auto pb-2 scrollbar-thin">
+                    <button onclick="insertText('Symptômes: ')" class="px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm rounded-lg transition whitespace-nowrap">Symptômes</button>
+                    <button onclick="insertText('Examen Clinique: ')" class="px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm rounded-lg transition whitespace-nowrap">Examen</button>
+                    <button onclick="insertText('Diagnostic: ')" class="px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm rounded-lg transition whitespace-nowrap">Diagnostic</button>
+                    <button onclick="insertText('Ordonnance:\n- ')" class="px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm rounded-lg transition whitespace-nowrap">Ordonnance</button>
+                    <button onclick="insertText('R.A.S')" class="px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm rounded-lg transition whitespace-nowrap">R.A.S</button>
+                </div>
+                <textarea id="modal-doctor-notes"
+                          class="flex-1 w-full border border-gray-200 rounded-xl p-6 text-base leading-relaxed resize-none focus:ring-2 focus:ring-[#14b999]/20 focus:border-[#14b999] outline-none shadow-inner bg-gray-50/50"
+                          placeholder="Rédigez vos notes de consultation ici..."></textarea>
+                <div class="mt-2 text-xs text-gray-400 flex justify-between">
+                     <span>Markdown supporté</span>
+                     <span id="word-count">0 mots</span>
+                </div>
+             </div>
+
+             <!-- Right: History/Context -->
+             <div class="w-80 bg-gray-50 border-l border-gray-100 p-6 overflow-y-auto hidden lg:block">
+                 <h3 class="font-semibold text-gray-800 mb-4">Derniers Rendez-vous</h3>
+                 <div id="modal-history-list" class="space-y-4">
+                     <!-- Populated by JS -->
+                     <div class="text-sm text-gray-400 italic">Chargement...</div>
+                 </div>
+             </div>
+        </div>
+
+        <!-- Modal Footer -->
+        <div class="px-6 py-4 border-t border-gray-100 bg-gray-50 rounded-b-xl flex justify-between items-center">
+            <button onclick="openFullscreen()" class="text-gray-500 hover:text-[#14b999] transition" title="Plein écran">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path></svg>
+            </button>
+            <div class="flex gap-3">
+                <button onclick="closeConsultationModal()" class="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg transition">Fermer</button>
+                <button onclick="closeConsultationModal()" class="px-6 py-2 bg-[#14b999] hover:bg-[#0d9479] text-white rounded-lg shadow-sm transition font-medium">Enregistrer & Fermer</button>
+            </div>
+        </div>
+    </div>
 </div>
 {% endblock %}
 
@@ -170,6 +239,7 @@
 <script>
 let calendar;
 let selectedAppointment = null;
+let saveTimeout = null;
 
 document.addEventListener('DOMContentLoaded', function() {
     const calendarEl = document.getElementById('calendar');
@@ -316,11 +386,11 @@ function updateStatus(newStatus) {
 }
 
 function saveNotes() {
-    if (!selectedAppointment) return;
+    if (!selectedAppointment) return Promise.resolve();
     
     const notes = document.getElementById('doctor-notes').value;
     
-    fetch(`/api/doctor/appointments/${selectedAppointment.id}/notes`, {
+    return fetch(`/api/doctor/appointments/${selectedAppointment.id}/notes`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ notes: notes })
@@ -344,5 +414,134 @@ function refreshWaitingCount() {
 }
 
 setInterval(refreshWaitingCount, 10000);
+
+// Modal Functions
+const modal = document.getElementById('consultation-modal');
+const modalContent = document.getElementById('consultation-modal-content');
+const modalNotes = document.getElementById('modal-doctor-notes');
+
+function openConsultationModal() {
+    if (!selectedAppointment) return;
+
+    // Sync content
+    modalNotes.value = document.getElementById('doctor-notes').value;
+    document.getElementById('modal-patient-name').textContent = selectedAppointment.extendedProps.patient_name;
+    document.getElementById('modal-patient-age').textContent = '-- ans'; // Default
+
+    document.getElementById('modal-consultation-info').textContent =
+        `${selectedAppointment.extendedProps.consultation_type} • ${selectedAppointment.extendedProps.consultation_reason}`;
+
+    // Show Modal
+    modal.classList.remove('hidden');
+    // Trigger reflow
+    void modal.offsetWidth;
+    modal.classList.remove('opacity-0');
+    modalContent.classList.remove('scale-95');
+
+    modalNotes.focus();
+    updateWordCount();
+
+    // Load History
+    loadPatientHistory(selectedAppointment.extendedProps.patient_id);
+}
+
+function closeConsultationModal() {
+    modal.classList.add('opacity-0');
+    modalContent.classList.add('scale-95');
+
+    setTimeout(() => {
+        modal.classList.add('hidden');
+    }, 200);
+
+    // Sync back
+    document.getElementById('doctor-notes').value = modalNotes.value;
+    saveNotes(); // Final save
+}
+
+function insertText(text) {
+    const start = modalNotes.selectionStart;
+    const end = modalNotes.selectionEnd;
+    const value = modalNotes.value;
+
+    modalNotes.value = value.substring(0, start) + text + value.substring(end);
+    modalNotes.selectionStart = modalNotes.selectionEnd = start + text.length;
+    modalNotes.focus();
+
+    triggerAutoSave();
+}
+
+function triggerAutoSave() {
+    // Sync to sidebar
+    document.getElementById('doctor-notes').value = modalNotes.value;
+
+    const indicator = document.getElementById('save-indicator');
+    indicator.textContent = "Enregistrement...";
+    indicator.classList.remove('opacity-0');
+
+    clearTimeout(saveTimeout);
+    saveTimeout = setTimeout(() => {
+        saveNotes().then(() => {
+            indicator.textContent = "Enregistré";
+            setTimeout(() => {
+                indicator.classList.add('opacity-0');
+            }, 2000);
+        });
+    }, 1000);
+
+    updateWordCount();
+}
+
+function updateWordCount() {
+    const text = modalNotes.value.trim();
+    const count = text ? text.split(/\s+/).length : 0;
+    document.getElementById('word-count').textContent = `${count} mot${count > 1 ? 's' : ''}`;
+}
+
+function loadPatientHistory(patientId) {
+    const container = document.getElementById('modal-history-list');
+    container.innerHTML = '<div class="text-sm text-gray-400 italic">Chargement...</div>';
+
+    fetch(`/api/doctor/patient/${patientId}/history`)
+        .then(r => r.json())
+        .then(data => {
+            if(data.patient.age) {
+                document.getElementById('modal-patient-age').textContent = `${data.patient.age} ans`;
+            }
+
+            if(data.history.length === 0) {
+                container.innerHTML = '<div class="text-sm text-gray-400">Aucun historique</div>';
+                return;
+            }
+
+            container.innerHTML = data.history.map(h => `
+                <div class="bg-white border border-gray-100 rounded-lg p-3 text-sm">
+                    <div class="flex justify-between items-center mb-1">
+                        <span class="font-medium text-gray-700">${h.date}</span>
+                        <span class="text-xs px-2 py-0.5 rounded-full ${h.status === 'completed' ? 'bg-blue-50 text-blue-600' : 'bg-gray-100 text-gray-500'}">${h.status}</span>
+                    </div>
+                    <p class="text-gray-600 line-clamp-2">${h.notes || 'Pas de notes'}</p>
+                </div>
+            `).join('');
+        })
+        .catch(e => {
+            container.innerHTML = '<div class="text-sm text-red-400">Erreur chargement historique</div>';
+        });
+}
+
+function openFullscreen() {
+    if (modalContent.requestFullscreen) {
+        modalContent.requestFullscreen();
+    }
+}
+
+// Event Listeners
+modalNotes.addEventListener('input', triggerAutoSave);
+
+// Close on escape
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
+        closeConsultationModal();
+    }
+});
 </script>
 {% endblock %}
