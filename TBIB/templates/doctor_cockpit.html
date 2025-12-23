@@ -1,0 +1,348 @@
+{% extends 'base.html' %}
+{% block title %}{{ t.dashboard }} - Cockpit{% endblock %}
+
+{% block content %}
+<div class="h-[calc(100vh-56px)] flex overflow-hidden">
+    <aside id="sidebar" class="w-64 bg-gradient-to-b from-[#0d9479] to-[#134d43] text-white flex flex-col transition-all duration-300 flex-shrink-0">
+        <div class="p-4 border-b border-white/10">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center font-bold">
+                    {{ current_user.name[0] }}
+                </div>
+                <div class="sidebar-text">
+                    <p class="font-semibold text-sm">Dr. {{ current_user.name }}</p>
+                    <p class="text-xs text-white/70">{{ doctor_profile.specialty }}</p>
+                </div>
+            </div>
+        </div>
+        
+        <nav class="flex-1 py-4">
+            <a href="{{ url_for('main.doctor_dashboard') }}" class="flex items-center gap-3 px-4 py-3 text-white/90 hover:bg-white/10 transition">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                </svg>
+                <span class="sidebar-text">Agenda</span>
+            </a>
+            <a href="{{ url_for('main.doctor_patients') }}" class="flex items-center gap-3 px-4 py-3 text-white/90 hover:bg-white/10 transition">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+                </svg>
+                <span class="sidebar-text">Patients</span>
+            </a>
+            <a href="{{ url_for('main.doctor_settings') }}" class="flex items-center gap-3 px-4 py-3 text-white/90 hover:bg-white/10 transition">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                </svg>
+                <span class="sidebar-text">Configuration</span>
+            </a>
+        </nav>
+        
+        <div class="p-4 border-t border-white/10">
+            <div class="bg-white/10 rounded-xl p-3 text-center">
+                <p class="text-xs text-white/70 uppercase tracking-wide mb-1">File d'attente</p>
+                <p class="text-3xl font-bold" id="waiting-count">{{ waiting_count }}</p>
+            </div>
+        </div>
+        
+        <button onclick="toggleSidebar()" class="p-3 border-t border-white/10 hover:bg-white/10 transition flex items-center justify-center">
+            <svg id="collapse-icon" class="w-5 h-5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7"/>
+            </svg>
+        </button>
+    </aside>
+    
+    <main class="flex-1 bg-gray-50 overflow-hidden flex min-w-0">
+        <div class="flex-1 flex flex-col p-4 overflow-hidden min-w-0">
+            <div class="bg-white rounded-xl shadow-sm border border-gray-100 flex-1 overflow-hidden">
+                <div id="calendar" class="h-full w-full"></div>
+            </div>
+        </div>
+        
+        <aside id="right-panel" class="w-96 flex-shrink-0 bg-white border-l border-gray-100 flex flex-col overflow-hidden transition-all duration-300">
+            <div id="panel-empty" class="flex-1 flex items-center justify-center text-gray-400">
+                <div class="text-center">
+                    <svg class="w-16 h-16 mx-auto mb-3 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                    </svg>
+                    <p>Sélectionnez un rendez-vous</p>
+                </div>
+            </div>
+            
+            <div id="panel-content" class="flex-1 flex flex-col overflow-hidden hidden">
+                <div class="p-4 border-b border-gray-100">
+                    <div class="flex items-center gap-3">
+                        <div id="patient-avatar" class="w-12 h-12 bg-[#14b999]/10 rounded-full flex items-center justify-center text-[#14b999] font-bold text-lg">
+                            ?
+                        </div>
+                        <div>
+                            <p id="patient-name" class="font-semibold text-gray-800">Patient Name</p>
+                            <p id="patient-phone" class="text-sm text-gray-500">+213 xxx xxx xxx</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="p-4 border-b border-gray-100">
+                    <div class="flex gap-2 flex-wrap">
+                        <button onclick="updateStatus('waiting')" id="btn-arrived" class="flex-1 flex items-center justify-center gap-1 px-3 py-2 bg-amber-50 text-amber-600 rounded-lg text-sm font-medium hover:bg-amber-100 transition">
+                            <span>✅</span> Arrivé
+                        </button>
+                        <button onclick="updateStatusSimple('waiting')" id="btn-in-progress" class="flex-1 flex items-center justify-center gap-1 px-3 py-2 bg-blue-50 text-blue-600 rounded-lg text-sm font-medium hover:bg-blue-100 transition">
+                            <span>🩺</span> En cours
+                        </button>
+                    </div>
+                    <div class="flex gap-2 mt-2">
+                        <button onclick="completeWithDiagnosis()" id="btn-completed" class="flex-1 flex items-center justify-center gap-1 px-3 py-2 bg-green-50 text-green-600 rounded-lg text-sm font-medium hover:bg-green-100 transition">
+                            <span>🏁</span> Terminé
+                        </button>
+                        <button onclick="updateStatus('no_show')" id="btn-no-show" class="flex-1 flex items-center justify-center gap-1 px-3 py-2 bg-gray-50 text-gray-600 rounded-lg text-sm font-medium hover:bg-gray-100 transition">
+                            <span>❌</span> Absent
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="flex-1 overflow-auto p-4 space-y-4">
+                    <div>
+                        <p class="text-xs text-gray-400 uppercase tracking-wide mb-2">Statut actuel</p>
+                        <span id="current-status" class="px-3 py-1 rounded-full text-sm font-medium bg-[#14b999]/10 text-[#14b999]">
+                            Confirmé
+                        </span>
+                    </div>
+                    
+                    <div>
+                        <p class="text-xs text-gray-400 uppercase tracking-wide mb-2">Motif de consultation</p>
+                        <p id="consultation-reason" class="text-sm text-gray-700">-</p>
+                    </div>
+                    
+                    <div>
+                        <p class="text-xs text-gray-400 uppercase tracking-wide mb-2">Type de consultation</p>
+                        <p id="consultation-type" class="text-sm text-gray-700">-</p>
+                    </div>
+                    
+                    <div id="no-show-warning" class="hidden bg-red-50 border border-red-100 rounded-lg p-3">
+                        <p class="text-xs text-red-600 font-medium">⚠️ Attention</p>
+                        <p id="no-show-info" class="text-sm text-red-700 mt-1">Ce patient a manqué 0 rendez-vous</p>
+                    </div>
+                    
+                    <div>
+                        <p class="text-xs text-gray-400 uppercase tracking-wide mb-2">Notes (privées)</p>
+                        <textarea id="doctor-notes" 
+                                  rows="4" 
+                                  class="w-full border border-gray-200 rounded-lg p-3 text-sm resize-none focus:ring-2 focus:ring-[#14b999]/20 focus:border-[#14b999] transition"
+                                  placeholder="Ajoutez vos notes ici..."></textarea>
+                        <button onclick="saveNotes()" class="mt-2 text-sm text-[#14b999] font-medium hover:underline">
+                            Enregistrer les notes
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </aside>
+    </main>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<link href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css' rel='stylesheet' />
+<script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js'></script>
+
+<style>
+    .sidebar-collapsed .sidebar-text { display: none; }
+    .sidebar-collapsed #sidebar { width: 4rem; }
+    .sidebar-collapsed #collapse-icon { transform: rotate(180deg); }
+    
+    .fc {
+        height: 100% !important;
+        width: 100% !important;
+    }
+    .fc .fc-toolbar-title { font-size: 1.25rem !important; font-weight: 600; }
+    .fc .fc-button-primary { background-color: #14b999 !important; border-color: #14b999 !important; }
+    .fc .fc-button-primary:hover { background-color: #0d9479 !important; }
+    .fc .fc-button-primary:disabled { background-color: #14b999 !important; opacity: 0.6; }
+    .fc .fc-button-active { background-color: #0d9479 !important; }
+    .fc-event { cursor: pointer; border-radius: 4px !important; }
+    .fc-timegrid-slot { height: 2.5em !important; }
+    .fc .fc-col-header-cell-cushion { font-weight: 500; color: #374151; padding: 8px 4px; }
+    .fc .fc-daygrid-day-number { font-weight: 500; }
+    .fc-day-today { background-color: rgba(20, 185, 153, 0.05) !important; }
+    .fc-view-harness { height: 100% !important; }
+</style>
+
+<script>
+let calendar;
+let selectedAppointment = null;
+
+document.addEventListener('DOMContentLoaded', function() {
+    const calendarEl = document.getElementById('calendar');
+    
+    calendar = new FullCalendar.Calendar(calendarEl, {
+        initialView: 'timeGridWeek',
+        locale: 'fr',
+        headerToolbar: {
+            left: 'prev,next today',
+            center: 'title',
+            right: 'timeGridWeek,timeGridDay'
+        },
+        slotDuration: '00:15:00',
+        slotMinTime: '08:00:00',
+        slotMaxTime: '20:00:00',
+        allDaySlot: false,
+        weekends: true,
+        nowIndicator: true,
+        eventClick: function(info) {
+            selectAppointment(info.event);
+        },
+        events: function(fetchInfo, successCallback, failureCallback) {
+            fetch(`/api/doctor/appointments?start=${fetchInfo.startStr}&end=${fetchInfo.endStr}`)
+                .then(response => response.json())
+                .then(events => successCallback(events))
+                .catch(error => {
+                    console.error('Error fetching events:', error);
+                    failureCallback(error);
+                });
+        },
+        eventDidMount: function(info) {
+            if (info.event.extendedProps.status === 'no_show') {
+                info.el.style.textDecoration = 'line-through';
+                info.el.style.opacity = '0.6';
+            }
+        }
+    });
+    
+    calendar.render();
+});
+
+function toggleSidebar() {
+    document.body.classList.toggle('sidebar-collapsed');
+}
+
+function selectAppointment(event) {
+    selectedAppointment = event;
+    
+    const props = event.extendedProps;
+    
+    document.getElementById('panel-empty').classList.add('hidden');
+    document.getElementById('panel-content').classList.remove('hidden');
+    
+    document.getElementById('patient-avatar').textContent = props.patient_name.charAt(0);
+    document.getElementById('patient-name').textContent = props.patient_name;
+    document.getElementById('patient-phone').textContent = props.patient_phone || 'Pas de téléphone';
+    document.getElementById('consultation-reason').textContent = props.consultation_reason || 'Non spécifié';
+    document.getElementById('consultation-type').textContent = props.consultation_type || 'Consultation';
+    document.getElementById('doctor-notes').value = props.doctor_notes || '';
+    
+    updateStatusBadge(props.status);
+    
+    if (props.no_show_count > 0) {
+        document.getElementById('no-show-warning').classList.remove('hidden');
+        document.getElementById('no-show-info').textContent = `Ce patient a manqué ${props.no_show_count} rendez-vous`;
+    } else {
+        document.getElementById('no-show-warning').classList.add('hidden');
+    }
+}
+
+function updateStatusBadge(status) {
+    const badge = document.getElementById('current-status');
+    const statusMap = {
+        'confirmed': { text: 'Confirmé', class: 'bg-[#14b999]/10 text-[#14b999]' },
+        'waiting': { text: 'En salle', class: 'bg-amber-50 text-amber-600' },
+        'completed': { text: 'Terminé', class: 'bg-blue-50 text-blue-600' },
+        'no_show': { text: 'Absent', class: 'bg-gray-100 text-gray-500' },
+        'cancelled': { text: 'Annulé', class: 'bg-red-50 text-red-500' }
+    };
+    
+    const info = statusMap[status] || statusMap['confirmed'];
+    badge.textContent = info.text;
+    badge.className = `px-3 py-1 rounded-full text-sm font-medium ${info.class}`;
+}
+
+function updateStatusSimple(newStatus) {
+    if (!selectedAppointment) return;
+    
+    fetch(`/api/doctor/appointments/${selectedAppointment.id}/status`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: newStatus })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            updateStatusBadge(newStatus);
+            const colorMap = {
+                'confirmed': '#14b999',
+                'waiting': '#f59e0b',
+                'completed': '#3b82f6',
+                'no_show': '#9ca3af',
+                'cancelled': '#ef4444'
+            };
+            selectedAppointment.setProp('color', colorMap[newStatus]);
+            if (newStatus === 'waiting' || newStatus === 'completed') {
+                refreshWaitingCount();
+            }
+        }
+    })
+    .catch(error => console.error('Error:', error));
+}
+
+function completeWithDiagnosis() {
+    if (!selectedAppointment) return;
+    
+    const diagnosis = prompt('Bilan / Diagnostic (facultatif):', '');
+    if (diagnosis === null) return;
+    
+    fetch(`/api/doctor/appointments/${selectedAppointment.id}/status`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: 'completed', diagnosis: diagnosis })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            updateStatusBadge('completed');
+            selectedAppointment.setProp('color', '#3b82f6');
+            refreshWaitingCount();
+            
+            if (diagnosis) {
+                const existingNotes = selectedAppointment.extendedProps.doctor_notes || '';
+                selectedAppointment.setExtendedProp('doctor_notes', `DIAGNOSTIC: ${diagnosis}\n\n${existingNotes}`.trim());
+                document.getElementById('doctor-notes').value = selectedAppointment.extendedProps.doctor_notes;
+            }
+        }
+    })
+    .catch(error => console.error('Error:', error));
+}
+
+function updateStatus(newStatus) {
+    updateStatusSimple(newStatus);
+}
+
+function saveNotes() {
+    if (!selectedAppointment) return;
+    
+    const notes = document.getElementById('doctor-notes').value;
+    
+    fetch(`/api/doctor/appointments/${selectedAppointment.id}/notes`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ notes: notes })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            selectedAppointment.setExtendedProp('doctor_notes', notes);
+        }
+    })
+    .catch(error => console.error('Error:', error));
+}
+
+function refreshWaitingCount() {
+    fetch('/api/queue_status/{{ doctor_profile.id }}')
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('waiting-count').textContent = data.waiting_count;
+        })
+        .catch(error => console.error('Error:', error));
+}
+
+setInterval(refreshWaitingCount, 10000);
+</script>
+{% endblock %}

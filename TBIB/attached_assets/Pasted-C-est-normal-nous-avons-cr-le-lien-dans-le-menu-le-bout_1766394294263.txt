@@ -1,0 +1,68 @@
+C'est normal, nous avons créé le lien dans le menu (le bouton "👥 Patients"), mais nous n'avons jamais créé la page ni la logique derrière. C'est une coquille vide pour l'instant (erreur 404).
+
+Pour faire un vrai onglet "Mes Patients" à la Doctolib, il ne faut pas juste afficher une liste brute. Il faut que le médecin puisse :
+
+Retrouver tous les patients qu'il a déjà vus.
+
+Chercher par nom.
+
+Voir l'historique des RDV de ce patient spécifique.
+
+Voici le PROMPT V29 : PATIENT MANAGEMENT MODULE. Il va créer la route manquante et une interface de gestion propre.
+
+Copie-colle ça dans Replit :
+
+🧬 PROMPT TBIB V29: FIX "PATIENTS" TAB (LIST & HISTORY)
+Role: Senior Full-Stack Developer. Goal: Implement the missing /doctor/patients route and template. The "Patients" tab in the dashboard must now display a searchable list of the doctor's patient base.
+
+1. BACKEND LOGIC (routes.py)
+Create a new route @app.route('/doctor/patients'). Logic:
+
+Query: Fetch all User (patients) who have at least one Appointment with the current_user (Doctor).
+
+Tip: Use a JOIN query or distinct selection to avoid duplicates (don't show "Walid" 10 times if he came 10 times).
+
+Search: If a query parameter ?q=Walid is present, filter the results by name.
+
+Render: Return doctor/patients.html passing the patients list.
+
+2. FRONTEND TEMPLATE (templates/doctor/patients.html)
+Create this new file. It must extend the Dashboard Layout (Sidebar + Content) created in V23/V24.
+
+The Layout:
+
+Header: Title "Mes Patients" + Search Bar (Input with magnifying glass icon).
+
+The List (Table or Cards):
+
+Columns:
+
+Patient: Avatar (Initials in Circle) + Name.
+
+Coordonnées: Phone + Email.
+
+Dernier RDV: Date of the last appointment.
+
+Actions: Button "Voir Dossier" (Solid Mint #14b999).
+
+3. FEATURE: PATIENT HISTORY MODAL
+When clicking "Voir Dossier":
+
+Open a Modal (or Sidebar Panel).
+
+Content:
+
+Identity: Name, Age, Blood Type (from HealthRecord).
+
+Notes: The doctor's private notes (HealthRecord.doctor_notes).
+
+History: A timeline/list of all past appointments with this doctor (Date, Motif, Duration).
+
+4. NAVIGATION FIX
+Open templates/doctor/dashboard.html (or the sidebar include).
+
+Locate the "Patients" link/icon.
+
+Update href: Change href="#" to href="{{ url_for('doctor_patients') }}".
+
+Execute this. The "Patients" tab must now work and show real data.

@@ -1,0 +1,429 @@
+{% extends 'base.html' %}
+{% block title %}Configuration - {{ t.dashboard }}{% endblock %}
+
+{% block content %}
+<div class="max-w-5xl mx-auto px-4 py-8">
+    <div class="flex items-center justify-between mb-6">
+        <div>
+            <h1 class="text-xl font-bold text-gray-900">Configuration</h1>
+            <p class="text-sm text-gray-500">Gérez votre profil, consultations et disponibilités</p>
+        </div>
+        <a href="{{ url_for('main.doctor_dashboard') }}" class="text-sm text-[#14b999] font-medium hover:underline">
+            ← Retour au tableau de bord
+        </a>
+    </div>
+    
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="mb-4 p-4 rounded-lg {% if category == 'success' %}bg-green-50 text-green-700 border border-green-200{% else %}bg-red-50 text-red-700 border border-red-200{% endif %}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    
+    <div x-data="settingsApp()" class="space-y-6">
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+            <div class="border-b border-gray-100">
+                <nav class="flex -mb-px">
+                    <button @click="activeTab = 'profile'" 
+                            :class="activeTab === 'profile' ? 'border-[#14b999] text-[#14b999]' : 'border-transparent text-gray-500 hover:text-gray-700'"
+                            class="px-6 py-4 text-sm font-medium border-b-2 transition">
+                        Informations publiques
+                    </button>
+                    <button @click="activeTab = 'consultations'" 
+                            :class="activeTab === 'consultations' ? 'border-[#14b999] text-[#14b999]' : 'border-transparent text-gray-500 hover:text-gray-700'"
+                            class="px-6 py-4 text-sm font-medium border-b-2 transition">
+                        Types de consultation
+                    </button>
+                    <button @click="activeTab = 'schedule'" 
+                            :class="activeTab === 'schedule' ? 'border-[#14b999] text-[#14b999]' : 'border-transparent text-gray-500 hover:text-gray-700'"
+                            class="px-6 py-4 text-sm font-medium border-b-2 transition">
+                        Horaires & Absences
+                    </button>
+                </nav>
+            </div>
+            
+            <div x-show="activeTab === 'profile'" class="p-6">
+                <form action="{{ url_for('main.doctor_settings_profile') }}" method="POST" class="space-y-6">
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div class="md:col-span-2">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Photo de profil (URL)</label>
+                            <input type="text" name="profile_picture" value="{{ doctor.profile_picture or '' }}" 
+                                   class="w-full border border-gray-200 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-[#14b999]/20 focus:border-[#14b999]"
+                                   placeholder="https://example.com/photo.jpg">
+                            {% if doctor.profile_picture %}
+                            <img src="{{ doctor.profile_picture }}" alt="Preview" class="mt-2 w-20 h-20 rounded-full object-cover">
+                            {% endif %}
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Nom complet</label>
+                            <input type="text" name="name" value="{{ doctor.user.name }}" required
+                                   class="w-full border border-gray-200 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-[#14b999]/20 focus:border-[#14b999]">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Spécialité</label>
+                            <input type="text" name="specialty" value="{{ doctor.specialty }}" required
+                                   class="w-full border border-gray-200 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-[#14b999]/20 focus:border-[#14b999]">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Ville</label>
+                            <input type="text" name="city" value="{{ doctor.city }}" required
+                                   class="w-full border border-gray-200 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-[#14b999]/20 focus:border-[#14b999]">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Adresse du cabinet</label>
+                            <input type="text" name="address" value="{{ doctor.address or '' }}"
+                                   class="w-full border border-gray-200 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-[#14b999]/20 focus:border-[#14b999]"
+                                   placeholder="123 Rue Example, Alger">
+                        </div>
+                        
+                        <div class="md:col-span-2">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Présentation / Bio</label>
+                            <textarea name="bio" rows="4"
+                                      class="w-full border border-gray-200 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-[#14b999]/20 focus:border-[#14b999]"
+                                      placeholder="Décrivez votre parcours, votre approche...">{{ doctor.bio or '' }}</textarea>
+                        </div>
+                        
+                        <div class="md:col-span-2">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Diplômes et formations</label>
+                            <textarea name="diplomas" rows="3"
+                                      class="w-full border border-gray-200 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-[#14b999]/20 focus:border-[#14b999]"
+                                      placeholder="Doctorat en médecine, Université d'Alger (2015)&#10;Spécialisation en cardiologie, CHU Mustapha (2020)">{{ doctor.diplomas or '' }}</textarea>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Langues parlées</label>
+                            <input type="text" name="languages" value="{{ doctor.languages or '' }}"
+                                   class="w-full border border-gray-200 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-[#14b999]/20 focus:border-[#14b999]"
+                                   placeholder="Français, Arabe, Anglais">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Moyens de paiement acceptés</label>
+                            <input type="text" name="payment_methods" value="{{ doctor.payment_methods or '' }}"
+                                   class="w-full border border-gray-200 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-[#14b999]/20 focus:border-[#14b999]"
+                                   placeholder="Espèces, CIB, Chèque">
+                        </div>
+                        
+                        <div class="md:col-span-2">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Expertises / Domaines de compétence</label>
+                            <input type="text" name="expertises" value="{{ doctor.expertises or '' }}"
+                                   class="w-full border border-gray-200 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-[#14b999]/20 focus:border-[#14b999]"
+                                   placeholder="Échocardiographie, Cardiologie interventionnelle, Prévention cardiovasculaire">
+                        </div>
+                    </div>
+                    
+                    <div class="flex justify-end pt-4 border-t border-gray-100">
+                        <button type="submit" class="px-6 py-2.5 bg-[#14b999] text-white rounded-lg hover:bg-[#0d9479] transition font-medium">
+                            Enregistrer les modifications
+                        </button>
+                    </div>
+                </form>
+            </div>
+            
+            <div x-show="activeTab === 'consultations'" x-cloak class="p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <p class="text-sm text-gray-500">Définissez vos types de consultation avec durée et tarif</p>
+                    <button @click="showTypeModal = true" class="text-sm bg-[#14b999] text-white px-4 py-2 rounded-lg hover:bg-[#0d9479] transition font-medium">
+                        + Ajouter un type
+                    </button>
+                </div>
+                
+                <div class="border border-gray-100 rounded-lg divide-y divide-gray-50">
+                    {% if consultation_types %}
+                        {% for ct in consultation_types %}
+                        <div class="p-4 flex items-center justify-between hover:bg-gray-50" id="type-{{ ct.id }}">
+                            <div class="flex items-center gap-3">
+                                <div class="w-4 h-4 rounded-full flex-shrink-0" style="background-color: {{ ct.color }}"></div>
+                                <div>
+                                    <p class="font-medium text-gray-800">{{ ct.name }}</p>
+                                    <p class="text-sm text-gray-500">
+                                        {{ ct.duration }} min
+                                        {% if ct.price %} · {{ ct.price }} DZD{% endif %}
+                                        {% if ct.is_emergency_only %}<span class="text-amber-600"> · Urgence</span>{% endif %}
+                                        {% if ct.require_existing_patient %}<span class="text-blue-600"> · Suivi</span>{% endif %}
+                                    </p>
+                                </div>
+                            </div>
+                            <button @click="deleteType({{ ct.id }})" class="text-red-500 hover:text-red-600 text-sm font-medium">
+                                Supprimer
+                            </button>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                    <div class="p-8 text-center text-gray-500">
+                        <p>Aucun type de consultation configuré</p>
+                        <p class="text-sm mt-1">Les patients pourront réserver des créneaux de 30 minutes par défaut</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div x-show="activeTab === 'schedule'" x-cloak class="p-6 space-y-6">
+                <div>
+                    <h3 class="font-semibold text-gray-800 mb-4">Horaires hebdomadaires</h3>
+                    <form action="{{ url_for('main.doctor_settings_availability') }}" method="POST">
+                        <div class="space-y-3">
+                            {% set days = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'] %}
+                            {% for i in range(7) %}
+                            {% set slot = availability.get(i, {}) %}
+                            <div class="flex items-center gap-4 p-3 bg-gray-50 rounded-lg">
+                                <label class="flex items-center gap-2 w-32">
+                                    <input type="checkbox" name="day_{{ i }}_active" value="1" 
+                                           {% if slot.get('is_available', False) %}checked{% endif %}
+                                           class="rounded border-gray-300 text-[#14b999] focus:ring-[#14b999]">
+                                    <span class="text-sm font-medium text-gray-700">{{ days[i] }}</span>
+                                </label>
+                                <div class="flex items-center gap-2">
+                                    <input type="time" name="day_{{ i }}_start" 
+                                           value="{{ slot.get('start_time', '08:00') }}"
+                                           class="border border-gray-200 rounded px-2 py-1 text-sm focus:ring-2 focus:ring-[#14b999]/20 focus:border-[#14b999]">
+                                    <span class="text-gray-400">à</span>
+                                    <input type="time" name="day_{{ i }}_end" 
+                                           value="{{ slot.get('end_time', '17:00') }}"
+                                           class="border border-gray-200 rounded px-2 py-1 text-sm focus:ring-2 focus:ring-[#14b999]/20 focus:border-[#14b999]">
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        <div class="mt-4 flex justify-end">
+                            <button type="submit" class="px-6 py-2.5 bg-[#14b999] text-white rounded-lg hover:bg-[#0d9479] transition font-medium">
+                                Enregistrer les horaires
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                
+                <div class="border-t border-gray-100 pt-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="font-semibold text-gray-800">Absences et congés</h3>
+                        <button @click="showAbsenceModal = true" class="text-sm bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 transition font-medium">
+                            + Poser une absence
+                        </button>
+                    </div>
+                    
+                    <div class="border border-gray-100 rounded-lg divide-y divide-gray-50">
+                        {% if absences %}
+                            {% for absence in absences %}
+                            <div class="p-4 flex items-center justify-between" id="absence-{{ absence.id }}">
+                                <div>
+                                    <p class="font-medium text-gray-800">
+                                        {{ absence.start_date.strftime('%d/%m/%Y') }} → {{ absence.end_date.strftime('%d/%m/%Y') }}
+                                    </p>
+                                    <p class="text-sm text-gray-500">{{ absence.reason or 'Pas de motif spécifié' }}</p>
+                                </div>
+                                <button @click="deleteAbsence({{ absence.id }})" class="text-red-500 hover:text-red-600 text-sm font-medium">
+                                    Supprimer
+                                </button>
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                        <div class="p-6 text-center text-gray-500">
+                            Aucune absence programmée
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div x-show="showTypeModal" x-cloak class="fixed inset-0 bg-black/50 flex items-center justify-center z-50" @click.self="showTypeModal = false">
+            <div class="bg-white rounded-2xl shadow-xl w-full max-w-md mx-4 p-6">
+                <h3 class="text-lg font-semibold text-gray-800 mb-4">Nouveau type de consultation</h3>
+                
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Nom</label>
+                        <input type="text" x-model="newType.name" class="w-full border border-gray-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-[#14b999]/20 focus:border-[#14b999]" placeholder="Ex: Consultation suivi">
+                    </div>
+                    
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Durée (min)</label>
+                            <select x-model="newType.duration" class="w-full border border-gray-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-[#14b999]/20 focus:border-[#14b999]">
+                                <option value="15">15 min</option>
+                                <option value="30" selected>30 min</option>
+                                <option value="45">45 min</option>
+                                <option value="60">60 min</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Prix (DZD)</label>
+                            <input type="text" x-model="newType.price" class="w-full border border-gray-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-[#14b999]/20 focus:border-[#14b999]" placeholder="2000">
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Couleur</label>
+                        <div class="flex gap-2">
+                            <template x-for="color in colors" :key="color">
+                                <button type="button" 
+                                        @click="newType.color = color"
+                                        :class="newType.color === color ? 'ring-2 ring-offset-2 ring-gray-400' : ''"
+                                        class="w-8 h-8 rounded-full transition"
+                                        :style="'background-color: ' + color">
+                                </button>
+                            </template>
+                        </div>
+                    </div>
+                    
+                    <div class="space-y-2">
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="checkbox" x-model="newType.is_emergency_only" class="rounded border-gray-300 text-[#14b999] focus:ring-[#14b999]">
+                            <span class="text-sm text-gray-700">Urgence uniquement (réservable 24h avant)</span>
+                        </label>
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="checkbox" x-model="newType.require_existing_patient" class="rounded border-gray-300 text-[#14b999] focus:ring-[#14b999]">
+                            <span class="text-sm text-gray-700">Patients existants uniquement</span>
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="flex gap-3 mt-6">
+                    <button @click="showTypeModal = false" class="flex-1 px-4 py-2 border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-50 transition font-medium">
+                        Annuler
+                    </button>
+                    <button @click="addType()" class="flex-1 px-4 py-2 bg-[#14b999] text-white rounded-lg hover:bg-[#0d9479] transition font-medium">
+                        Ajouter
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <div x-show="showAbsenceModal" x-cloak class="fixed inset-0 bg-black/50 flex items-center justify-center z-50" @click.self="showAbsenceModal = false">
+            <div class="bg-white rounded-2xl shadow-xl w-full max-w-md mx-4 p-6">
+                <h3 class="text-lg font-semibold text-gray-800 mb-4">Nouvelle absence</h3>
+                
+                <div class="space-y-4">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Date de début</label>
+                            <input type="date" x-model="newAbsence.start_date" class="w-full border border-gray-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-[#14b999]/20 focus:border-[#14b999]">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Date de fin</label>
+                            <input type="date" x-model="newAbsence.end_date" class="w-full border border-gray-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-[#14b999]/20 focus:border-[#14b999]">
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Motif (optionnel)</label>
+                        <input type="text" x-model="newAbsence.reason" class="w-full border border-gray-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-[#14b999]/20 focus:border-[#14b999]" placeholder="Ex: Vacances, Formation...">
+                    </div>
+                </div>
+                
+                <div class="flex gap-3 mt-6">
+                    <button @click="showAbsenceModal = false" class="flex-1 px-4 py-2 border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-50 transition font-medium">
+                        Annuler
+                    </button>
+                    <button @click="addAbsence()" class="flex-1 px-4 py-2 bg-[#14b999] text-white rounded-lg hover:bg-[#0d9479] transition font-medium">
+                        Ajouter
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function settingsApp() {
+    return {
+        activeTab: 'profile',
+        showTypeModal: false,
+        showAbsenceModal: false,
+        colors: ['#14b999', '#3b82f6', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'],
+        newType: {
+            name: '',
+            duration: 30,
+            price: '',
+            color: '#14b999',
+            is_emergency_only: false,
+            require_existing_patient: false
+        },
+        newAbsence: {
+            start_date: '',
+            end_date: '',
+            reason: ''
+        },
+        
+        addType() {
+            if (!this.newType.name) {
+                alert('Veuillez entrer un nom');
+                return;
+            }
+            fetch('/doctor/settings/consultation-type', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(this.newType)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                }
+            });
+        },
+        
+        deleteType(id) {
+            if (!confirm('Supprimer ce type de consultation ?')) return;
+            
+            fetch(`/doctor/settings/consultation-type/${id}`, {
+                method: 'DELETE'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById(`type-${id}`).remove();
+                }
+            });
+        },
+        
+        addAbsence() {
+            if (!this.newAbsence.start_date || !this.newAbsence.end_date) {
+                alert('Veuillez sélectionner les dates');
+                return;
+            }
+            const data = {
+                start_date: this.newAbsence.start_date + 'T00:00:00',
+                end_date: this.newAbsence.end_date + 'T23:59:59',
+                reason: this.newAbsence.reason
+            };
+            
+            fetch('/doctor/settings/absence', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                }
+            });
+        },
+        
+        deleteAbsence(id) {
+            if (!confirm('Supprimer cette absence ?')) return;
+            
+            fetch(`/doctor/settings/absence/${id}`, {
+                method: 'DELETE'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById(`absence-${id}`).remove();
+                }
+            });
+        }
+    }
+}
+</script>
+{% endblock %}

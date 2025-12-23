@@ -1,0 +1,115 @@
+🧬 PROMPT TBIB V24: THE COMPLETE DOCTOLIB PRO TRANSFORMATION (LOGIC + UI)
+Role: Senior Full-Stack Architect & UX Specialist. Goal: Upgrade TBIB to a professional SaaS level by implementing a "Smart Agenda" backend and a "Cockpit" frontend using FullCalendar.
+
+PART 1: DATABASE EVOLUTION (ADVANCED MODELS)
+Extend models.py with these configurations. Do not delete existing data.
+
+ConsultationType Model (Variable Durations):
+
+id, doctor_id (FK), name (String, e.g., "Consultation Suivi").
+
+duration (Integer, minutes - CRITICAL for scheduling).
+
+price (String), color (String, hex code for UI).
+
+is_emergency_only (Boolean, default=False) -> Only bookable 24h before.
+
+require_existing_patient (Boolean, default=False) -> Blocks new patients.
+
+DoctorAbsence Model (Vacations):
+
+id, doctor_id, start_date (DateTime), end_date (DateTime), reason.
+
+Update User (Patient) Model:
+
+Add no_show_count (Integer, default=0).
+
+Add is_blocked (Boolean, default=False).
+
+PART 2: BACKEND LOGIC (THE BRAIN)
+A. Smart Slot Generator V2 (generate_slots in app.py): Rewrite the logic to support variable durations.
+
+Input: doctor_id, date, consultation_type_id.
+
+Rules:
+
+If consultation_type.require_existing_patient is True AND User has NO past appointments -> Return Error.
+
+If consultation_type.is_emergency_only is True AND date > today + 1 -> Return Error.
+
+If current_user.no_show_count >= 3 -> Block.
+
+Loop: Iterate through the day using consultation_type.duration as the step (e.g., 15min, 45min).
+
+Availability: Check DoctorAbsence and existing Appointment conflicts.
+
+B. Dashboard API (/api/doctor/appointments): Create an API that returns JSON events for FullCalendar:
+
+Format: { id: 1, title: "Patient Name", start: "ISO-Date", end: "ISO-Date", color: "#HexFromType", extendedProps: { ... } }.
+
+Crucial: The end time must be calculated as start + duration.
+
+PART 3: FRONTEND ARCHITECTURE (THE "COCKPIT")
+Completely refactor /doctor/dashboard.
+
+A. Dependencies: Add FullCalendar (v5 or v6) CDN (CSS+JS) to base.html.
+
+B. Layout (Flexbox Row, h-screen):
+
+Left Sidebar (Navigation):
+
+Collapsible (w-16 or w-64). Style: Dark Green / White Mint.
+
+Items: 📅 Agenda, 👥 Patients, ⚙️ Configuration (Links to new tabs).
+
+Center Stage (The Calendar - 60%):
+
+id="calendar". Header: "Aujourd'hui", Navigation, "Semaine/Jour".
+
+Right Panel (The "Desk" - 30% - Dynamic):
+
+Default: "Sélectionnez un rendez-vous."
+
+Active (On Click): Shows the Appointment Card.
+
+Patient Info (Photo, Name, Age).
+
+Action Bar: Buttons [✅ Arrivé] [🩺 En cours] [🏁 Terminé] [❌ Absent].
+
+Context: Motif, History, Link to "Dossier Médical".
+
+Notes: Private text area for the doctor.
+
+PART 4: JAVASCRIPT & INTERACTION
+Write a robust script in the dashboard template:
+
+Init FullCalendar:
+
+timeGridWeek, timeGridDay.
+
+slotDuration: '00:15:00'.
+
+minTime: Based on doctor's hours.
+
+locale: 'fr'.
+
+Source: Feed from /api/doctor/appointments.
+
+Event Click:
+
+Do NOT navigate.
+
+Populate the Right Panel with extendedProps data.
+
+Status Workflow (AJAX):
+
+"✅ Arrivé": Updates status -> Changes event color to Yellow/Green -> Updates "File d'attente" count.
+
+"❌ Absent": Updates status -> Increments no_show_count -> Changes color to Gray/Strike.
+
+PART 5: CONFIGURATION & BOOKING UI
+Doctor Settings Tab: A form to Add/Edit ConsultationType (Name, Duration, Price, Color) and manage DoctorAbsence.
+
+Public Booking Wizard: Update "Step 2" to fetch these dynamic types. Passing the correct type_id is now required to calculate slots.
+
+Execute this massive update. Connect the DB, Logic, and UI into a seamless workflow.

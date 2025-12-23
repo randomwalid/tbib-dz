@@ -1,0 +1,227 @@
+{% extends 'base.html' %}
+{% block title %}{{ t.my_appointments }}{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto px-4 py-8">
+    <h1 class="text-xl font-bold text-gray-900 mb-6">{{ t.my_appointments }}</h1>
+    
+    {% if appointments %}
+        {% for appt in appointments %}
+            {% if appt.status in ['confirmed', 'waiting'] and appt.appointment_date >= today %}
+                {% if appt.queue_number is not none and appt.appointment_date == today %}
+                <div class="bg-white rounded-2xl shadow-md overflow-hidden mb-4" data-doctor-id="{{ appt.doctor_id }}" data-my-number="{{ appt.queue_number }}">
+                    <div class="p-6">
+                        <div class="flex justify-between items-center mb-4">
+                            <p class="text-xs font-semibold text-[#14b999] uppercase tracking-wider">
+                                {% if appt.status == 'waiting' %}VOUS ÊTES ENREGISTRÉ{% else %}TOUR ACTUEL{% endif %}
+                            </p>
+                            <div class="flex items-center gap-2 text-xs text-gray-400">
+                                <span class="w-2 h-2 bg-[#14b999] rounded-full pulse-dot"></span>
+                                En direct
+                            </div>
+                        </div>
+                        
+                        {% if appt.status == 'waiting' %}
+                        <div class="bg-[#14b999]/10 rounded-xl p-3 mb-4 text-center">
+                            <p class="text-sm text-[#14b999] font-medium">C'est bientôt votre tour !</p>
+                        </div>
+                        {% endif %}
+                        
+                        <div class="text-center py-6">
+                            <p class="text-8xl md:text-9xl font-bold text-[#14b999]" id="current-serving-{{ appt.doctor_id }}">
+                                {{ '%02d' % appt.doctor_profile.waiting_room_count }}
+                            </p>
+                        </div>
+                        
+                        <div class="bg-gray-50 rounded-xl p-4 mb-4">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 bg-[#14b999]/20 rounded-full flex items-center justify-center text-[#14b999] font-semibold" id="patient-initial-{{ appt.doctor_id }}">
+                                    ?
+                                </div>
+                                <div>
+                                    <p class="text-xs text-gray-400 uppercase tracking-wide">PATIENT APPELÉ</p>
+                                    <p class="font-medium text-gray-800" id="current-patient-{{ appt.doctor_id }}">--</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-center justify-between text-center">
+                            <div>
+                                <p class="text-2xl font-bold text-gray-800" id="waiting-count-{{ appt.doctor_id }}">
+                                    {{ appt.queue_number - appt.doctor_profile.waiting_room_count - 1 if appt.queue_number > appt.doctor_profile.waiting_room_count else 0 }}
+                                </p>
+                                <p class="text-xs text-gray-500">En attente</p>
+                            </div>
+                            <div class="h-8 border-l border-gray-200"></div>
+                            <div>
+                                <p class="text-2xl font-bold text-[#14b999]">{{ '%02d' % appt.queue_number }}</p>
+                                <p class="text-xs text-gray-500">Votre numéro</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-gray-50 px-6 py-4 border-t border-gray-100 flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 bg-[#14b999]/10 rounded-full flex items-center justify-center text-[#14b999] font-semibold">
+                                {{ appt.doctor_profile.user.name[0] }}
+                            </div>
+                            <div>
+                                <p class="font-medium text-gray-800">Dr. {{ appt.doctor_profile.user.name }}</p>
+                                <p class="text-sm text-gray-500">{{ appt.doctor_profile.specialty }}</p>
+                            </div>
+                        </div>
+                        <form method="POST" action="{{ url_for('main.cancel_appointment', appointment_id=appt.id) }}">
+                            <button type="submit" class="text-red-500 hover:text-red-600 text-sm font-medium">{{ t.cancel }}</button>
+                        </form>
+                    </div>
+                </div>
+                {% elif appt.booking_type == 'scheduled' and appt.appointment_time and not appt.queue_number %}
+                <div class="bg-white rounded-2xl shadow-md overflow-hidden mb-4 border border-blue-100">
+                    <div class="p-6">
+                        <div class="flex justify-between items-center mb-4">
+                            <p class="text-xs font-semibold text-blue-600 uppercase tracking-wider">RENDEZ-VOUS CONFIRMÉ</p>
+                            <span class="px-3 py-1 rounded-full text-xs font-medium bg-blue-50 text-blue-600">
+                                Programmé
+                            </span>
+                        </div>
+                        
+                        <div class="flex items-center justify-center py-6 gap-6">
+                            <div class="w-20 h-20 bg-blue-50 rounded-2xl flex items-center justify-center">
+                                <svg class="w-10 h-10 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                </svg>
+                            </div>
+                            <div class="text-center">
+                                <p class="text-3xl font-bold text-gray-800">
+                                    {{ appt.appointment_date.strftime('%d %b %Y') }}
+                                </p>
+                                <p class="text-2xl font-semibold text-blue-600 mt-1">
+                                    {{ appt.appointment_time.strftime('%H:%M') }}
+                                </p>
+                            </div>
+                        </div>
+                        
+                        {% if appt.consultation_reason %}
+                        <div class="bg-gray-50 rounded-xl p-3 mb-4 text-center">
+                            <p class="text-sm text-gray-600">{{ appt.consultation_reason }}</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="bg-gray-50 px-6 py-4 border-t border-gray-100 flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 font-semibold">
+                                {{ appt.doctor_profile.user.name[0] }}
+                            </div>
+                            <div>
+                                <p class="font-medium text-gray-800">Dr. {{ appt.doctor_profile.user.name }}</p>
+                                <p class="text-sm text-gray-500">{{ appt.doctor_profile.specialty }}</p>
+                            </div>
+                        </div>
+                        <form method="POST" action="{{ url_for('main.cancel_appointment', appointment_id=appt.id) }}">
+                            <button type="submit" class="text-red-500 hover:text-red-600 text-sm font-medium">{{ t.cancel }}</button>
+                        </form>
+                    </div>
+                </div>
+                {% endif %}
+            {% else %}
+            <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4 mb-3 flex items-center justify-between">
+                <div class="flex items-center gap-4">
+                    <div class="w-10 h-10 rounded-full flex items-center justify-center font-semibold
+                        {% if appt.status == 'completed' %}bg-blue-50 text-blue-600
+                        {% elif appt.status == 'cancelled' %}bg-gray-100 text-gray-500
+                        {% elif appt.status == 'no_show' %}bg-red-50 text-red-600
+                        {% else %}bg-[#14b999]/10 text-[#14b999]{% endif %}">
+                        {% if appt.appointment_time %}
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                            </svg>
+                        {% elif appt.queue_number is not none %}
+                            {{ '%02d' % appt.queue_number }}
+                        {% else %}
+                            --
+                        {% endif %}
+                    </div>
+                    <div>
+                        <p class="font-medium text-gray-800">Dr. {{ appt.doctor_profile.user.name }}</p>
+                        <p class="text-sm text-gray-500">
+                            {{ appt.doctor_profile.specialty }} - {{ appt.appointment_date.strftime('%d/%m/%Y') }}
+                            {% if appt.appointment_time %}à {{ appt.appointment_time.strftime('%H:%M') }}{% endif %}
+                        </p>
+                    </div>
+                </div>
+                <span class="px-3 py-1 rounded-full text-xs font-medium
+                    {% if appt.status == 'completed' %}bg-blue-50 text-blue-600
+                    {% elif appt.status == 'cancelled' %}bg-gray-100 text-gray-500
+                    {% elif appt.status == 'no_show' %}bg-red-50 text-red-600
+                    {% else %}bg-[#14b999]/10 text-[#14b999]{% endif %}">
+                    {% if appt.status == 'confirmed' %}{{ t.confirmed }}
+                    {% elif appt.status == 'completed' %}{{ t.completed }}
+                    {% elif appt.status == 'cancelled' %}{{ t.cancelled }}
+                    {% else %}{{ t.no_show_status }}{% endif %}
+                </span>
+            </div>
+            {% endif %}
+        {% endfor %}
+    {% else %}
+    <div class="text-center py-16">
+        <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+            </svg>
+        </div>
+        <p class="text-gray-500 mb-4">{{ t.no_appointments }}</p>
+        <a href="{{ url_for('main.home') }}" class="inline-block bg-[#14b999] text-white px-6 py-2.5 rounded-lg hover:bg-[#0d9479] transition font-medium">
+            {{ t.find_doctor }}
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const cards = document.querySelectorAll('[data-doctor-id]');
+    
+    cards.forEach(card => {
+        const doctorId = card.dataset.doctorId;
+        const myNumber = parseInt(card.dataset.myNumber);
+        
+        if (isNaN(myNumber)) return;
+        
+        function updateStatus() {
+            fetch(`/api/queue_status/${doctorId}`)
+                .then(response => response.json())
+                .then(data => {
+                    const waitingEl = document.getElementById(`waiting-count-${doctorId}`);
+                    const patientEl = document.getElementById(`current-patient-${doctorId}`);
+                    const servingEl = document.getElementById(`current-serving-${doctorId}`);
+                    const initialEl = document.getElementById(`patient-initial-${doctorId}`);
+                    
+                    if (servingEl) {
+                        servingEl.textContent = String(data.current_serving).padStart(2, '0');
+                    }
+                    
+                    if (waitingEl) {
+                        const waiting = Math.max(0, myNumber - data.current_serving - 1);
+                        waitingEl.textContent = waiting;
+                    }
+                    
+                    if (patientEl) {
+                        patientEl.textContent = data.current_patient || '--';
+                    }
+                    
+                    if (initialEl && data.current_patient) {
+                        initialEl.textContent = data.current_patient.charAt(0);
+                    }
+                })
+                .catch(err => console.log('Update failed:', err));
+        }
+        
+        updateStatus();
+        setInterval(updateStatus, 5000);
+    });
+});
+</script>
+{% endblock %}

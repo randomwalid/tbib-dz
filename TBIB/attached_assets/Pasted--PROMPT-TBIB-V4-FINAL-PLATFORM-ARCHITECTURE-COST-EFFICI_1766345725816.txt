@@ -1,0 +1,88 @@
+🧬 PROMPT TBIB V4: FINAL PLATFORM ARCHITECTURE (COST-EFFICIENT & ROBUST)
+Role: Senior Python Full-Stack Architect. Goal: Build "TBIB", a bilingual (FR/AR) medical booking platform with Role-Based Access Control. Constraint: Maximize efficiency. Code MUST be robust, modular, and error-free on the first run.
+
+1. DATA ARCHITECTURE (THE BACKBONE)
+Do not hallucinate models. Use strictly this structure:
+
+User: id, email, password_hash, role ('patient' or 'doctor'), name, phone.
+
+DoctorProfile: id, user_id (ForeignKey), specialty, city, address, bio, waiting_room_count (Integer, default=0).
+
+Appointment: id, patient_id (FK), doctor_id (FK), status ('confirmed', 'completed', 'cancelled', 'no_show'), queue_number (Integer), is_urgent (Boolean).
+
+2. CORE USER FLOWS (LOGIC GATES)
+A. Authentication & Routing
+
+Landing Page: Clear dual login/register options ("Patient" vs "Médecin").
+
+Routing Logic:
+
+current_user.role == 'patient' -> Redirect to Route /patient/home.
+
+current_user.role == 'doctor' -> Redirect to Route /doctor/dashboard.
+
+B. Patient Flow (The Search Engine)
+
+Route /patient/home:
+
+Hero Section: Blue background (bg-blue-900). Contains the Search Bar (Specialty + City).
+
+Action: Submitting search filters the DoctorProfile list.
+
+Booking: Clicking a doctor shows a "Prendre RDV / Book" button.
+
+Logic: Clicking "Book" creates an Appointment with status 'confirmed' and assigns a queue_number (current count + 1).
+
+C. The "Ticket" View (CONDITIONAL VISIBILITY)
+
+Route /patient/appointments:
+
+Display a list of active appointments.
+
+CRITICAL UI: The "Big Green Ticket Number" (Queue Status) is ONLY visible inside an active appointment card here. It is NOT the homepage.
+
+If appointment is today: Show "Votre Tour : X" and "En cours : Y".
+
+D. Doctor Flow (The Control Tower)
+
+Route /doctor/dashboard:
+
+List of appointments for today.
+
+Actions: "Patient Suivant" (Increments counter), "No-Show" (Flags patient).
+
+Epidemiology: A simple tab showing a static heatmap image or chart labeled "Radar Épidémiologique".
+
+3. CRITICAL FEATURES IMPLEMENTATION
+A. Bilingual Support (RTL/LTR)
+
+Navbar must have a "FR | AR" toggle.
+
+Storing language preference in session.
+
+If AR: Apply dir="rtl" to the <html> tag and use Arabic labels for common UI elements.
+
+B. Visual Identity ("Modern Emerald")
+
+Brand Color: Emerald Green (#047857).
+
+Search Section: Deep Blue (#1e3a8a) with white text.
+
+UI Style: Rounded corners, pill-shaped inputs, clean generic sans-serif fonts (Cairo for Arabic).
+
+4. EXECUTION PLAN (STEP-BY-STEP)
+Setup: Initialize Flask, SQLAlchemy, Flask-Login, and Migrations.
+
+Models: Create the 3 models defined above.
+
+Seed Data (Crucial for Testing):
+
+Create 1 Doctor (doc@tbib.dz / doc) -> Specialty: "Dentiste", City: "Alger".
+
+Create 1 Patient (pat@tbib.dz / pat).
+
+Create 1 Active Appointment between them so I can see the "Ticket View" immediately in the "My Appointments" tab.
+
+Views: Build the templates using TailwindCSS via CDN.
+
+Execute this plan. Focus on the Logic Flow: Login -> Search -> Book -> Ticket.

@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+{% block title %}{{ t.register }}{% endblock %}
+
+{% block content %}
+<div class="min-h-[80vh] flex items-center justify-center px-4 py-8">
+    <div class="max-w-sm w-full">
+        <div class="text-center mb-6">
+            <img src="{{ url_for('static', filename='img/logo_accueil.png') }}" alt="TBIB" class="h-20 mx-auto mb-6">
+        </div>
+        
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+            <div class="flex gap-2 mb-6">
+                <a href="{{ url_for('main.register', role='patient') }}" class="flex-1 py-2 text-center rounded-lg text-sm font-medium transition {% if role == 'patient' %}bg-[#14b999] text-white{% else %}bg-gray-100 text-gray-600 hover:bg-gray-200{% endif %}">
+                    {{ t.patient }}
+                </a>
+                <a href="{{ url_for('main.register', role='doctor') }}" class="flex-1 py-2 text-center rounded-lg text-sm font-medium transition {% if role == 'doctor' %}bg-[#14b999] text-white{% else %}bg-gray-100 text-gray-600 hover:bg-gray-200{% endif %}">
+                    {{ t.doctor }}
+                </a>
+            </div>
+            
+            <form method="POST">
+                <input type="hidden" name="role" value="{{ role }}">
+                
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-1.5">{{ t.name }}</label>
+                    <input type="text" name="name" required class="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#14b999]/20 focus:border-[#14b999]">
+                </div>
+                
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-1.5">{{ t.email }}</label>
+                    <input type="email" name="email" required class="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#14b999]/20 focus:border-[#14b999]">
+                </div>
+                
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-1.5">{{ t.phone }}</label>
+                    <input type="tel" name="phone" class="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#14b999]/20 focus:border-[#14b999]">
+                </div>
+                
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-1.5">{{ t.password }}</label>
+                    <input type="password" name="password" required class="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#14b999]/20 focus:border-[#14b999]">
+                </div>
+                
+                {% if role == 'doctor' %}
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-1.5">{{ t.specialty }}</label>
+                    <input type="text" name="specialty" required class="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#14b999]/20 focus:border-[#14b999]">
+                </div>
+                
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-1.5">{{ t.city }}</label>
+                    <input type="text" name="city" required class="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#14b999]/20 focus:border-[#14b999]">
+                </div>
+                
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-1.5">{{ t.address }}</label>
+                    <input type="text" name="address" class="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#14b999]/20 focus:border-[#14b999]">
+                </div>
+                
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-1.5">{{ t.bio }}</label>
+                    <textarea name="bio" rows="2" class="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#14b999]/20 focus:border-[#14b999]"></textarea>
+                </div>
+                {% endif %}
+                
+                <button type="submit" class="w-full bg-[#14b999] text-white py-2.5 rounded-lg hover:bg-[#0d9479] transition font-medium">
+                    {{ t.register }}
+                </button>
+            </form>
+        </div>
+        
+        <p class="text-center mt-6 text-gray-600 text-sm">
+            <a href="{{ url_for('main.login') }}" class="text-[#14b999] hover:underline font-medium">{{ t.login }}</a>
+        </p>
+    </div>
+</div>
+{% endblock %}

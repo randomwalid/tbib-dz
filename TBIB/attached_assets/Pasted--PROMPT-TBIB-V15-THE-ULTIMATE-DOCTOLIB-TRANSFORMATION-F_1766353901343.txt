@@ -1,0 +1,123 @@
+🧬 PROMPT TBIB V15: THE ULTIMATE DOCTOLIB TRANSFORMATION (FULL STACK)
+Role: Senior Full-Stack Architect & UI/UX Specialist. Goal: Transform "TBIB" from a queue system into a comprehensive SaaS medical platform matching "Doctolib" features and aesthetics.
+
+PART 1: DATABASE EVOLUTION (MIGRATE MODELS)
+Update models.py to support advanced scheduling, health records, and richer profiles. Extend existing models, do not delete.
+
+New Model: DoctorAvailability (The Schedule):
+
+id, doctor_id (FK), day_of_week (Int: 0=Mon, 6=Sun).
+
+start_time (Time, e.g., 09:00), end_time (Time, e.g., 17:00).
+
+is_available (Boolean).
+
+New Model: HealthRecord (Carnet de Santé):
+
+id, patient_id (FK), doctor_id (FK).
+
+blood_type (String), allergies (Text), chronic_conditions (Text).
+
+vaccines_history (JSON or Text), doctor_notes (Text - Private).
+
+Update Appointment Model:
+
+Add appointment_time (DateTime) -> Crucial for the calendar.
+
+Add consultation_type (String, e.g., "Consultation", "Urgence").
+
+Add duration (Integer, minutes, default=30).
+
+Add symptoms_summary (Text, for Case Classification).
+
+Update DoctorProfile Model:
+
+Add whatsapp_number (String).
+
+PART 2: BACKEND LOGIC (THE ENGINE)
+Smart Slot Generator (generate_slots):
+
+Input: doctor_id, date.
+
+Logic:
+
+Fetch DoctorAvailability for that specific day of the week.
+
+Loop from start_time to end_time in 30-minute intervals.
+
+CRITICAL: Check the Appointment table. If a slot is taken, exclude it.
+
+Output: JSON { "2025-12-24": ["09:00", "09:30", ...], ... }.
+
+WhatsApp Smart Link Helper:
+
+Create a function to generate links: https://wa.me/<number>?text=<encoded_message>.
+
+Usage: For sending appointment reminders directly from the dashboard.
+
+PART 3: FRONTEND - THE "DOCTOLIB" BOOKING UI
+Refactor the Doctor Profile Page (/doctor/<id>) completely.
+
+A. The Layout:
+
+Desktop: 2 Columns.
+
+Left (60%): Doctor Info (Photo, Name, Map, Presentation, Legal Info).
+
+Right (40%): A Sticky Widget (remains fixed on scroll) titled "Prenez votre rendez-vous en ligne".
+
+Mobile: Stacked (Info first, Booking button sticky at bottom or inline).
+
+B. The Booking Wizard (Multi-Step Form in the Right Widget): Use JavaScript to manage steps (Show/Hide).
+
+Step 1: Patient Status
+
+Title: "Avez-vous déjà consulté ce soignant ?"
+
+UI: Two large buttons "Oui" / "Non".
+
+Step 2: Reason (Motif)
+
+Title: "Motif de consultation".
+
+UI: Dropdown or Radio list ("Première consultation", "Suivi", "Urgence").
+
+Step 3: The Calendar (The "Grid")
+
+Title: "Choisissez la date".
+
+UI: Display next 3-4 days as columns (e.g., "Mer 24").
+
+Slots: Under each day, list available slots as Pills.
+
+Style: bg-[#14b999]/10 (Light Mint) for slots. Hover: bg-[#14b999] (Solid Mint).
+
+Step 4: Case Classification (Symptoms)
+
+Title: "Symptômes (Optionnel)".
+
+UI: Simple text area to populate symptoms_summary.
+
+Step 5: Confirmation.
+
+PART 4: DASHBOARD UPGRADES
+Doctor Dashboard:
+
+Settings Tab: A grid form (Mon-Sun) to set DoctorAvailability times.
+
+Appointment Card: Show the "Motif" and "Symptômes" prominently.
+
+Actions: Add a WhatsApp Icon Button that opens the "Smart Link" with a pre-filled reminder message.
+
+Patient Dashboard:
+
+Tab "Mon Carnet de Santé": A clean form to input Blood Type/Allergies and view history.
+
+PART 5: VISUAL GUIDELINES
+Primary Color: #14b999 (Mint) for all primary buttons and active states.
+
+Cards: bg-white with shadow-md or shadow-lg.
+
+Typography: Clean, readable, medical grade.
+
+Execute this full transformation. Prioritize the Data Migration and the Booking Wizard Logic.

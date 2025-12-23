@@ -1,0 +1,45 @@
+Act as a Senior Backend Architect. We are upgrading the core scheduling engine of "TBIB" to match Doctolib's advanced configuration capabilities.
+
+### 1. DATABASE EVOLUTION (ADVANCED MODELS)
+Extend `models.py` with these new configurations. Do not delete existing data.
+
+**A. `ConsultationType` Model (Variable Durations):**
+* `id`, `doctor_id` (FK), `name` (String, e.g., "Consultation Suivi"), `duration` (Integer, minutes), `price` (String).
+* `color` (String, hex code for UI).
+* `is_emergency_only` (Boolean, default=False) -> Only bookable 24h before.
+* `require_existing_patient` (Boolean, default=False) -> Blocks new patients.
+
+**B. `DoctorAbsence` Model (Vacations):**
+* `id`, `doctor_id`, `start_date` (DateTime), `end_date` (DateTime), `reason`.
+
+**C. Update `User` (Patient) Model:**
+* Add `no_show_count` (Integer, default=0).
+* Add `is_blocked` (Boolean, default=False).
+
+### 2. LOGIC UPGRADE: THE SLOT GENERATOR V2
+Rewrite the `generate_slots(doctor_id, date, consultation_type_id)` function in `app.py`.
+**New Algorithm:**
+1.  **Get Rules:** Fetch the specific `ConsultationType` chosen by the user (or default to 30min if none).
+2.  **Check Blocking:**
+    * If `consultation_type.require_existing_patient` is True AND User has NO past appointments with this doctor -> **Return Error/Empty List**.
+    * If `consultation_type.is_emergency_only` is True AND `date > today + 1 day` -> **Return Error/Empty List**.
+3.  **Check User Ban:** If `current_user.no_show_count >= 3`, block slot generation entirely.
+4.  **Loop & Availability:**
+    * Iterate through the day using the `consultation_type.duration` as the step (e.g., 15min, 45min).
+    * **CRITICAL:** Check `DoctorAbsence` table. If date overlaps, no slots.
+    * Check `Appointment` table for conflicts.
+5.  **Return:** List of valid start times.
+
+### 3. FRONTEND: DOCTOR SETTINGS DASHBOARD
+Create a new Tab in `/doctor/dashboard` called **"Configuration"**.
+* **Form 1 (Motifs):** Add/Edit Consultation Types (Name, Duration, Price, Color, Is Emergency?).
+* **Form 2 (Absences):** "Poser une absence" (Start Date, End Date).
+* **Visual:** List existing types with their color pills.
+
+### 4. BOOKING WIZARD UPDATE
+Update the Step 2 of the Wizard ("Motif"):
+* Instead of hardcoded options, fetch the `ConsultationType` list from the DB for that doctor.
+* When a user clicks a motif, store its `id`.
+* Pass this `id` to the `generate_slots` API so the calendar shows slots based on the correct duration (e.g., if I click "Urgence 15min", show me 4 slots per hour. If "Bilan 1h", show 1 slot per hour).
+
+**Execute this. This makes the calendar "Smart" and variable.**

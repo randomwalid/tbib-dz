@@ -1,0 +1,95 @@
+🧬 PROMPT TBIB V41: MANUAL SEEDING SCRIPT (SHELL EXECUTION)
+Role: Senior Python Developer. Goal: Create a standalone script seed_prod.py to populate the database via the command line. This bypasses web server timeouts.
+
+1. CREATE FILE: seed_prod.py
+Create a new file in the root directory named seed_prod.py. Content:
+
+Python
+
+from app import app, db
+from models import User, DoctorProfile, DoctorAvailability, ConsultationType, Doctor
+from datetime import datetime, timedelta
+import random
+from werkzeug.security import generate_password_hash
+
+# DATA LISTS
+CITIES = ["Alger", "Oran", "Constantine", "Annaba", "Setif", "Bejaia", "Tlemcen", "Blida"]
+SPECIALTIES = ["Médecin Généraliste", "Dentiste", "Cardiologue", "Pédiatre", "Dermatologue", "Gynécologue", "Ophtalmologue"]
+NAMES_M = ["Mohamed", "Amine", "Walid", "Karim", "Yacine", "Omar", "Youcef", "Bilal"]
+NAMES_F = ["Sarah", "Fatima", "Meriem", "Yasmine", "Amel", "Leila", "Noura", "Imene"]
+LAST_NAMES = ["Benali", "Saidi", "Dahmani", "Moussaoui", "Belkacem", "Larbi", "Chraiet", "Mekki"]
+
+def seed_database():
+    with app.app_context():
+        print("🚀 STARTING DATABASE SEEDING (PRODUCTION)...")
+        
+        # 1. Ensure Tables Exist
+        db.create_all()
+        print("✅ Tables verified.")
+
+        # 2. Check if data exists
+        if User.query.filter_by(role='doctor').first():
+            print("⚠️ Database already contains doctors. Aborting to prevent duplicates.")
+            return
+
+        # 3. Create 50 Doctors
+        for i in range(1, 51):
+            # Gender & Name
+            gender = random.choice(['M', 'F'])
+            fname = random.choice(NAMES_M) if gender == 'M' else random.choice(NAMES_F)
+            lname = random.choice(LAST_NAMES)
+            full_name = f"Dr. {fname} {lname}"
+            
+            # User Account
+            email = f"doc{i}@tbib.dz"
+            user = User(
+                email=email,
+                password_hash=generate_password_hash("123456"),
+                role='doctor',
+                is_verified=True
+            )
+            db.session.add(user)
+            db.session.flush() # Get ID
+
+            # Profile
+            city = random.choice(CITIES)
+            spec = random.choice(SPECIALTIES)
+            profile = DoctorProfile(
+                id=user.id,
+                first_name=fname,
+                last_name=lname,
+                specialty=spec,
+                city=city,
+                bio=f"Spécialiste en {spec} à {city}. Expérience confirmée.",
+                waiting_room_count=random.randint(0, 5)
+            )
+            db.session.add(profile)
+
+            # Consultation Types
+            t1 = ConsultationType(doctor_id=user.id, name="Consultation", duration=30, price="2000 DA", color="#14b999")
+            t2 = ConsultationType(doctor_id=user.id, name="Urgence", duration=15, price="3000 DA", color="#ef4444", is_emergency_only=True)
+            db.session.add_all([t1, t2])
+
+            # Availability (Next 7 days, 09:00 - 17:00)
+            # Create a basic Mon-Fri schedule
+            for day_offset in range(7):
+                date_target = datetime.now() + timedelta(days=day_offset)
+                if date_target.weekday() < 5: # Mon-Fri
+                    avail = DoctorAvailability(
+                        doctor_id=user.id,
+                        day_of_week=date_target.strftime('%A'), # Keep simple logic
+                        start_time="09:00",
+                        end_time="17:00"
+                    )
+                    db.session.add(avail)
+
+            if i % 10 == 0:
+                print(f"   ... Created {i} doctors")
+
+        db.session.commit()
+        print("✅ SUCCESS: 50 Doctors injected with schedules!")
+
+if __name__ == "__main__":
+    seed_database()
+2. INSTRUCTIONS
+Provide the exact Shell command to run this script.

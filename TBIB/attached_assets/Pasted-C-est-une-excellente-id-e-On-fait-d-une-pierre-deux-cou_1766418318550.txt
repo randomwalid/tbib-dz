@@ -1,0 +1,56 @@
+C'est une excellente idée. On fait d'une pierre deux coups.
+
+Cela va permettre de déployer à la fois le Tableau de Bord "Éthique" pour le Ministère (celui qui respecte tes valeurs) ET les correctifs fonctionnels indispensables (Diagnostic médecin + RDV pour un proche).
+
+Voici le PROMPT V51 : THE FINAL MERGE (MINISTRY + FEATURES). Il contient tout. C'est le prompt ultime.
+
+Copie-colle ça dans Replit :
+
+🧬 PROMPT TBIB V51: MINISTRY OBSERVATORY & CORE FEATURES PACK
+Role: Senior Full Stack Developer. Goal: Implement the Ethical Ministry Dashboard AND fix critical user interactions (Doctor Diagnosis & Family Booking) in one go.
+
+PART 1: THE MINISTRY DASHBOARD (Route /admin/ministry)
+Context: Create a public-health oriented dashboard. STRICT CONSTRAINT: No individual patient data. Aggregated statistics only (Privacy by Design).
+
+1. Update routes.py: Create @app.route('/admin/ministry'):
+
+Equity Data: Calculate doctors_per_city. Identify cities with < 2 doctors.
+
+Anonymous Watch: Create a mock dictionary of health trends (e.g., {'Grippe': '+12%', 'Diabète': 'Stable'}). Do NOT fetch real patient names.
+
+Auto-Report: Generate a summary string (e.g., "RAPPORT: La couverture médicale est stable. Vigilance grippale en hausse.").
+
+2. Create Template templates/admin/ministry.html:
+
+Theme: Professional Health (White/Navy Blue/Clean).
+
+Header Badge: 🛡️ "DONNÉES ANONYMISÉES & AGRÉGÉES - RGPD/CNI COMPLIANT".
+
+Zones:
+
+Top: Key stats (Total Doctors, Cities Covered).
+
+Left: "Observatoire de l'Équité" (List of cities with doctor counts).
+
+Bottom Right: "Veille Épidémiologique" (The anonymous trends).
+
+PART 2: FUNCTIONAL POLISH (Diagnosis & Booking)
+1. Feature A: Doctor Diagnosis (templates/doctor_dashboard.html)
+
+Action: When the doctor clicks "Terminer la consultation":
+
+Open a simple Javascript prompt or Modal asking for: "Bilan / Diagnostic".
+
+Send this text to the backend route (e.g., /complete_appointment/<id>).
+
+Backend: Ensure the completion route saves this text into the appointment's notes or diagnosis field.
+
+2. Feature B: "Book for Someone Else" (templates/home.html / Booking Modal)
+
+Action: Fix the checkbox/button "Pour un proche".
+
+When checked/clicked, it MUST reveal a text input: patient_name_override (Placeholder: "Nom complet du patient").
+
+Backend: When booking, save this name if provided (append to notes: "Patient: [Name]").
+
+Execute this. I need the dashboard to be ethical and the app to be fully functional for a demo.

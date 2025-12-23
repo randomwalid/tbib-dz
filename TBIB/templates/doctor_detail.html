@@ -1,0 +1,396 @@
+{% extends 'base.html' %}
+{% block title %}Dr. {{ doctor.user.name }}{% endblock %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto px-4 py-8">
+    <div class="flex flex-col lg:flex-row gap-8">
+        <div class="lg:w-3/5">
+            <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mb-6">
+                <div class="flex items-start gap-4">
+                    <div class="w-20 h-20 bg-[#14b999]/10 rounded-full flex items-center justify-center text-[#14b999] font-bold text-2xl flex-shrink-0">
+                        {{ doctor.user.name[0] }}
+                    </div>
+                    <div>
+                        <h1 class="text-2xl font-bold text-gray-900">Dr. {{ doctor.user.name }}</h1>
+                        <p class="text-[#14b999] font-medium">{{ doctor.specialty }}</p>
+                        <p class="text-gray-500 flex items-center gap-1 mt-1">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                            </svg>
+                            {{ doctor.city }}{% if doctor.address %} - {{ doctor.address }}{% endif %}
+                        </p>
+                    </div>
+                </div>
+            </div>
+            
+            {% if doctor.bio %}
+            <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mb-6">
+                <h2 class="text-lg font-semibold text-gray-900 mb-4">Présentation</h2>
+                <p class="text-gray-600 leading-relaxed">{{ doctor.bio }}</p>
+            </div>
+            {% endif %}
+            
+            <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+                <h2 class="text-lg font-semibold text-gray-900 mb-4">Informations pratiques</h2>
+                <div class="space-y-3 text-sm">
+                    <div class="flex items-center gap-3 text-gray-600">
+                        <svg class="w-5 h-5 text-[#14b999]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/>
+                        </svg>
+                        {{ doctor.user.phone or 'Non renseigné' }}
+                    </div>
+                    <div class="flex items-center gap-3 text-gray-600">
+                        <svg class="w-5 h-5 text-[#14b999]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        Consultation: 30 minutes
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="lg:w-2/5">
+            <div class="bg-white rounded-xl shadow-md border border-gray-100 p-6 lg:sticky lg:top-20">
+                <h2 class="text-lg font-semibold text-gray-900 mb-4">Prenez votre rendez-vous en ligne</h2>
+                
+                <div id="booking-wizard">
+                    <div id="step-1" class="step">
+                        <p class="text-sm text-gray-600 mb-4">Avez-vous déjà consulté ce médecin ?</p>
+                        <div class="grid grid-cols-2 gap-3">
+                            <button onclick="nextStep(2, 'returning')" class="py-3 px-4 border-2 border-gray-200 rounded-xl text-gray-700 font-medium hover:border-[#14b999] hover:text-[#14b999] transition">
+                                Oui
+                            </button>
+                            <button onclick="nextStep(2, 'new')" class="py-3 px-4 border-2 border-gray-200 rounded-xl text-gray-700 font-medium hover:border-[#14b999] hover:text-[#14b999] transition">
+                                Non
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div id="step-2" class="step hidden">
+                        <p class="text-sm text-gray-600 mb-4">Type de consultation</p>
+                        <div id="consultation-types-container" class="space-y-2">
+                            <div class="text-center py-4">
+                                <div class="animate-spin w-6 h-6 border-2 border-[#14b999] border-t-transparent rounded-full mx-auto"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div id="step-3" class="step hidden">
+                        <div class="flex items-center justify-between mb-4">
+                            <p class="text-sm text-gray-600">Choisissez la date</p>
+                            <div class="flex gap-2">
+                                <button onclick="prevDays()" id="prev-btn" class="p-1 rounded hover:bg-gray-100 disabled:opacity-30" disabled>
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                                    </svg>
+                                </button>
+                                <button onclick="nextDays()" id="next-btn" class="p-1 rounded hover:bg-gray-100">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div id="slots-container" class="grid grid-cols-3 gap-2">
+                            <div class="text-center py-8 col-span-3">
+                                <div class="animate-spin w-8 h-8 border-2 border-[#14b999] border-t-transparent rounded-full mx-auto"></div>
+                                <p class="text-sm text-gray-500 mt-2">Chargement...</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div id="step-4" class="step hidden">
+                        <div class="text-center py-6">
+                            <div class="w-16 h-16 bg-[#14b999]/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <svg class="w-8 h-8 text-[#14b999]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                </svg>
+                            </div>
+                            <h3 class="font-semibold text-gray-900 mb-2">Confirmer le rendez-vous</h3>
+                            <p class="text-sm text-gray-600 mb-1">Dr. {{ doctor.user.name }}</p>
+                            <p class="text-sm font-medium text-[#14b999]" id="confirm-datetime"></p>
+                            <p class="text-sm text-gray-500" id="confirm-reason"></p>
+                        </div>
+                        
+                        <div class="mb-4 bg-gray-50 p-4 rounded-xl border border-gray-100">
+                            <label class="flex items-center gap-2 cursor-pointer select-none">
+                                <input type="checkbox" id="for-someone-else-checkbox" onchange="toggleProxyBooking()" class="w-4 h-4 text-[#14b999] border-gray-300 rounded focus:ring-[#14b999]">
+                                <span class="text-sm text-gray-700 font-medium">Prendre RDV pour un proche</span>
+                            </label>
+                            
+                            <div id="proxy-booking-input" class="mt-3 hidden" style="display: none;">
+                                <label class="text-xs text-gray-500 mb-1 block">Nom complet du patient concerné :</label>
+                                <input type="text" id="patient-name-override" 
+                                       placeholder="Ex: Ma grand-mère Fatima Benali"
+                                       class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#14b999] focus:border-transparent text-sm"
+                                       oninput="syncNameInput(this)">
+                            </div>
+                        </div>
+                        
+                        <form method="POST" action="{{ url_for('main.book_appointment', doctor_id=doctor.id) }}" id="booking-form">
+                            <input type="hidden" name="appointment_date" id="input-date">
+                            <input type="hidden" name="appointment_time" id="input-time">
+                            <input type="hidden" name="consultation_reason" id="input-reason">
+                            <input type="hidden" name="consultation_type_id" id="input-type-id">
+                            <input type="hidden" name="patient_name_override" id="input-patient-name">
+                            
+                            <button type="submit" class="w-full bg-[#14b999] text-white py-3 rounded-xl hover:bg-[#0d9479] transition font-medium shadow-lg shadow-[#14b999]/30">
+                                Confirmer le rendez-vous
+                            </button>
+                        </form>
+                    </div>
+                    
+                    <button onclick="goBack()" id="back-btn" class="hidden mt-4 text-sm text-gray-500 hover:text-gray-700 flex items-center gap-1 mx-auto">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                        </svg>
+                        Retour
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const doctorId = {{ doctor.id }};
+let currentStep = 1;
+let selectedDate = null;
+let selectedTime = null;
+let selectedReason = 'Consultation';
+let selectedTypeId = null;
+let selectedDuration = 30;
+let consultationTypes = [];
+let startDate = new Date();
+startDate.setHours(0, 0, 0, 0);
+
+const dayNames = ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'];
+const monthNames = ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil', 'Août', 'Sep', 'Oct', 'Nov', 'Déc'];
+
+document.addEventListener('DOMContentLoaded', loadConsultationTypes);
+
+function loadConsultationTypes() {
+    fetch(`/api/doctors/${doctorId}/consultation-types`)
+        .then(res => res.json())
+        .then(types => {
+            consultationTypes = types;
+            renderConsultationTypes();
+        });
+}
+
+function renderConsultationTypes() {
+    const container = document.getElementById('consultation-types-container');
+    container.innerHTML = '';
+    
+    consultationTypes.forEach(type => {
+        const btn = document.createElement('button');
+        btn.className = 'type-btn w-full py-3 px-4 border-2 border-gray-200 rounded-xl text-left text-gray-700 hover:border-[#14b999] transition flex items-center gap-3';
+        btn.innerHTML = `
+            <div class="w-3 h-3 rounded-full flex-shrink-0" style="background-color: ${type.color}"></div>
+            <div class="flex-1">
+                <p class="font-medium">${type.name}</p>
+                <p class="text-xs text-gray-500">${type.duration} min${type.price ? ' · ' + type.price + ' DZD' : ''}</p>
+            </div>
+        `;
+        btn.onclick = () => selectType(type);
+        container.appendChild(btn);
+    });
+}
+
+function selectType(type) {
+    selectedReason = type.name;
+    selectedTypeId = type.id;
+    selectedDuration = type.duration;
+    
+    document.querySelectorAll('.type-btn').forEach(btn => {
+        btn.classList.remove('border-[#14b999]', 'bg-[#14b999]/10');
+    });
+    event.currentTarget.classList.add('border-[#14b999]', 'bg-[#14b999]/10');
+    
+    showStep(3);
+}
+
+function showStep(step) {
+    document.querySelectorAll('.step').forEach(s => s.classList.add('hidden'));
+    document.getElementById(`step-${step}`).classList.remove('hidden');
+    document.getElementById('back-btn').classList.toggle('hidden', step === 1);
+    currentStep = step;
+    
+    if (step === 3) {
+        loadSlots();
+    }
+}
+
+function nextStep(step, data) {
+    showStep(step);
+}
+
+function goBack() {
+    if (currentStep > 1) {
+        showStep(currentStep - 1);
+    }
+}
+
+function formatDate(date) {
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2, '0');
+    const d = String(date.getDate()).padStart(2, '0');
+    return `${y}-${m}-${d}`;
+}
+
+function loadSlots() {
+    const container = document.getElementById('slots-container');
+    container.innerHTML = `
+        <div class="text-center py-8 col-span-3">
+            <div class="animate-spin w-8 h-8 border-2 border-[#14b999] border-t-transparent rounded-full mx-auto"></div>
+            <p class="text-sm text-gray-500 mt-2">Chargement...</p>
+        </div>
+    `;
+    
+    const startStr = formatDate(startDate);
+    const typeParam = selectedTypeId ? `&type_id=${selectedTypeId}` : '';
+    
+    fetch(`/api/doctors/${doctorId}/smart-slots?start_date=${startStr}&days=3${typeParam}`)
+        .then(res => res.json())
+        .then(response => {
+            container.innerHTML = '';
+            
+            if (response.error) {
+                container.innerHTML = `<p class="col-span-3 text-center text-amber-600 text-sm py-4">${response.error}</p>`;
+                return;
+            }
+            
+            const data = response.slots || response;
+            const dates = Object.keys(data).sort();
+            
+            dates.forEach(dateStr => {
+                const d = new Date(dateStr + 'T00:00:00');
+                const dayCol = document.createElement('div');
+                dayCol.className = 'text-center';
+                
+                const header = document.createElement('div');
+                header.className = 'text-xs font-medium text-gray-500 mb-2';
+                header.innerHTML = `${dayNames[d.getDay()]} ${d.getDate()} ${monthNames[d.getMonth()]}`;
+                dayCol.appendChild(header);
+                
+                const slots = data[dateStr];
+                if (slots.length === 0) {
+                    const noSlot = document.createElement('div');
+                    noSlot.className = 'text-xs text-gray-400 py-4';
+                    noSlot.textContent = 'Complet';
+                    dayCol.appendChild(noSlot);
+                } else {
+                    const slotsDiv = document.createElement('div');
+                    slotsDiv.className = 'space-y-1 max-h-48 overflow-y-auto';
+                    
+                    slots.forEach(time => {
+                        const btn = document.createElement('button');
+                        btn.className = 'w-full py-2 px-2 text-xs rounded-lg border border-[#14b999] text-[#14b999] hover:bg-[#14b999] hover:text-white transition';
+                        btn.textContent = time;
+                        btn.onclick = () => selectSlot(dateStr, time, btn);
+                        slotsDiv.appendChild(btn);
+                    });
+                    
+                    dayCol.appendChild(slotsDiv);
+                }
+                
+                container.appendChild(dayCol);
+            });
+            
+            updateNavButtons();
+        })
+        .catch(err => {
+            container.innerHTML = '<p class="col-span-3 text-center text-red-500">Erreur de chargement</p>';
+        });
+}
+
+function selectSlot(date, time, btn) {
+    document.querySelectorAll('#slots-container button').forEach(b => {
+        b.classList.remove('bg-[#14b999]', 'text-white');
+        b.classList.add('text-[#14b999]');
+    });
+    
+    btn.classList.add('bg-[#14b999]', 'text-white');
+    btn.classList.remove('text-[#14b999]');
+    
+    selectedDate = date;
+    selectedTime = time;
+    
+    document.getElementById('input-date').value = date;
+    document.getElementById('input-time').value = time;
+    document.getElementById('input-reason').value = selectedReason;
+    
+    // On réinitialise l'input pour un proche par sécurité
+    document.getElementById('for-someone-else-checkbox').checked = false;
+    toggleProxyBooking();
+    
+    const typeIdInput = document.getElementById('input-type-id');
+    if (selectedTypeId) {
+        typeIdInput.value = selectedTypeId;
+    } else {
+        typeIdInput.removeAttribute('name');
+    }
+    
+    const d = new Date(date + 'T00:00:00');
+    document.getElementById('confirm-datetime').textContent = 
+        `${dayNames[d.getDay()]} ${d.getDate()} ${monthNames[d.getMonth()]} à ${time}`;
+    document.getElementById('confirm-reason').textContent = selectedReason;
+    
+    showStep(4);
+}
+
+function prevDays() {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    startDate.setDate(startDate.getDate() - 3);
+    if (startDate < today) {
+        startDate = new Date(today);
+    }
+    loadSlots();
+}
+
+function nextDays() {
+    startDate.setDate(startDate.getDate() + 3);
+    loadSlots();
+}
+
+function updateNavButtons() {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    document.getElementById('prev-btn').disabled = startDate <= today;
+}
+
+// --- FONCTIONS CORRIGÉES POUR LE RDV PROCHE ---
+
+function toggleProxyBooking() {
+    const checkbox = document.getElementById('for-someone-else-checkbox');
+    const inputDiv = document.getElementById('proxy-booking-input');
+    const textInput = document.getElementById('patient-name-override');
+    const hiddenInput = document.getElementById('input-patient-name');
+    
+    if (checkbox.checked) {
+        // Force l'affichage en retirant la classe et en modifiant le style directement
+        inputDiv.classList.remove('hidden');
+        inputDiv.style.display = 'block';
+    } else {
+        // Masque tout
+        inputDiv.classList.add('hidden');
+        inputDiv.style.display = 'none';
+        
+        // Nettoie les champs si on décoche
+        textInput.value = '';
+        hiddenInput.value = '';
+    }
+}
+
+// Cette fonction copie le nom en temps réel dans le champ caché
+function syncNameInput(inputElement) {
+    document.getElementById('input-patient-name').value = inputElement.value;
+}
+</script>
+{% endblock %}

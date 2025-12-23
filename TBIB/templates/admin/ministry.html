@@ -1,0 +1,179 @@
+{% extends 'base.html' %}
+{% block title %}Observatoire Santé - Ministère{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-slate-50">
+    <div class="bg-gradient-to-r from-slate-800 to-slate-900 text-white py-6 px-6">
+        <div class="max-w-7xl mx-auto">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-2xl font-bold">Observatoire National de Santé</h1>
+                    <p class="text-slate-300 text-sm mt-1">Tableau de bord - Ministère de la Santé</p>
+                </div>
+                <div class="bg-green-500/20 border border-green-400/50 rounded-lg px-4 py-2">
+                    <div class="flex items-center gap-2 text-green-300 text-sm font-medium">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                        </svg>
+                        DONNEES ANONYMISEES & AGREGEES - RGPD/CNI COMPLIANT
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="max-w-7xl mx-auto px-6 py-8">
+        <div class="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-8">
+            <p class="text-blue-800 font-medium">{{ report }}</p>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 bg-[#14b999]/10 rounded-xl flex items-center justify-center">
+                        <svg class="w-6 h-6 text-[#14b999]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <p class="text-3xl font-bold text-gray-900">{{ total_doctors }}</p>
+                        <p class="text-sm text-gray-500">Medecins Actifs</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center">
+                        <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <p class="text-3xl font-bold text-gray-900">{{ total_cities }}</p>
+                        <p class="text-sm text-gray-500">Villes Couvertes</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 bg-amber-50 rounded-xl flex items-center justify-center">
+                        <svg class="w-6 h-6 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <p class="text-3xl font-bold text-gray-900">{{ underserved_cities|length }}</p>
+                        <p class="text-sm text-gray-500">Zones Sous-Couvertes</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 bg-purple-50 rounded-xl flex items-center justify-center">
+                        <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <p class="text-3xl font-bold text-gray-900">{{ doctors_per_city|length }}</p>
+                        <p class="text-sm text-gray-500">Specialites Actives</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                <div class="bg-slate-800 text-white px-6 py-4">
+                    <h2 class="font-semibold flex items-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3"/>
+                        </svg>
+                        Observatoire de l'Equite Territoriale
+                    </h2>
+                </div>
+                <div class="p-6">
+                    <div class="space-y-3">
+                        {% for city, count in doctors_per_city %}
+                        <div class="flex items-center justify-between py-2 border-b border-gray-50 last:border-0">
+                            <div class="flex items-center gap-3">
+                                {% if count < 2 %}
+                                <span class="w-2 h-2 bg-red-500 rounded-full"></span>
+                                {% elif count < 5 %}
+                                <span class="w-2 h-2 bg-amber-500 rounded-full"></span>
+                                {% else %}
+                                <span class="w-2 h-2 bg-green-500 rounded-full"></span>
+                                {% endif %}
+                                <span class="font-medium text-gray-800">{{ city }}</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <div class="w-32 bg-gray-100 rounded-full h-2">
+                                    <div class="h-2 rounded-full {% if count < 2 %}bg-red-500{% elif count < 5 %}bg-amber-500{% else %}bg-green-500{% endif %}" 
+                                         style="width: {{ [count * 10, 100]|min }}%"></div>
+                                </div>
+                                <span class="text-sm font-medium text-gray-600 w-12 text-right">{{ count }} med.</span>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    
+                    {% if underserved_cities %}
+                    <div class="mt-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+                        <p class="text-sm font-medium text-red-800 mb-2">Zones necessitant une attention prioritaire:</p>
+                        <p class="text-sm text-red-700">{{ underserved_cities|join(', ') }}</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                <div class="bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-6 py-4">
+                    <h2 class="font-semibold flex items-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                        </svg>
+                        Veille Epidemiologique (Anonymisee)
+                    </h2>
+                </div>
+                <div class="p-6">
+                    <p class="text-xs text-gray-500 mb-4 uppercase tracking-wide">Tendances basees sur les motifs de consultation agreges</p>
+                    <div class="space-y-4">
+                        {% for condition, trend in health_trends.items() %}
+                        <div class="flex items-center justify-between py-3 border-b border-gray-50 last:border-0">
+                            <span class="font-medium text-gray-800">{{ condition }}</span>
+                            <span class="px-3 py-1 rounded-full text-sm font-medium
+                                {% if '+' in trend %}bg-red-100 text-red-700
+                                {% elif '-' in trend %}bg-green-100 text-green-700
+                                {% else %}bg-gray-100 text-gray-600{% endif %}">
+                                {{ trend }}
+                            </span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    
+                    <div class="mt-6 p-4 bg-amber-50 border border-amber-200 rounded-lg">
+                        <div class="flex items-start gap-3">
+                            <svg class="w-5 h-5 text-amber-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            <div>
+                                <p class="text-sm font-medium text-amber-800">Vigilance Grippale</p>
+                                <p class="text-xs text-amber-700 mt-1">Hausse des consultations liees aux syndromes grippaux. Recommandation: renforcer la communication sur la vaccination.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="mt-8 text-center text-xs text-gray-400">
+            <p>Donnees generees automatiquement - Aucune information personnelle de patient n'est exposee</p>
+            <p class="mt-1">Conforme RGPD & Reglementation CNI sur la protection des donnees de sante</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

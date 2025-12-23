@@ -1,0 +1,78 @@
+🧬 PROMPT TBIB V28: ULTIMATE DOCTOR SETTINGS & PATIENT DATA
+Role: Senior Full-Stack Developer. Goal: Create a complete CRUD "Settings Hub" for doctors and ensure robust patient data persistence.
+
+1. DATABASE UPGRADES (RICH PROFILES)
+Extend models.py to store detailed info. Do not delete existing data.
+
+A. Update DoctorProfile:
+
+profile_picture (String, URL/Path).
+
+bio (Text, Long description).
+
+languages (String or JSON, e.g., "Français, Arabe").
+
+payment_methods (String, e.g., "Espèces, CIB").
+
+expertises (String, e.g., "Orthodontie, Pédodontie").
+
+diplomas (Text).
+
+B. Update User (Patient):
+
+Ensure these fields exist and are persisted: phone (String), birth_date (Date), gender (String), address (String), city (String).
+
+2. FEATURE: DOCTOR SETTINGS HUB (/doctor/settings)
+Create a new comprehensive route and template. Use a Tabbed Layout for organization:
+
+TAB 1: INFORMATIONS PUBLIQUES (Identity)
+
+Photo: Simple URL input or File Upload (if configured).
+
+Bio & Présentation: Textarea.
+
+Infos Pratiques: Checkboxes or Tags input for "Langues", "Paiement", "Expertises".
+
+Save Button: Updates the DoctorProfile table.
+
+TAB 2: GESTION DES CONSULTATIONS (The Business)
+
+List View: Show current ConsultationType (Nom, Durée, Prix, Couleur).
+
+Actions:
+
+"Modifier" (Edit duration/price).
+
+"Supprimer".
+
+"Ajouter un type" (Modal form).
+
+CRITICAL: This data drives the calendar. Ensure duration is saved as Integer (minutes).
+
+TAB 3: HORAIRES & ABSENCES (The Time)
+
+Weekly Hours: A grid (Lun-Dim) with Start/End inputs. Saves to DoctorAvailability.
+
+Absences: A list of upcoming leaves. Form to "Poser une absence" (Date Début - Date Fin). Saves to DoctorAbsence.
+
+3. FEATURE: PATIENT PROFILE PERSISTENCE
+Refactor the /patient/profile route (POST method).
+
+Input: Accept form data for Phone, Birth Date, Address.
+
+Logic:
+
+Fetch current_user.
+
+Update fields.
+
+db.session.commit().
+
+Verification: Ensure that when the user logs back in, these fields are pre-filled in the form.
+
+4. UI/UX DETAILS
+Use the Sidebar Layout created in V23. Add "Configuration" as an active link.
+
+Use Flash Messages ("Modifications enregistrées !") in Green (#14b999) upon success.
+
+Execute this. Give the doctor full control over their public image and business rules.

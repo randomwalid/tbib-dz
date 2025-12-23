@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="{{ lang }}" {% if lang == 'ar' %}dir="rtl"{% endif %}>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ t.brand }} - {% block title %}{% endblock %}</title>
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/logo_final.png') }}">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        {% if lang == 'ar' %}
+        body { font-family: 'Cairo', sans-serif; }
+        {% else %}
+        body { font-family: 'Inter', sans-serif; }
+        {% endif %}
+        .pulse-dot {
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+    </style>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        mint: {
+                            50: '#f0fdf9',
+                            100: '#ccfbef',
+                            200: '#99f6df',
+                            300: '#5ceacc',
+                            400: '#2dd4b4',
+                            500: '#14b999',
+                            600: '#0d9479',
+                            700: '#0f7562',
+                            800: '#115d50',
+                            900: '#134d43',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-white min-h-screen flex flex-col">
+    <nav class="bg-white border-b border-gray-100 sticky top-0 z-50">
+        <div class="max-w-6xl mx-auto px-4">
+            <div class="flex justify-between items-center h-14">
+                <a href="{{ url_for('main.home') }}" class="flex items-center">
+                    <img src="{{ url_for('static', filename='img/logo_final.png') }}" alt="TBIB" class="h-12 w-auto">
+                </a>
+                
+                <div class="flex items-center gap-3">
+                    {% if current_user.is_authenticated %}
+                        {% if current_user.role == 'patient' %}
+                            <div class="relative" x-data="{ open: false }">
+                                <button @click="open = !open" class="flex items-center gap-2 text-sm font-medium text-gray-700 hover:text-[#14b999] transition">
+                                    <div class="w-8 h-8 bg-[#14b999]/10 rounded-full flex items-center justify-center text-[#14b999] font-semibold text-xs">
+                                        {{ current_user.name[0] }}
+                                    </div>
+                                    <span class="hidden md:inline">{{ current_user.name.split()[0] }}</span>
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                                    </svg>
+                                </button>
+                                <div x-show="open" @click.away="open = false" x-transition class="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50">
+                                    <a href="{{ url_for('main.my_appointments') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">{{ t.my_appointments }}</a>
+                                    <a href="{{ url_for('main.patient_profile') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">{{ t.get('my_account', 'Mon Compte') }}</a>
+                                    <hr class="my-2 border-gray-100">
+                                    <a href="{{ url_for('main.logout') }}" class="block px-4 py-2 text-sm text-red-600 hover:bg-red-50">{{ t.logout }}</a>
+                                </div>
+                            </div>
+                        {% else %}
+                            <a href="{{ url_for('main.doctor_dashboard') }}" class="text-sm font-medium text-gray-700 hover:text-[#14b999] transition">{{ t.dashboard }}</a>
+                            <a href="{{ url_for('main.logout') }}" class="text-sm text-gray-500 hover:text-gray-700 transition">{{ t.logout }}</a>
+                        {% endif %}
+                    {% else %}
+                        <a href="{{ url_for('main.login') }}" class="text-sm text-gray-600 hover:text-gray-800 transition">{{ t.login }}</a>
+                        <a href="{{ url_for('main.register') }}" class="text-sm bg-[#14b999] text-white px-4 py-2 rounded-lg hover:bg-[#0d9479] transition font-medium">{{ t.register }}</a>
+                    {% endif %}
+                    
+                    <div class="flex gap-1 text-xs text-gray-400 border-l border-gray-200 pl-3 ml-2">
+                        <a href="{{ url_for('main.set_language', lang='fr') }}" class="{% if lang == 'fr' %}text-[#14b999] font-medium{% endif %}">FR</a>
+                        <span>/</span>
+                        <a href="{{ url_for('main.set_language', lang='ar') }}" class="{% if lang == 'ar' %}text-[#14b999] font-medium{% endif %}">AR</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+    
+    <main class="flex-grow">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="max-w-6xl mx-auto px-4 mt-4">
+                    {% for category, message in messages %}
+                        <div class="p-3 rounded-lg mb-2 text-sm {% if category == 'error' %}bg-red-50 text-red-600{% elif category == 'success' %}bg-[#14b999]/10 text-[#14b999]{% else %}bg-yellow-50 text-yellow-600{% endif %}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+        
+        {% block content %}{% endblock %}
+    </main>
+    
+    {% block scripts %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,121 @@
+{% extends 'base.html' %}
+{% block title %}{{ t.find_doctor }}{% endblock %}
+
+{% block content %}
+{% if not search_mode %}
+<div class="min-h-[80vh] flex flex-col justify-center items-center px-4">
+    <div class="text-center mb-8">
+        <img src="{{ url_for('static', filename='img/logo_accueil.png') }}" alt="TBIB" class="h-48 md:h-72 mx-auto mb-6">
+        <p class="text-xl text-gray-500">{{ t.search_subtitle }}</p>
+    </div>
+    
+    <form method="GET" class="w-full max-w-2xl">
+        <div class="bg-white rounded-2xl shadow-lg p-4 md:p-6">
+            <div class="flex flex-col md:flex-row gap-3">
+                <select name="specialty" class="flex-1 px-4 py-3 border border-gray-200 rounded-xl text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#14b999]/20 focus:border-[#14b999]">
+                    <option value="">{{ t.all_specialties }}</option>
+                    {% for spec in specialties %}
+                    <option value="{{ spec }}">{{ spec }}</option>
+                    {% endfor %}
+                </select>
+                
+                <select name="city" class="flex-1 px-4 py-3 border border-gray-200 rounded-xl text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#14b999]/20 focus:border-[#14b999]">
+                    <option value="">{{ t.all_cities }}</option>
+                    {% for c in cities %}
+                    <option value="{{ c }}">{{ c }}</option>
+                    {% endfor %}
+                </select>
+                
+                <button type="submit" class="bg-[#14b999] text-white px-8 py-3 rounded-xl hover:bg-[#0d9479] transition font-medium flex items-center justify-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                    </svg>
+                    {{ t.search }}
+                </button>
+            </div>
+        </div>
+    </form>
+    
+    <p class="mt-8 text-sm text-gray-400">Recherchez par spécialité ou ville pour trouver un médecin</p>
+</div>
+
+{% else %}
+<div class="max-w-6xl mx-auto px-4 pt-8">
+    <form method="GET" class="mb-8">
+        <div class="bg-white rounded-2xl shadow-md p-4 md:p-6">
+            <div class="flex flex-col md:flex-row gap-3 items-center">
+                <a href="{{ url_for('main.home') }}" class="md:mr-4">
+                    <img src="{{ url_for('static', filename='img/logo_final.png') }}" alt="TBIB" class="h-10 w-auto">
+                </a>
+                
+                <select name="specialty" class="flex-1 px-4 py-3 border border-gray-200 rounded-xl text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#14b999]/20 focus:border-[#14b999]">
+                    <option value="">{{ t.all_specialties }}</option>
+                    {% for spec in specialties %}
+                    <option value="{{ spec }}" {% if spec == selected_specialty %}selected{% endif %}>{{ spec }}</option>
+                    {% endfor %}
+                </select>
+                
+                <select name="city" class="flex-1 px-4 py-3 border border-gray-200 rounded-xl text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#14b999]/20 focus:border-[#14b999]">
+                    <option value="">{{ t.all_cities }}</option>
+                    {% for c in cities %}
+                    <option value="{{ c }}" {% if c == selected_city %}selected{% endif %}>{{ c }}</option>
+                    {% endfor %}
+                </select>
+                
+                <button type="submit" class="bg-[#14b999] text-white px-8 py-3 rounded-xl hover:bg-[#0d9479] transition font-medium flex items-center justify-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                    </svg>
+                    {{ t.search }}
+                </button>
+            </div>
+        </div>
+    </form>
+    
+    {% if doctors %}
+    <div class="pb-12">
+        <h2 class="text-lg font-semibold text-gray-800 mb-6">{{ t.available_doctors }}</h2>
+        
+        <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {% for doctor in doctors %}
+            <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition">
+                <div class="p-5">
+                    <div class="flex items-start gap-4">
+                        <div class="w-12 h-12 bg-[#14b999]/10 rounded-full flex items-center justify-center text-[#14b999] font-semibold text-lg flex-shrink-0">
+                            {{ doctor.user.name[0] }}
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <h3 class="font-semibold text-gray-900">Dr. {{ doctor.user.name }}</h3>
+                            <p class="text-sm text-[#14b999]">{{ doctor.specialty }}</p>
+                            <p class="text-sm text-gray-500 mt-1 flex items-center gap-1">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                                </svg>
+                                {{ doctor.city }}
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <a href="{{ url_for('main.doctor_profile', doctor_id=doctor.id) }}" class="mt-4 block w-full bg-[#14b999] text-white py-2.5 rounded-lg hover:bg-[#0d9479] transition font-medium text-sm text-center">
+                        {{ t.book }}
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% else %}
+    <div class="text-center py-16">
+        <div class="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg class="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+        </div>
+        <h3 class="text-lg font-medium text-gray-700 mb-2">Aucun médecin trouvé</h3>
+        <p class="text-gray-500">Essayez une autre spécialité ou ville</p>
+        <a href="{{ url_for('main.home') }}" class="inline-block mt-4 text-[#14b999] font-medium hover:underline">Nouvelle recherche</a>
+    </div>
+    {% endif %}
+</div>
+{% endif %}
+{% endblock %}

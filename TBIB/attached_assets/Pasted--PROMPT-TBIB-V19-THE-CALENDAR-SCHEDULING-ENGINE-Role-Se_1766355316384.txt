@@ -1,0 +1,80 @@
+🧬 PROMPT TBIB V19: THE CALENDAR & SCHEDULING ENGINE
+Role: Senior Python Backend Engineer & JavaScript Developer. Goal: Implement the "Doctolib-style" Appointment Grid. The "Prendre RDV" button must open a calendar, NOT add to the queue.
+
+1. BACKEND: THE SLOT GENERATOR API
+Create a new API route in app.py to calculate availability dynamically.
+
+Route: /api/doctors/<int:doctor_id>/slots
+
+Method: GET
+
+Parameters: start_date (YYYY-MM-DD), days (Int, default=3).
+
+Logic (The "Engine"):
+
+Fetch the doctor's DoctorAvailability (Opening Hours) for the requested days.
+
+If no availability is set in DB, default to 09:00-17:00 (Safe Fallback).
+
+Fetch existing Appointment records for these days to identify conflicts.
+
+Loop: Generate 30-minute slots (e.g., 09:00, 09:30...).
+
+Filter: If a generated slot overlaps with an existing appointment, remove it.
+
+Return JSON:
+
+JSON
+
+{
+  "2025-12-24": ["09:00", "09:30", "14:00"],
+  "2025-12-25": []
+}
+2. FRONTEND: THE BOOKING WIZARD (STEP 3 FIX)
+Update the Booking Widget on the Doctor Profile (/doctor/<id>).
+
+JavaScript Logic:
+
+When the user reaches Step 3 ("Choisissez la date"):
+
+Call the API: fetch(/api/doctors/${doctorId}/slots?start_date=${selectedDate}).
+
+Render: Clear previous slots. Loop through the JSON response.
+
+Create Pills: For each time slot, create a button:
+
+Text: time (e.g., "09:30").
+
+Class: py-2 px-4 rounded-full border border-[#14b999] text-[#14b999] hover:bg-[#14b999] hover:text-white transition cursor-pointer.
+
+Click Event: Clicking a pill should:
+
+Highlight it (Solid Green).
+
+Store the value in a hidden input <input name="appointment_time">.
+
+Enable the "Suivant" / "Confirmer" button.
+
+3. CONTROLLER FIX: THE /book ROUTE
+Modify the POST logic in /book to handle this calendar data.
+
+Input Check: Look for appointment_time (Datetime) in the form data.
+
+Condition:
+
+IF appointment_time is present: This is a Scheduled Appointment.
+
+Set status = 'confirmed'.
+
+DO NOT assign a queue_number (Set it to NULL or 0). The patient is NOT in the waiting room yet.
+
+IF appointment_time is missing: Assume it's a "Walk-in" (Sans RDV) added by the secretary.
+
+Assign queue_number = max(queue) + 1.
+
+4. UI POLISH
+Ensure the calendar grid displays 3 columns (Day 1, Day 2, Day 3) for a nice visual overview.
+
+Add a "Next Days" arrow button to fetch the next batch of dates.
+
+Execute this. The Priority is: API -> JS Grid -> Booking Save.

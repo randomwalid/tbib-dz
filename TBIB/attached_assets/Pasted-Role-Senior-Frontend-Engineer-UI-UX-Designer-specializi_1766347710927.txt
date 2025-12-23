@@ -1,0 +1,51 @@
+Role: Senior Frontend Engineer & UI/UX Designer specializing in TailwindCSS and responsive design. Goal: Refactor the existing Flask templates to achieve a premium, mobile-first look matching the provided mockups, and implement real-time updates for the ticket view.
+
+1. MANDATE: MOBILE-FIRST RESPONSIVENESS
+The current layout is too desktop-oriented. Refactor ALL templates based on this rule:
+
+Default layout must be for mobile (iPhone width). Stack elements vertically.
+
+Use Tailwind breakpoints (md:, lg:) only to expand layouts for larger screens (e.g., sidebars, grid columns).
+
+Patient Views: The Search Hero section and the Ticket Card must be full-width (w-full) on mobile with comfortable padding.
+
+Doctor Dashboard: On mobile, the sidebar should become a top navigation bar or a hamburger menu.
+
+2. VISUAL CORRECTION (THE "UGLY GREEN" FIX)
+The current green is flat. We need the modern, rich "Emerald" from the mockups.
+
+Update Tailwind Colors: Do not use default colors. Use these specific values/gradients:
+
+Primary Brand (Gradients): Use bg-gradient-to-r from-[#047857] to-[#10B981] for main buttons and active headers.
+
+Ticket Number Color: Use a text gradient: bg-gradient-to-br from-emerald-600 to-teal-500 bg-clip-text text-transparent.
+
+Backgrounds: Ensure main background is bg-gray-50 (off-white) to make white cards pop with shadow-md.
+
+3. FEATURE: REAL-TIME TICKET (AJAX)
+The ticket in /patient/appointments is currently static. It needs to be "En direct".
+
+Backend: Create a lightweight API endpoint: /api/queue_status/<doctor_id> returning JSON { "current_serving": X }.
+
+Frontend (JS): On the appointments page, add a JavaScript script that:
+
+Selects elements showing "En cours : Y".
+
+Uses setInterval to fetch the API every 5 seconds.
+
+Updates the DOM element with the new number without reloading the page.
+
+UI Element: Add a small badge "🔴 En direct" (pulsing red or green dot) next to the ticket to show it's live.
+
+4. UI MATCHING (THE MOCKUP TARGET)
+Refactor the appointment card in /patient/appointments to exactly match the reference image style:
+
+Container: A clean white card, rounded-2xl, soft shadow.
+
+Header: "VOTRE TOUR" (small, uppercase, gray text).
+
+Centerpiece: The Queue Number must be HUGE (text-8xl or 9xl), centered, using the gradient text color defined above.
+
+Footer: "En cours : [Live Number]" in a smaller, distinct section below the big number.
+
+Action: Iterate through templates (base.html, patient/appointments.html, doctor/dashboard.html, etc.) and apply these responsive and visual fixes, then add the JS for the live ticket.

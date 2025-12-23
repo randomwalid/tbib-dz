@@ -1,0 +1,81 @@
+🧬 PROMPT TBIB V10: THE COMPLETE PLATFORM OVERHAUL (SEARCH-FIRST & PURE UI)
+Role: Senior Full-Stack Architect & Lead UI Designer. Goal: Transform the current prototype into a professional, public-facing platform. Key Directives:
+
+Architecture: Switch to a "Search-First" flow (Public Home).
+
+Design: Enforce a strict Minimalist White/Mint (#14b999) aesthetic. Remove all "Admin Template" clutter.
+
+PART 1: ARCHITECTURE & ROUTING (SEARCH-FIRST)
+The current "Login-Wall" is bad for UX. Open the gates.
+
+Route / (Home): MUST render the Search Page (patient/home.html). Remove @login_required. Anyone can search.
+
+Auth Logic:
+
+Move Login/Register forms to dedicated routes (/login, /register).
+
+Navbar Logic: If user is Guest, show "Se connecter" (Gray) & "S'inscrire" (Mint Button). If Logged In, show "Mes Rendez-vous".
+
+The "Booking Gate":
+
+Guests can see doctors.
+
+Clicking "Prendre RDV" triggers a check.
+
+IF Guest: Redirect to /login?next=booking.
+
+IF User: Create Appointment -> Redirect to "Mes RDV".
+
+PART 2: VISUAL PURGE & BRANDING (THE "CLEAN" LOOK)
+Strictly apply the Brand Color: #14b999 (Mint Turquoise).
+
+Delete Immediately:
+
+The dark/black Footer.
+
+The "Epidemiology Radar" section.
+
+The Blue/Purple/Gradient backgrounds on the Dashboard tiles.
+
+The Blue Hero section on the Home page.
+
+Global Style:
+
+Backgrounds: Always bg-gray-50 (Off-White).
+
+Cards: bg-white with shadow-sm or shadow-md and rounded-xl.
+
+Primary Buttons: Solid bg-[#14b999] (No gradients).
+
+Text Highlights: text-[#14b999].
+
+PART 3: TEMPLATE SPECIFIC REFACTORING
+A. Public Home (patient/home.html) - The "Google" Vibe
+
+Layout: A completely clean page.
+
+Center: The Search Bar (White floating card) centered vertically and horizontally.
+
+Header: Just the Logo "TBIB" and a subtitle "Trouvez votre médecin".
+
+No clutter: No "Features", no "Testimonials".
+
+B. Doctor Dashboard (doctor/dashboard.html) - The "Pro" Vibe
+
+Header: White Navbar (Not Green). Logo in #14b999.
+
+The "Patient Suivant" Button:
+
+Massive, Full-Width on mobile.
+
+Solid bg-[#14b999].
+
+Text: White, Bold, Large.
+
+Stats Cards: Refactor into clean White Cards (not colored tiles).
+
+Label: Uppercase Gray.
+
+Number: Huge #14b999 font.
+
+Execute this full transformation. Logic first, then UI cleanup.

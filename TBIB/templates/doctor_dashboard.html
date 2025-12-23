@@ -1,0 +1,211 @@
+{% extends 'base.html' %}
+{% block title %}{{ t.dashboard }}{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 py-6 md:py-10">
+    <div class="mb-8">
+        <h1 class="text-xl font-bold text-gray-900">{{ t.dashboard }}</h1>
+        <p class="text-sm text-gray-500">Dr. {{ current_user.name }} - {{ doctor_profile.specialty }}</p>
+    </div>
+    
+    <form method="POST" action="{{ url_for('main.next_patient') }}" class="mb-8">
+        <button type="submit" class="w-full bg-[#14b999] text-white py-4 md:py-5 rounded-xl hover:bg-[#0d9479] transition font-bold text-lg shadow-sm">
+            {{ t.next_patient }}
+        </button>
+    </form>
+    
+    <div class="grid grid-cols-3 gap-4 mb-8">
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4 text-center">
+            <p class="text-3xl md:text-4xl font-bold text-[#14b999]">{{ '%02d' % doctor_profile.waiting_room_count }}</p>
+            <p class="text-xs text-gray-500 uppercase tracking-wide mt-1">{{ t.current }}</p>
+        </div>
+        
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4 text-center">
+            <p class="text-3xl md:text-4xl font-bold text-[#14b999]">{{ '%02d' % waiting_room|length }}</p>
+            <p class="text-xs text-gray-500 uppercase tracking-wide mt-1">{{ t.total }}</p>
+        </div>
+        
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4 text-center">
+            <p class="text-3xl md:text-4xl font-bold text-[#14b999]">{{ '%02d' % waiting_count }}</p>
+            <p class="text-xs text-gray-500 uppercase tracking-wide mt-1">{{ t.waiting }}</p>
+        </div>
+    </div>
+    
+    <div x-data="{ activeTab: 'waiting' }" class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+        <div class="flex border-b border-gray-100">
+            <button @click="activeTab = 'waiting'" 
+                    :class="activeTab === 'waiting' ? 'border-b-2 border-[#14b999] text-[#14b999]' : 'text-gray-500'"
+                    class="flex-1 py-3 px-4 text-sm font-medium transition">
+                Salle d'attente
+                <span class="ml-1 px-2 py-0.5 rounded-full text-xs" 
+                      :class="activeTab === 'waiting' ? 'bg-[#14b999]/10 text-[#14b999]' : 'bg-gray-100 text-gray-600'">
+                    {{ waiting_count }}
+                </span>
+            </button>
+            <button @click="activeTab = 'agenda'" 
+                    :class="activeTab === 'agenda' ? 'border-b-2 border-blue-500 text-blue-600' : 'text-gray-500'"
+                    class="flex-1 py-3 px-4 text-sm font-medium transition">
+                Mon Planning
+                <span class="ml-1 px-2 py-0.5 rounded-full text-xs"
+                      :class="activeTab === 'agenda' ? 'bg-blue-50 text-blue-600' : 'bg-gray-100 text-gray-600'">
+                    {{ scheduled_appointments|length }}
+                </span>
+            </button>
+        </div>
+        
+        <div x-show="activeTab === 'waiting'">
+            {% if waiting_room %}
+            <div class="divide-y divide-gray-50">
+                {% for appt in waiting_room %}
+                {% if appt.status in ['confirmed', 'waiting'] %}
+                <div class="p-4 flex items-center justify-between
+                    {% if appt.queue_number == doctor_profile.waiting_room_count + 1 %}bg-[#14b999]/5{% endif %}">
+                    <div class="flex items-center gap-4">
+                        <div class="w-10 h-10 rounded-full flex items-center justify-center font-bold
+                            {% if appt.queue_number == doctor_profile.waiting_room_count + 1 %}bg-[#14b999] text-white
+                            {% elif appt.status == 'completed' %}bg-blue-50 text-blue-600
+                            {% elif appt.status == 'no_show' %}bg-red-50 text-red-600
+                            {% else %}bg-gray-100 text-gray-600{% endif %}">
+                            {{ '%02d' % appt.queue_number }}
+                        </div>
+                        <div>
+                            <p class="font-medium text-gray-800">{{ appt.patient.name }}</p>
+                            <p class="text-sm text-gray-500">
+                                {% if appt.booking_type == 'scheduled' and appt.appointment_time %}
+                                    RDV {{ appt.appointment_time.strftime('%H:%M') }}
+                                {% else %}
+                                    Sans RDV
+                                {% endif %}
+                                {% if appt.consultation_reason %} - {{ appt.consultation_reason }}{% endif %}
+                            </p>
+                        </div>
+                    </div>
+                    
+                    {% if appt.status in ['confirmed', 'waiting'] %}
+                    <form method="POST" action="{{ url_for('main.mark_no_show', appointment_id=appt.id) }}">
+                        <button type="submit" class="text-red-500 hover:text-red-600 text-sm font-medium">{{ t.no_show }}</button>
+                    </form>
+                    {% endif %}
+                </div>
+                {% endif %}
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="p-8 text-center text-gray-500">
+                Aucun patient en attente
+            </div>
+            {% endif %}
+        </div>
+        
+        <div x-show="activeTab === 'agenda'" x-cloak>
+            {% if scheduled_appointments %}
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead class="bg-gray-50 text-xs text-gray-500 uppercase">
+                        <tr>
+                            <th class="px-4 py-3 text-left">Heure</th>
+                            <th class="px-4 py-3 text-left">Patient</th>
+                            <th class="px-4 py-3 text-left">Motif</th>
+                            <th class="px-4 py-3 text-left">Statut</th>
+                            <th class="px-4 py-3 text-right">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-50">
+                        {% for appt in scheduled_appointments %}
+                        <tr class="hover:bg-gray-50" id="appt-row-{{ appt.id }}">
+                            <td class="px-4 py-3">
+                                <span class="font-medium text-gray-800">{{ appt.appointment_time.strftime('%H:%M') }}</span>
+                            </td>
+                            <td class="px-4 py-3">
+                                <p class="font-medium text-gray-800">{{ appt.patient.name }}</p>
+                                <p class="text-xs text-gray-500">{{ appt.patient.phone or 'Pas de téléphone' }}</p>
+                            </td>
+                            <td class="px-4 py-3 text-sm text-gray-600">
+                                {{ appt.consultation_reason or 'Consultation' }}
+                            </td>
+                            <td class="px-4 py-3">
+                                {% if appt.status == 'waiting' or appt.queue_number %}
+                                    <span class="px-2 py-1 rounded-full text-xs font-medium bg-[#14b999]/10 text-[#14b999]">
+                                        En salle #{{ '%02d' % appt.queue_number }}
+                                    </span>
+                                {% elif appt.status == 'completed' %}
+                                    <span class="px-2 py-1 rounded-full text-xs font-medium bg-blue-50 text-blue-600">
+                                        Terminé
+                                    </span>
+                                {% elif appt.status == 'cancelled' %}
+                                    <span class="px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-500">
+                                        Annulé
+                                    </span>
+                                {% elif appt.status == 'no_show' %}
+                                    <span class="px-2 py-1 rounded-full text-xs font-medium bg-red-50 text-red-600">
+                                        Absent
+                                    </span>
+                                {% else %}
+                                    <span class="px-2 py-1 rounded-full text-xs font-medium bg-yellow-50 text-yellow-700">
+                                        Attendu
+                                    </span>
+                                {% endif %}
+                            </td>
+                            <td class="px-4 py-3 text-right">
+                                {% if appt.status == 'confirmed' and not appt.queue_number %}
+                                <button onclick="checkInPatient({{ appt.id }})" 
+                                        id="checkin-btn-{{ appt.id }}"
+                                        class="inline-flex items-center gap-1 px-3 py-1.5 bg-[#14b999] text-white text-sm font-medium rounded-lg hover:bg-[#0d9479] transition">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                    </svg>
+                                    Patient Arrivé
+                                </button>
+                                {% elif appt.queue_number %}
+                                <span class="text-sm text-gray-500">Ticket #{{ '%02d' % appt.queue_number }}</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="p-8 text-center text-gray-500">
+                <svg class="w-12 h-12 text-gray-300 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                </svg>
+                Aucun rendez-vous prévu aujourd'hui
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function checkInPatient(appointmentId) {
+    const btn = document.getElementById(`checkin-btn-${appointmentId}`);
+    btn.disabled = true;
+    btn.innerHTML = '<span class="animate-spin">⏳</span> Enregistrement...';
+    
+    fetch(`/api/check_in/${appointmentId}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            location.reload();
+        } else {
+            alert(data.error || 'Erreur lors de l\'enregistrement');
+            btn.disabled = false;
+            btn.innerHTML = '✅ Patient Arrivé';
+        }
+    })
+    .catch(err => {
+        alert('Erreur de connexion');
+        btn.disabled = false;
+        btn.innerHTML = '✅ Patient Arrivé';
+    });
+}
+</script>
+{% endblock %}
