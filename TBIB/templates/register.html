@@ -8,17 +8,17 @@
             <img src="{{ url_for('static', filename='img/logo_accueil.png') }}" alt="TBIB" class="h-20 mx-auto mb-6">
         </div>
         
-        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 fade-in">
             <div class="flex gap-2 mb-6">
-                <a href="{{ url_for('main.register', role='patient') }}" class="flex-1 py-2 text-center rounded-lg text-sm font-medium transition {% if role == 'patient' %}bg-[#14b999] text-white{% else %}bg-gray-100 text-gray-600 hover:bg-gray-200{% endif %}">
+                <a href="{{ url_for('main.register', role='patient') }}" class="flex-1 py-2 text-center rounded-lg text-sm font-medium btn-transition {% if role == 'patient' %}bg-[#14b999] text-white{% else %}bg-gray-100 text-gray-600 hover:bg-gray-200{% endif %}">
                     {{ t.patient }}
                 </a>
-                <a href="{{ url_for('main.register', role='doctor') }}" class="flex-1 py-2 text-center rounded-lg text-sm font-medium transition {% if role == 'doctor' %}bg-[#14b999] text-white{% else %}bg-gray-100 text-gray-600 hover:bg-gray-200{% endif %}">
+                <a href="{{ url_for('main.register', role='doctor') }}" class="flex-1 py-2 text-center rounded-lg text-sm font-medium btn-transition {% if role == 'doctor' %}bg-[#14b999] text-white{% else %}bg-gray-100 text-gray-600 hover:bg-gray-200{% endif %}">
                     {{ t.doctor }}
                 </a>
             </div>
             
-            <form method="POST">
+            <form method="POST" x-data="{ loading: false }" @submit="loading = true">
                 <input type="hidden" name="role" value="{{ role }}">
                 
                 <div class="mb-4">
@@ -63,8 +63,10 @@
                 </div>
                 {% endif %}
                 
-                <button type="submit" class="w-full bg-[#14b999] text-white py-2.5 rounded-lg hover:bg-[#0d9479] transition font-medium">
-                    {{ t.register }}
+                <button type="submit" :disabled="loading" :class="{'opacity-75 cursor-not-allowed': loading}" class="w-full bg-[#14b999] text-white py-2.5 rounded-lg hover:bg-[#0d9479] btn-transition font-medium flex items-center justify-center">
+                    <span x-show="loading" class="spinner mr-2" style="display: none;"></span>
+                    <span x-show="!loading">{{ t.register }}</span>
+                    <span x-show="loading">{{ t.get('loading', 'Chargement...') }}</span>
                 </button>
             </form>
         </div>
