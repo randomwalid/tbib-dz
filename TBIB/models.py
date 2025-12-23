@@ -1,8 +1,18 @@
+import enum
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime, date, time
 
 from extensions import db
+
+class AppointmentMode(enum.Enum):
+    TICKET_QUEUE = 'TICKET_QUEUE'
+    SMART_RDV = 'SMART_RDV'
+
+class KYCStatus(enum.Enum):
+    PENDING = 'PENDING'
+    VERIFIED = 'VERIFIED'
+    REJECTED = 'REJECTED'
 
 class User(UserMixin, db.Model):
     __tablename__ = 'users'
@@ -45,6 +55,10 @@ class DoctorProfile(db.Model):
     diplomas = db.Column(db.Text, nullable=True)
     waiting_room_count = db.Column(db.Integer, default=0)
     
+    appointment_mode = db.Column(db.Enum(AppointmentMode), default=AppointmentMode.TICKET_QUEUE)
+    kyc_status = db.Column(db.Enum(KYCStatus), default=KYCStatus.PENDING)
+    documents_encrypted_path = db.Column(db.String(500), nullable=True)
+
     appointments = db.relationship('Appointment', backref='doctor_profile', foreign_keys='Appointment.doctor_id', lazy='dynamic')
 
 class DoctorAvailability(db.Model):
@@ -140,3 +154,15 @@ class Relative(db.Model):
     allergies = db.Column(db.Text)
     
     patient = db.relationship('User', backref=db.backref('relatives', lazy=True))
+
+
+class EpidemiologyData(db.Model):
+    __tablename__ = 'epidemiology_data'
+
+    id = db.Column(db.Integer, primary_key=True)
+    city = db.Column(db.String(100), nullable=False)
+    wilaya = db.Column(db.String(100), nullable=False)
+    pathology_tag = db.Column(db.String(100), nullable=False)
+    age_group = db.Column(db.String(50), nullable=False)
+    gender = db.Column(db.String(20), nullable=False)
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
