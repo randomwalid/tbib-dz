@@ -111,6 +111,13 @@ class Appointment(db.Model):
     patient = db.relationship('User', foreign_keys=[patient_id], backref='patient_appointments')
     consultation_type_id = db.Column(db.Integer, db.ForeignKey('consultation_types.id'), nullable=True)
     consultation_type = db.relationship('ConsultationType', backref='appointments')
+
+    emergency_type_id = db.Column(db.Integer, db.ForeignKey('emergency_types.id'), nullable=True)
+    emergency_type = db.relationship('EmergencyType', backref='appointments')
+
+    relative_id = db.Column(db.Integer, db.ForeignKey('relatives.id'), nullable=True)
+    relative = db.relationship('Relative', backref='appointments')
+
     doctor_notes = db.Column(db.Text)
 
 
@@ -140,6 +147,33 @@ class DoctorAbsence(db.Model):
     reason = db.Column(db.String(255))
     
     doctor_profile = db.relationship('DoctorProfile', backref='absences')
+
+
+class EmergencyType(db.Model):
+    __tablename__ = 'emergency_types'
+
+    id = db.Column(db.Integer, primary_key=True)
+    doctor_id = db.Column(db.Integer, db.ForeignKey('doctor_profiles.id'), nullable=True)
+    name = db.Column(db.String(100), nullable=False)
+    description = db.Column(db.Text)
+    priority_level = db.Column(db.Integer, default=1) # 1 (Low) to 5 (Critical)
+    color = db.Column(db.String(10), default='#ff0000')
+
+    doctor_profile = db.relationship('DoctorProfile', backref='emergency_types')
+
+
+class UserRelationship(db.Model):
+    __tablename__ = 'user_relationships'
+
+    id = db.Column(db.Integer, primary_key=True)
+    requester_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    target_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    relation_type = db.Column(db.String(50), nullable=False) # e.g., PARENT, SPOUSE, CHILD
+    status = db.Column(db.String(20), default='PENDING') # PENDING, ACCEPTED, REJECTED
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    requester = db.relationship('User', foreign_keys=[requester_id], backref='relationships_requested')
+    target = db.relationship('User', foreign_keys=[target_id], backref='relationships_received')
 
 
 class Relative(db.Model):
