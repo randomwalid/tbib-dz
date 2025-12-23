@@ -69,7 +69,7 @@
                 </div>
             </div>
             
-            <div id="panel-content" class="flex-1 flex flex-col overflow-hidden hidden">
+            <div id="panel-content" class="flex-1 flex flex-col overflow-hidden hidden fade-in">
                 <div class="p-4 border-b border-gray-100">
                     <div class="flex items-center gap-3">
                         <div id="patient-avatar" class="w-12 h-12 bg-[#14b999]/10 rounded-full flex items-center justify-center text-[#14b999] font-bold text-lg">
@@ -84,18 +84,18 @@
                 
                 <div class="p-4 border-b border-gray-100">
                     <div class="flex gap-2 flex-wrap">
-                        <button onclick="updateStatus('waiting')" id="btn-arrived" class="flex-1 flex items-center justify-center gap-1 px-3 py-2 bg-amber-50 text-amber-600 rounded-lg text-sm font-medium hover:bg-amber-100 transition">
+                        <button onclick="updateStatus('waiting')" id="btn-arrived" class="flex-1 flex items-center justify-center gap-1 px-3 py-2 bg-amber-50 text-amber-600 rounded-lg text-sm font-medium hover:bg-amber-100 btn-transition">
                             <span>✅</span> Arrivé
                         </button>
-                        <button onclick="updateStatusSimple('waiting')" id="btn-in-progress" class="flex-1 flex items-center justify-center gap-1 px-3 py-2 bg-blue-50 text-blue-600 rounded-lg text-sm font-medium hover:bg-blue-100 transition">
+                        <button onclick="updateStatusSimple('waiting')" id="btn-in-progress" class="flex-1 flex items-center justify-center gap-1 px-3 py-2 bg-blue-50 text-blue-600 rounded-lg text-sm font-medium hover:bg-blue-100 btn-transition">
                             <span>🩺</span> En cours
                         </button>
                     </div>
                     <div class="flex gap-2 mt-2">
-                        <button onclick="completeWithDiagnosis()" id="btn-completed" class="flex-1 flex items-center justify-center gap-1 px-3 py-2 bg-green-50 text-green-600 rounded-lg text-sm font-medium hover:bg-green-100 transition">
+                        <button onclick="completeWithDiagnosis()" id="btn-completed" class="flex-1 flex items-center justify-center gap-1 px-3 py-2 bg-green-50 text-green-600 rounded-lg text-sm font-medium hover:bg-green-100 btn-transition">
                             <span>🏁</span> Terminé
                         </button>
-                        <button onclick="updateStatus('no_show')" id="btn-no-show" class="flex-1 flex items-center justify-center gap-1 px-3 py-2 bg-gray-50 text-gray-600 rounded-lg text-sm font-medium hover:bg-gray-100 transition">
+                        <button onclick="updateStatus('no_show')" id="btn-no-show" class="flex-1 flex items-center justify-center gap-1 px-3 py-2 bg-gray-50 text-gray-600 rounded-lg text-sm font-medium hover:bg-gray-100 btn-transition">
                             <span>❌</span> Absent
                         </button>
                     </div>
@@ -258,6 +258,14 @@ function updateStatusBadge(status) {
 function updateStatusSimple(newStatus) {
     if (!selectedAppointment) return;
     
+    // Simple loading indication
+    const activeBtn = document.activeElement;
+    const originalText = activeBtn ? activeBtn.innerHTML : '';
+    if (activeBtn && activeBtn.tagName === 'BUTTON') {
+        activeBtn.disabled = true;
+        activeBtn.innerHTML = '<span class="spinner inline-block"></span>';
+    }
+
     fetch(`/api/doctor/appointments/${selectedAppointment.id}/status`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -280,7 +288,13 @@ function updateStatusSimple(newStatus) {
             }
         }
     })
-    .catch(error => console.error('Error:', error));
+    .catch(error => console.error('Error:', error))
+    .finally(() => {
+        if (activeBtn && activeBtn.tagName === 'BUTTON') {
+            activeBtn.disabled = false;
+            activeBtn.innerHTML = originalText;
+        }
+    });
 }
 
 function completeWithDiagnosis() {
@@ -289,6 +303,11 @@ function completeWithDiagnosis() {
     const diagnosis = prompt('Bilan / Diagnostic (facultatif):', '');
     if (diagnosis === null) return;
     
+    const btn = document.getElementById('btn-completed');
+    const originalText = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner inline-block"></span>';
+
     fetch(`/api/doctor/appointments/${selectedAppointment.id}/status`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -308,7 +327,11 @@ function completeWithDiagnosis() {
             }
         }
     })
-    .catch(error => console.error('Error:', error));
+    .catch(error => console.error('Error:', error))
+    .finally(() => {
+        btn.disabled = false;
+        btn.innerHTML = originalText;
+    });
 }
 
 function updateStatus(newStatus) {

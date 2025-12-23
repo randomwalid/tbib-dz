@@ -23,6 +23,44 @@
             0%, 100% { opacity: 1; }
             50% { opacity: 0.5; }
         }
+
+        /* Micro-animations */
+        .btn-transition {
+            transition: all 0.2s ease-in-out;
+        }
+        .btn-transition:hover:not(:disabled) {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        .btn-transition:active:not(:disabled) {
+            transform: translateY(0);
+            box-shadow: none;
+        }
+
+        .spinner {
+            border: 2px solid currentColor;
+            border-radius: 50%;
+            border-top-color: transparent;
+            opacity: 0.8;
+            width: 1rem;
+            height: 1rem;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.4s ease-out forwards;
+            opacity: 0;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
     </style>
     <script>
         tailwind.config = {
