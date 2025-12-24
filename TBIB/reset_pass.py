@@ -1,8 +1,10 @@
-from app import app, db
+from app import create_app
+from extensions import db
 from models import User
 from werkzeug.security import generate_password_hash
 
 def reset_password():
+    app = create_app()
     # On ouvre l'accès à la base de données
     ctx = app.app_context()
     ctx.push()
