@@ -5,16 +5,16 @@
 {% block content %}
 <div class="min-h-screen bg-[#F8F9FA] p-6 md:p-10 font-sans">
     <div class="max-w-7xl mx-auto space-y-8">
-        
+
         <!-- Header -->
         <div class="flex flex-col md:flex-row md:items-center justify-between bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
             <div class="flex items-center gap-5">
                 <!-- Avatar Placeholder -->
                 <div class="h-16 w-16 rounded-full bg-[#3cc7a7]/10 flex items-center justify-center text-[#3cc7a7] text-2xl font-bold ring-2 ring-offset-2 ring-[#3cc7a7]/20">
-                    {{ current_user.name[0] | upper if current_user.is_authenticated else 'D' }}
+                    {{ current_user.name[0] | upper }}
                 </div>
                 <div>
-                    <h1 class="text-2xl font-bold text-[#333333]">Dr. {{ current_user.name if current_user.is_authenticated else 'Ahmed Benali' }}</h1>
+                    <h1 class="text-2xl font-bold text-[#333333]">Dr. {{ current_user.name }}</h1>
                     <div class="flex items-center gap-3 mt-1.5">
                         <!-- KYC Badge -->
                         <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold tracking-wide bg-[#3cc7a7]/10 text-[#3cc7a7] border border-[#3cc7a7]/20">
@@ -25,14 +25,14 @@
                         </span>
                         <span class="text-gray-400 text-sm font-medium flex items-center">
                             <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
-                            Dentiste
+                            {{ doctor_profile.specialty if doctor_profile else 'Spécialiste' }}
                         </span>
                     </div>
                 </div>
             </div>
             <div class="mt-4 md:mt-0 text-right">
                  <p class="text-xs text-gray-400 uppercase tracking-wider font-semibold">Date du jour</p>
-                 <p class="text-xl font-bold text-[#333333]" x-data x-text="new Date().toLocaleDateString('fr-FR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })">mardi 23 décembre 2025</p>
+                 <p class="text-xl font-bold text-[#333333]" x-data x-text="new Date().toLocaleDateString('fr-FR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })"></p>
             </div>
         </div>
 
@@ -95,7 +95,7 @@
         </div>
 
         <!-- Patient List -->
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden" x-data="patientList()">
             <div class="p-6 border-b border-gray-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div>
                     <h2 class="text-lg font-bold text-[#333333]">Liste des Patients</h2>
@@ -103,10 +103,10 @@
                 </div>
                 <div class="flex gap-2">
                     <span class="px-3 py-1 bg-[#3cc7a7]/10 text-[#3cc7a7] rounded-full text-xs font-bold border border-[#3cc7a7]/20">
-                        3 En attente
+                        <span x-text="patients.filter(p => p.extendedProps.status === 'waiting' || p.extendedProps.status === 'confirmed').length">0</span> En attente
                     </span>
                     <span class="px-3 py-1 bg-blue-50 text-blue-600 rounded-full text-xs font-bold border border-blue-100">
-                         1 En cours
+                         <span x-text="patients.filter(p => p.extendedProps.status === 'waiting' && p.extendedProps.queue_number === currentQueueNumber).length">0</span> En cours
                     </span>
                 </div>
             </div>
@@ -122,121 +122,50 @@
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-50">
-                        <!-- Row 1: John Doe (Active) -->
-                        <tr class="bg-[#3cc7a7]/5">
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <span class="font-mono text-sm text-[#3cc7a7] font-bold">09:00</span>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="flex items-center">
-                                    <div class="h-9 w-9 rounded-full flex items-center justify-center text-xs font-bold mr-3 transition-all shadow-sm bg-white border-2 border-[#3cc7a7] text-[#3cc7a7]">
-                                        JD
+                        <template x-if="patients.length === 0">
+                            <tr>
+                                <td colspan="4" class="px-6 py-8 text-center text-gray-400 text-sm">Aucun patient en attente pour le moment.</td>
+                            </tr>
+                        </template>
+                        <template x-for="appt in patients" :key="appt.id">
+                            <tr :class="{'bg-[#3cc7a7]/5': isCurrent(appt), 'hover:bg-gray-50 transition-colors group': !isCurrent(appt)}">
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="font-mono text-sm" :class="isCurrent(appt) ? 'text-[#3cc7a7] font-bold' : 'text-gray-500 font-medium'" x-text="formatTime(appt.start)"></span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="flex items-center">
+                                        <div class="h-9 w-9 rounded-full flex items-center justify-center text-xs font-bold mr-3 transition-all shadow-sm"
+                                             :class="isCurrent(appt) ? 'bg-white border-2 border-[#3cc7a7] text-[#3cc7a7]' : 'bg-gray-100 text-gray-500 group-hover:bg-white group-hover:shadow-sm'">
+                                            <span x-text="getInitials(appt.extendedProps.patient_name)"></span>
+                                        </div>
+                                        <div>
+                                            <p class="font-bold text-[#333333]" x-text="appt.extendedProps.patient_name"></p>
+                                            <p class="text-xs text-gray-400" x-text="'Motif: ' + (appt.extendedProps.consultation_reason || 'Consultation')"></p>
+                                        </div>
                                     </div>
-                                    <div>
-                                        <p class="font-bold text-[#333333]">John Doe <span class="text-gray-400 font-normal text-xs">(Anonymisé)</span></p>
-                                        <p class="text-xs text-gray-400">Motif: Consultation Généraliste</p>
-                                    </div>
-                                </div>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-[#3cc7a7]/10 text-[#3cc7a7] border border-[#3cc7a7]/20">
-                                    <span class="relative flex h-2 w-2 mr-2">
-                                      <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#3cc7a7] opacity-75"></span>
-                                      <span class="relative inline-flex rounded-full h-2 w-2 bg-[#3cc7a7]"></span>
-                                    </span>
-                                    En cours
-                                </span>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                <button class="text-[#3cc7a7] hover:text-[#2da88d] bg-white border border-[#3cc7a7] hover:bg-[#3cc7a7]/5 px-3 py-1.5 rounded-lg transition-all text-xs font-bold">
-                                    Terminer
-                                </button>
-                            </td>
-                        </tr>
-
-                        <!-- Row 2: Alice Smith (Waiting) -->
-                        <tr class="hover:bg-gray-50 transition-colors group">
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <span class="font-mono text-sm text-gray-500 font-medium">09:30</span>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="flex items-center">
-                                    <div class="h-9 w-9 rounded-full flex items-center justify-center text-xs font-bold mr-3 transition-all shadow-sm bg-gray-100 text-gray-500 group-hover:bg-white group-hover:shadow-sm">
-                                        AS
-                                    </div>
-                                    <div>
-                                        <p class="font-bold text-[#333333]">Alice Smith <span class="text-gray-400 font-normal text-xs">(Anonymisé)</span></p>
-                                        <p class="text-xs text-gray-400">Motif: Renouvellement</p>
-                                    </div>
-                                </div>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-gray-100 text-gray-600 border border-gray-200">
-                                    En attente
-                                </span>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                <button class="text-gray-400 hover:text-gray-600 hover:bg-gray-100 px-3 py-1.5 rounded-lg transition-all">
-                                    Détails
-                                </button>
-                            </td>
-                        </tr>
-
-                        <!-- Row 3: Mohamed K. (Waiting) -->
-                        <tr class="hover:bg-gray-50 transition-colors group">
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <span class="font-mono text-sm text-gray-500 font-medium">10:00</span>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="flex items-center">
-                                    <div class="h-9 w-9 rounded-full flex items-center justify-center text-xs font-bold mr-3 transition-all shadow-sm bg-gray-100 text-gray-500 group-hover:bg-white group-hover:shadow-sm">
-                                        MK
-                                    </div>
-                                    <div>
-                                        <p class="font-bold text-[#333333]">Mohamed K. <span class="text-gray-400 font-normal text-xs">(Anonymisé)</span></p>
-                                        <p class="text-xs text-gray-400">Motif: Urgence bénigne</p>
-                                    </div>
-                                </div>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-gray-100 text-gray-600 border border-gray-200">
-                                    En attente
-                                </span>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                <button class="text-gray-400 hover:text-gray-600 hover:bg-gray-100 px-3 py-1.5 rounded-lg transition-all">
-                                    Détails
-                                </button>
-                            </td>
-                        </tr>
-
-                        <!-- Row 4: Nadia B. (Waiting) -->
-                        <tr class="hover:bg-gray-50 transition-colors group">
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <span class="font-mono text-sm text-gray-500 font-medium">10:30</span>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="flex items-center">
-                                    <div class="h-9 w-9 rounded-full flex items-center justify-center text-xs font-bold mr-3 transition-all shadow-sm bg-gray-100 text-gray-500 group-hover:bg-white group-hover:shadow-sm">
-                                        NB
-                                    </div>
-                                    <div>
-                                        <p class="font-bold text-[#333333]">Nadia B. <span class="text-gray-400 font-normal text-xs">(Anonymisé)</span></p>
-                                        <p class="text-xs text-gray-400">Motif: Suivi</p>
-                                    </div>
-                                </div>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-gray-100 text-gray-600 border border-gray-200">
-                                    En attente
-                                </span>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                <button class="text-gray-400 hover:text-gray-600 hover:bg-gray-100 px-3 py-1.5 rounded-lg transition-all">
-                                    Détails
-                                </button>
-                            </td>
-                        </tr>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <template x-if="isCurrent(appt)">
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-[#3cc7a7]/10 text-[#3cc7a7] border border-[#3cc7a7]/20">
+                                            <span class="relative flex h-2 w-2 mr-2">
+                                              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#3cc7a7] opacity-75"></span>
+                                              <span class="relative inline-flex rounded-full h-2 w-2 bg-[#3cc7a7]"></span>
+                                            </span>
+                                            En cours
+                                        </span>
+                                    </template>
+                                    <template x-if="!isCurrent(appt)">
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-gray-100 text-gray-600 border border-gray-200" x-text="getStatusLabel(appt.extendedProps.status)">
+                                        </span>
+                                    </template>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                    <button class="text-gray-400 hover:text-gray-600 hover:bg-gray-100 px-3 py-1.5 rounded-lg transition-all">
+                                        Détails
+                                    </button>
+                                </td>
+                            </tr>
+                        </template>
                     </tbody>
                 </table>
             </div>
@@ -244,6 +173,58 @@
                 <button class="text-xs font-bold text-[#3cc7a7] hover:text-[#2da88d] uppercase tracking-wide transition-colors">Voir le planning complet</button>
             </div>
         </div>
+
+        <script>
+            function patientList() {
+                return {
+                    patients: [],
+                    currentQueueNumber: 0,
+                    init() {
+                        this.fetchData();
+                        setInterval(() => this.fetchData(), 10000); // Poll every 10s
+                    },
+                    fetchData() {
+                        // Fetch Queue Status to know current waiting_room_count
+                        fetch('/api/queue_status/{{ doctor.id }}')
+                            .then(r => r.json())
+                            .then(statusData => {
+                                this.currentQueueNumber = statusData.current_serving;
+
+                                // Fetch Appointments for today
+                                const today = new Date().toISOString().split('T')[0];
+                                fetch(`/api/doctor/appointments?start=${today}T00:00:00&end=${today}T23:59:59`)
+                                    .then(r => r.json())
+                                    .then(events => {
+                                        // Filter only relevant statuses and sort by time
+                                        this.patients = events.filter(e =>
+                                            ['waiting', 'confirmed'].includes(e.extendedProps.status)
+                                        ).sort((a, b) => new Date(a.start) - new Date(b.start));
+                                    });
+                            });
+                    },
+                    isCurrent(appt) {
+                        // Check if this appointment corresponds to the current queue number being served
+                        // AND if status is waiting (meaning they are in the room or just called)
+                        // If queue_number is not null, compare it.
+                        return appt.extendedProps.queue_number === this.currentQueueNumber && appt.extendedProps.status === 'waiting';
+                    },
+                    formatTime(isoString) {
+                        return new Date(isoString).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+                    },
+                    getInitials(name) {
+                        return name ? name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() : '??';
+                    },
+                    getStatusLabel(status) {
+                        const labels = {
+                            'waiting': 'En attente',
+                            'confirmed': 'Confirmé',
+                            'completed': 'Terminé'
+                        };
+                        return labels[status] || status;
+                    }
+                }
+            }
+        </script>
     </div>
 </div>
 {% endblock %}
