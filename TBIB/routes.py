@@ -136,6 +136,9 @@ def get_t():
 def initialize_demo_data():
     import random
     
+    if User.query.filter_by(email='doctor1@tbib.dz').first():
+        return
+    
     cities = ["Alger", "Oran", "Constantine", "Annaba", "Setif", "Bejaia", "Tlemcen", "Blida"]
     specialties = ["Médecin Généraliste", "Dentiste", "Cardiologue", "Pédiatre", "Dermatologue", "Gynécologue", "Ophtalmologue"]
     first_names = ["Mohamed", "Amine", "Sarah", "Fatima", "Youssef", "Karim", "Nadia", "Amina", "Rachid", "Leila", "Yasmine", "Omar", "Lina", "Anis"]

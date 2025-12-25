@@ -1,8 +1,8 @@
 """Initial migration
 
-Revision ID: 848ef2d605b0
-Revises:
-Create Date: 2025-12-24 12:30:41.834605
+Revision ID: 3c40fa5bed12
+Revises: 
+Create Date: 2025-12-25 01:31:21.373131
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '848ef2d605b0'
+revision = '3c40fa5bed12'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -42,6 +42,7 @@ def upgrade():
     sa.Column('created_at', sa.DateTime(), nullable=True),
     sa.Column('no_show_count', sa.Integer(), nullable=True),
     sa.Column('is_blocked', sa.Boolean(), nullable=True),
+    sa.Column('reliability_score', sa.Float(), nullable=False),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('email')
     )
@@ -159,6 +160,10 @@ def upgrade():
     sa.Column('emergency_type_id', sa.Integer(), nullable=True),
     sa.Column('relative_id', sa.Integer(), nullable=True),
     sa.Column('doctor_notes', sa.Text(), nullable=True),
+    sa.Column('is_shadow_slot', sa.Boolean(), nullable=True),
+    sa.Column('urgency_level', sa.Integer(), nullable=True),
+    sa.Column('arrival_time', sa.DateTime(), nullable=True),
+    sa.Column('check_in_time', sa.DateTime(), nullable=True),
     sa.ForeignKeyConstraint(['consultation_type_id'], ['consultation_types.id'], ),
     sa.ForeignKeyConstraint(['doctor_id'], ['doctor_profiles.id'], ),
     sa.ForeignKeyConstraint(['emergency_type_id'], ['emergency_types.id'], ),
