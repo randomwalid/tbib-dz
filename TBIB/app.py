@@ -25,25 +25,25 @@ def create_app():
     app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///tbib.db')
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {'pool_pre_ping': True}
-    
+
     db.init_app(app)
     migrate.init_app(app, db)
     login_manager.init_app(app)
     login_manager.login_view = 'main.login'
-    
+
     configure_logging(app)
 
     from models import User
-    
+
     @login_manager.user_loader
     def load_user(user_id):
         return User.query.get(int(user_id))
-    
+
     @app.before_request
     def set_language():
         if 'lang' not in session:
             session['lang'] = 'fr'
-    
+
     @app.after_request
     def add_cache_control(response):
         response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
@@ -65,10 +65,10 @@ def create_app():
         if request.path.startswith('/api/'):
             return jsonify({'error': 'Internal Server Error'}), 500
         return render_template('500.html'), 500
-    
+
     from routes import main_bp
     app.register_blueprint(main_bp)
-    
+
     return app
 
 if __name__ == '__main__':

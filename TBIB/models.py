@@ -16,7 +16,7 @@ class KYCStatus(enum.Enum):
 
 class User(UserMixin, db.Model):
     __tablename__ = 'users'
-    
+
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(120), unique=True, nullable=False)
     password_hash = db.Column(db.String(256), nullable=False)
@@ -30,22 +30,22 @@ class User(UserMixin, db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     no_show_count = db.Column(db.Integer, default=0)
     is_blocked = db.Column(db.Boolean, default=False)
-    
+
     # SmartFlow: Score de fiabilité du patient (0-100)
     # - No-Show: -20 pts | Retard >15min: -5 pts | Ponctuel: +2 pts (max 100)
     reliability_score = db.Column(db.Float, default=100.0, nullable=False)
-    
+
     doctor_profile = db.relationship('DoctorProfile', backref='user', uselist=False, cascade='all, delete-orphan')
-    
+
     def set_password(self, password):
         self.password_hash = generate_password_hash(password, method='pbkdf2:sha256')
-    
+
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
 
 class DoctorProfile(db.Model):
     __tablename__ = 'doctor_profiles'
-    
+
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     specialty = db.Column(db.String(100), nullable=False)
@@ -58,7 +58,7 @@ class DoctorProfile(db.Model):
     expertises = db.Column(db.String(500), nullable=True)
     diplomas = db.Column(db.Text, nullable=True)
     waiting_room_count = db.Column(db.Integer, default=0)
-    
+
     appointment_mode = db.Column(db.Enum(AppointmentMode), default=AppointmentMode.TICKET_QUEUE)
     kyc_status = db.Column(db.Enum(KYCStatus), default=KYCStatus.PENDING)
     documents_encrypted_path = db.Column(db.String(500), nullable=True)
@@ -67,19 +67,19 @@ class DoctorProfile(db.Model):
 
 class DoctorAvailability(db.Model):
     __tablename__ = 'doctor_availability'
-    
+
     id = db.Column(db.Integer, primary_key=True)
     doctor_id = db.Column(db.Integer, db.ForeignKey('doctor_profiles.id'), nullable=False)
     day_of_week = db.Column(db.Integer, nullable=False)
     start_time = db.Column(db.Time, nullable=False)
     end_time = db.Column(db.Time, nullable=False)
     is_available = db.Column(db.Boolean, default=True)
-    
+
     doctor_profile = db.relationship('DoctorProfile', backref='availability_slots')
 
 class HealthRecord(db.Model):
     __tablename__ = 'health_records'
-    
+
     id = db.Column(db.Integer, primary_key=True)
     patient_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False, unique=True)
     blood_type = db.Column(db.String(10))
@@ -90,7 +90,7 @@ class HealthRecord(db.Model):
     vaccines = db.Column(db.Text)
     notes = db.Column(db.Text)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
-    
+
     patient = db.relationship('User', backref=db.backref('health_record', uselist=False))
 
 class Appointment(db.Model):
@@ -99,7 +99,7 @@ class Appointment(db.Model):
         db.Index('ix_unique_scheduled_slot', 'doctor_id', 'appointment_date', 'appointment_time',
                  unique=True, postgresql_where=db.text("status = 'confirmed' AND appointment_time IS NOT NULL")),
     )
-    
+
     id = db.Column(db.Integer, primary_key=True)
     patient_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     doctor_id = db.Column(db.Integer, db.ForeignKey('doctor_profiles.id'), nullable=False)
@@ -111,7 +111,7 @@ class Appointment(db.Model):
     appointment_time = db.Column(db.Time, nullable=True)
     booking_type = db.Column(db.String(20), default='scheduled')
     consultation_reason = db.Column(db.String(100))
-    
+
     patient = db.relationship('User', foreign_keys=[patient_id], backref='patient_appointments')
     consultation_type_id = db.Column(db.Integer, db.ForeignKey('consultation_types.id'), nullable=True)
     consultation_type = db.relationship('ConsultationType', backref='appointments')
@@ -123,7 +123,7 @@ class Appointment(db.Model):
     relative = db.relationship('Relative', backref='appointments')
 
     doctor_notes = db.Column(db.Text)
-    
+
     # === SmartFlow Fields ===
     # Shadow Slot: Surbooking sécurisé pour patients peu fiables (score < 50)
     is_shadow_slot = db.Column(db.Boolean, default=False)
@@ -137,7 +137,7 @@ class Appointment(db.Model):
 
 class ConsultationType(db.Model):
     __tablename__ = 'consultation_types'
-    
+
     id = db.Column(db.Integer, primary_key=True)
     doctor_id = db.Column(db.Integer, db.ForeignKey('doctor_profiles.id'), nullable=False)
     name = db.Column(db.String(100), nullable=False)
@@ -147,19 +147,19 @@ class ConsultationType(db.Model):
     is_emergency_only = db.Column(db.Boolean, default=False)
     require_existing_patient = db.Column(db.Boolean, default=False)
     is_active = db.Column(db.Boolean, default=True)
-    
+
     doctor_profile = db.relationship('DoctorProfile', backref='consultation_types')
 
 
 class DoctorAbsence(db.Model):
     __tablename__ = 'doctor_absences'
-    
+
     id = db.Column(db.Integer, primary_key=True)
     doctor_id = db.Column(db.Integer, db.ForeignKey('doctor_profiles.id'), nullable=False)
     start_date = db.Column(db.DateTime, nullable=False)
     end_date = db.Column(db.DateTime, nullable=False)
     reason = db.Column(db.String(255))
-    
+
     doctor_profile = db.relationship('DoctorProfile', backref='absences')
 
 
@@ -192,7 +192,7 @@ class UserRelationship(db.Model):
 
 class Relative(db.Model):
     __tablename__ = 'relatives'
-    
+
     id = db.Column(db.Integer, primary_key=True)
     patient_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     name = db.Column(db.String(100), nullable=False)
@@ -200,7 +200,7 @@ class Relative(db.Model):
     birth_date = db.Column(db.Date)
     blood_type = db.Column(db.String(5))
     allergies = db.Column(db.Text)
-    
+
     patient = db.relationship('User', backref=db.backref('relatives', lazy=True))
 
 

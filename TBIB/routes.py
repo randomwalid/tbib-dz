@@ -135,23 +135,20 @@ def get_t():
 
 def initialize_demo_data():
     import random
-    
-    if User.query.filter_by(email='doctor1@tbib.dz').first():
-        return
-    
+
     cities = ["Alger", "Oran", "Constantine", "Annaba", "Setif", "Bejaia", "Tlemcen", "Blida"]
     specialties = ["Médecin Généraliste", "Dentiste", "Cardiologue", "Pédiatre", "Dermatologue", "Gynécologue", "Ophtalmologue"]
     first_names = ["Mohamed", "Amine", "Sarah", "Fatima", "Youssef", "Karim", "Nadia", "Amina", "Rachid", "Leila", "Yasmine", "Omar", "Lina", "Anis"]
     last_names = ["Benali", "Saidi", "Dahmani", "Boudiaf", "Hadj", "Mebarki", "Hamidi", "Cherif", "Bouzid", "Belkacem", "Rahmouni", "Meziane"]
     street_names = ['Didouche Mourad', 'Ben Mhidi', 'Abane Ramdane', 'Amirouche', 'Pasteur']
-    
+
     for i in range(50):
         first = random.choice(first_names)
         last = random.choice(last_names)
         full_name = f"Dr. {first} {last}"
         city_choice = random.choice(cities)
         specialty = random.choice(specialties)
-        
+
         user = User(
             email=f"doctor{i+1}@tbib.dz",
             role='doctor',
@@ -162,7 +159,7 @@ def initialize_demo_data():
         user.set_password('doctor123')
         db.session.add(user)
         db.session.flush()
-        
+
         doctor_profile = DoctorProfile(
             user_id=user.id,
             specialty=specialty,
@@ -175,7 +172,7 @@ def initialize_demo_data():
         )
         db.session.add(doctor_profile)
         db.session.flush()
-        
+
         start_t = time(9, 0)
         end_t = time(17, 0)
         for day in range(5):
@@ -187,7 +184,7 @@ def initialize_demo_data():
                 is_available=True
             )
             db.session.add(availability)
-        
+
         consultation = ConsultationType(
             doctor_id=doctor_profile.id,
             name="Consultation",
@@ -197,7 +194,7 @@ def initialize_demo_data():
             is_active=True
         )
         db.session.add(consultation)
-        
+
         urgence = ConsultationType(
             doctor_id=doctor_profile.id,
             name="Urgence",
@@ -207,7 +204,7 @@ def initialize_demo_data():
             is_active=True
         )
         db.session.add(urgence)
-    
+
     db.session.commit()
     print("✅ DATABASE INITIALIZED: 50 Doctors & Schedules Created!")
 
@@ -216,24 +213,24 @@ def initialize_demo_data():
 def home():
     if current_user.is_authenticated and current_user.role == 'doctor':
         return redirect(url_for('main.doctor_dashboard'))
-    
+
     try:
         doctor_count = DoctorProfile.query.count()
     except:
         db.create_all()
         doctor_count = 0
-    
+
     if doctor_count == 0:
         print("⚠️ DATABASE EMPTY. INITIALIZING DEMO DATA...")
         initialize_demo_data()
         return redirect(url_for('main.home'))
-    
+
     specialty = request.args.get('specialty', '')
     city = request.args.get('city', '')
-    
+
     search_mode = bool(specialty or city)
     doctors = []
-    
+
     if search_mode:
         query = DoctorProfile.query.join(User)
         if specialty:
@@ -241,10 +238,10 @@ def home():
         if city:
             query = query.filter(DoctorProfile.city.ilike(f'%{city}%'))
         doctors = query.all()
-    
+
     specialties = db.session.query(DoctorProfile.specialty).distinct().all()
     cities = db.session.query(DoctorProfile.city).distinct().all()
-    
+
     return render_template('home.html', 
                            doctors=doctors,
                            search_mode=search_mode,
@@ -265,14 +262,14 @@ def set_language(lang):
 def login():
     if current_user.is_authenticated:
         return redirect(url_for('main.home'))
-    
+
     next_url = request.args.get('next', '')
-    
+
     if request.method == 'POST':
         email = request.form.get('email')
         password = request.form.get('password')
         user = User.query.filter_by(email=email).first()
-        
+
         if user and user.check_password(password):
             login_user(user)
             if user.role == 'doctor':
@@ -281,37 +278,37 @@ def login():
                 return redirect(next_url)
             return redirect(url_for('main.home'))
         flash('Email ou mot de passe incorrect', 'error')
-    
+
     return render_template('login.html', next_url=next_url, t=get_t(), lang=session.get('lang', 'fr'))
 
 @main_bp.route('/register', methods=['GET', 'POST'])
 def register():
     if current_user.is_authenticated:
         return redirect(url_for('main.home'))
-    
+
     role = request.args.get('role', 'patient')
-    
+
     if request.method == 'POST':
         email = request.form.get('email')
         password = request.form.get('password')
         name = request.form.get('name')
         phone = request.form.get('phone')
         role = request.form.get('role', 'patient')
-        
+
         if User.query.filter_by(email=email).first():
             flash('Cet email est déjà utilisé', 'error')
             return render_template('register.html', role=role, t=get_t(), lang=session.get('lang', 'fr'))
-        
+
         user = User(email=email, name=name, phone=phone, role=role)
         user.set_password(password)
         db.session.add(user)
-        
+
         if role == 'doctor':
             specialty = request.form.get('specialty')
             city = request.form.get('city')
             address = request.form.get('address')
             bio = request.form.get('bio')
-            
+
             db.session.flush()
             doctor_profile = DoctorProfile(
                 user_id=user.id,
@@ -321,14 +318,14 @@ def register():
                 bio=bio
             )
             db.session.add(doctor_profile)
-        
+
         db.session.commit()
         login_user(user)
-        
+
         if role == 'doctor':
             return redirect(url_for('main.doctor_dashboard'))
         return redirect(url_for('main.home'))
-    
+
     return render_template('register.html', role=role, t=get_t(), lang=session.get('lang', 'fr'))
 
 @main_bp.route('/logout')
@@ -340,21 +337,21 @@ def logout():
 @main_bp.route('/book/<int:doctor_id>', methods=['POST'])
 def book_appointment(doctor_id):
     from sqlalchemy.exc import IntegrityError
-    
+
     if not current_user.is_authenticated:
         return redirect(url_for('main.login', next=url_for('main.doctor_profile', doctor_id=doctor_id)))
-    
+
     if current_user.role != 'patient':
         return redirect(url_for('main.home'))
-    
+
     doctor = DoctorProfile.query.get_or_404(doctor_id)
-    
+
     appointment_date_str = request.form.get('appointment_date')
     appointment_time_str = request.form.get('appointment_time')
     consultation_reason = request.form.get('consultation_reason', 'Consultation')
     consultation_type_id = request.form.get('consultation_type_id')
     patient_name_override = request.form.get('patient_name_override', '').strip()
-    
+
     if not consultation_type_id or str(consultation_type_id).strip() == "":
         consultation_type_id = None
     else:
@@ -362,7 +359,7 @@ def book_appointment(doctor_id):
             consultation_type_id = int(consultation_type_id)
         except (ValueError, TypeError):
             consultation_type_id = None
-    
+
     if appointment_date_str and appointment_time_str:
         try:
             appt_date = datetime.strptime(appointment_date_str, '%Y-%m-%d').date()
@@ -370,35 +367,71 @@ def book_appointment(doctor_id):
         except ValueError:
             flash('Date ou heure invalide', 'error')
             return redirect(url_for('main.doctor_profile', doctor_id=doctor_id))
-        
+
         notes = f"Patient: {patient_name_override}" if patient_name_override else None
-        
-        appointment = Appointment(
+
+        # --- DÉBUT LOGIQUE SMARTFLOW ---
+
+        # 1. On instancie l'objet (sans le sauvegarder tout de suite)
+        new_appointment = Appointment(
             patient_id=current_user.id,
             doctor_id=doctor_id,
-            status='confirmed',
             appointment_date=appt_date,
             appointment_time=appt_time,
+            status='confirmed',
+            is_shadow_slot=False,
             booking_type='scheduled',
             consultation_reason=consultation_reason,
             consultation_type_id=consultation_type_id,
             queue_number=None,
             doctor_notes=notes
         )
-        
-        try:
-            db.session.add(appointment)
+
+        # 2. Vérification intelligente du créneau
+        existing_appointment = Appointment.query.filter_by(
+            doctor_id=doctor_id,
+            appointment_date=new_appointment.appointment_date,
+            appointment_time=new_appointment.appointment_time,
+            status='confirmed'
+        ).first()
+
+        if existing_appointment:
+            # Le créneau est pris : on lance l'analyse SmartFlow
+            patient_score = current_user.reliability_score if current_user.reliability_score is not None else 100
+
+            # Est-ce qu'il y a déjà un "Ticket Shadow" (surbooking) sur ce créneau ?
+            has_shadow = Appointment.query.filter_by(
+                doctor_id=doctor_id,
+                appointment_date=new_appointment.appointment_date,
+                appointment_time=new_appointment.appointment_time,
+                is_shadow_slot=True
+            ).first() is not None
+
+            # ALGO : Si patient "à risque" (<50) ET qu'il n'y a pas encore d'overbooking
+            if patient_score < 50 and not has_shadow:
+                new_appointment.is_shadow_slot = True
+                db.session.add(new_appointment)
+                db.session.commit()
+                flash('Réservation confirmée (Priorité SmartFlow)', 'info')
+                return redirect(url_for('main.my_appointments'))
+            else:
+                # Sinon, c'est un vrai blocage
+                flash('Ce créneau n\'est plus disponible.', 'danger')
+                return redirect(url_for('main.doctor_profile', doctor_id=doctor_id))
+        else:
+            # 3. Créneau libre : réservation standard
+            db.session.add(new_appointment)
             db.session.commit()
-        except IntegrityError:
-            db.session.rollback()
-            flash('Ce créneau n\'est plus disponible', 'error')
-            return redirect(url_for('main.doctor_profile', doctor_id=doctor_id))
+            flash('Rendez-vous confirmé.', 'success')
+            return redirect(url_for('main.my_appointments'))
+
+        # --- FIN LOGIQUE SMARTFLOW ---
     else:
         today_count = Appointment.query.filter_by(
             doctor_id=doctor_id,
             appointment_date=date.today()
         ).count()
-        
+
         appointment = Appointment(
             patient_id=current_user.id,
             doctor_id=doctor_id,
@@ -409,7 +442,7 @@ def book_appointment(doctor_id):
         )
         db.session.add(appointment)
         db.session.commit()
-    
+
     flash(get_t()['appointment_booked'], 'success')
     return redirect(url_for('main.my_appointments'))
 
@@ -418,11 +451,11 @@ def book_appointment(doctor_id):
 def my_appointments():
     if current_user.role != 'patient':
         return redirect(url_for('main.doctor_dashboard'))
-    
+
     appointments = Appointment.query.filter_by(
         patient_id=current_user.id
     ).order_by(Appointment.created_at.desc()).all()
-    
+
     return render_template('my_appointments.html', 
                            appointments=appointments,
                            today=date.today(),
@@ -435,13 +468,13 @@ def my_appointments():
 def patient_profile(section='info'):
     if current_user.role != 'patient':
         return redirect(url_for('main.doctor_dashboard'))
-    
+
     health_record = current_user.health_record
     if not health_record:
         health_record = HealthRecord(patient_id=current_user.id)
         db.session.add(health_record)
         db.session.commit()
-    
+
     if request.method == 'POST':
         if section == 'info':
             current_user.name = request.form.get('name', current_user.name)
@@ -472,9 +505,9 @@ def patient_profile(section='info'):
                 current_user.set_password(new_password)
                 db.session.commit()
                 flash('Mot de passe mis à jour', 'success')
-        
+
         return redirect(url_for('main.patient_profile', section=section))
-    
+
     return render_template('patient_profile.html',
                            section=section,
                            health_record=health_record,
@@ -486,20 +519,20 @@ def patient_profile(section='info'):
 def add_relative():
     if current_user.role != 'patient':
         return redirect(url_for('main.home'))
-    
+
     name = request.form.get('name')
     relation = request.form.get('relation')
     birth_date_str = request.form.get('birth_date')
     blood_type = request.form.get('blood_type')
     allergies = request.form.get('allergies')
-    
+
     birth_date = None
     if birth_date_str:
         try:
             birth_date = datetime.strptime(birth_date_str, '%Y-%m-%d').date()
         except:
             pass
-            
+
     relative = Relative(
         patient_id=current_user.id,
         name=name,
@@ -508,10 +541,10 @@ def add_relative():
         blood_type=blood_type,
         allergies=allergies
     )
-    
+
     db.session.add(relative)
     db.session.commit()
-    
+
     flash(f"Profil de {name} ajouté avec succès", "success")
     return redirect(url_for('main.patient_profile', section='relatives'))
 
@@ -520,7 +553,7 @@ def add_relative():
 def doctor_dashboard():
     if current_user.role != 'doctor':
         return redirect(url_for('main.home'))
-    
+
     try:
         current_app.logger.info(f"Dashboard access by Doctor {current_user.id}")
         doctor_profile = current_user.doctor_profile
@@ -580,7 +613,7 @@ def patient_ticket(patient_id):
 def next_patient():
     if current_user.role != 'doctor':
         return jsonify({'error': 'Unauthorized'}), 403
-    
+
     try:
         doctor_profile = current_user.doctor_profile
 
@@ -637,7 +670,7 @@ def next_patient():
 def mark_no_show(appointment_id):
     if current_user.role != 'doctor':
         return redirect(url_for('main.home'))
-    
+
     try:
         appointment = Appointment.query.get_or_404(appointment_id)
         if appointment.doctor_id == current_user.doctor_profile.id:
@@ -648,7 +681,7 @@ def mark_no_show(appointment_id):
         db.session.rollback()
         current_app.logger.error(f"Error in mark_no_show for appointment {appointment_id}: {str(e)}", exc_info=True)
         flash("Impossible de marquer l'absence.", "error")
-    
+
     return redirect(url_for('main.doctor_dashboard'))
 
 @main_bp.route('/cancel/<int:appointment_id>', methods=['POST'])
@@ -656,12 +689,12 @@ def mark_no_show(appointment_id):
 def cancel_appointment(appointment_id):
     if current_user.role != 'patient':
         return redirect(url_for('main.home'))
-    
+
     appointment = Appointment.query.get_or_404(appointment_id)
     if appointment.patient_id == current_user.id:
         appointment.status = 'cancelled'
         db.session.commit()
-    
+
     return redirect(url_for('main.my_appointments'))
 
 @main_bp.route('/api/emergency/shift', methods=['POST'])
@@ -694,20 +727,20 @@ def shift_appointments_api():
 def get_queue_status(doctor_id):
     """Retourne l'état de la file d'attente avec données SmartFlow."""
     doctor = DoctorProfile.query.get_or_404(doctor_id)
-    
+
     # Comptage des patients en attente
     waiting_count = Appointment.query.filter_by(
         doctor_id=doctor_id,
         appointment_date=date.today(),
         status='confirmed'
     ).count()
-    
+
     checked_in_count = Appointment.query.filter_by(
         doctor_id=doctor_id,
         appointment_date=date.today(),
         status='waiting'
     ).count()
-    
+
     # Patient actuel
     current_patient = None
     current_appt = Appointment.query.filter_by(
@@ -717,11 +750,11 @@ def get_queue_status(doctor_id):
     ).first()
     if current_appt:
         current_patient = current_appt.patient.name
-    
+
     # === SmartFlow: Détection du Drift ===
     optimizer = QueueOptimizer()
     drift_info = optimizer.detect_drift(doctor_id)
-    
+
     return jsonify({
         'current_serving': doctor.waiting_room_count,
         'waiting_count': waiting_count,
@@ -740,24 +773,24 @@ def get_queue_status(doctor_id):
 def check_in_patient(appointment_id):
     if current_user.role != 'doctor':
         return jsonify({'error': 'Unauthorized'}), 403
-    
+
     appointment = Appointment.query.get_or_404(appointment_id)
-    
+
     if appointment.doctor_id != current_user.doctor_profile.id:
         return jsonify({'error': 'Unauthorized'}), 403
-    
+
     if appointment.queue_number is not None:
         return jsonify({'error': 'Patient already checked in'}), 400
-    
+
     max_queue = db.session.query(db.func.max(Appointment.queue_number)).filter(
         Appointment.doctor_id == current_user.doctor_profile.id,
         Appointment.appointment_date == date.today()
     ).scalar() or 0
-    
+
     appointment.queue_number = max_queue + 1
     appointment.status = 'waiting'
     db.session.commit()
-    
+
     return jsonify({
         'success': True,
         'queue_number': appointment.queue_number,
@@ -769,62 +802,62 @@ def get_doctor_slots(doctor_id):
     doctor = DoctorProfile.query.get_or_404(doctor_id)
     start_date_str = request.args.get('start_date', date.today().isoformat())
     days = request.args.get('days', 3, type=int)
-    
+
     try:
         start_date = datetime.strptime(start_date_str, '%Y-%m-%d').date()
     except ValueError:
         start_date = date.today()
-    
+
     slots = {}
-    
+
     for i in range(days):
         current_date = start_date + timedelta(days=i)
         day_of_week = current_date.weekday()
-        
+
         availability = DoctorAvailability.query.filter_by(
             doctor_id=doctor_id,
             day_of_week=day_of_week,
             is_available=True
         ).first()
-        
+
         if availability:
             start_time = availability.start_time
             end_time = availability.end_time
         else:
             start_time = time(9, 0)
             end_time = time(17, 0)
-        
+
         existing_appointments = Appointment.query.filter_by(
             doctor_id=doctor_id,
             appointment_date=current_date,
             status='confirmed'
         ).all()
-        
+
         booked_times = set()
         for appt in existing_appointments:
             if appt.appointment_time:
                 booked_times.add(appt.appointment_time.strftime('%H:%M'))
-        
+
         day_slots = []
         current_time = datetime.combine(current_date, start_time)
         end_datetime = datetime.combine(current_date, end_time)
-        
+
         now = datetime.now()
-        
+
         while current_time < end_datetime:
             time_str = current_time.strftime('%H:%M')
-            
+
             if current_date == date.today() and current_time <= now:
                 current_time += timedelta(minutes=30)
                 continue
-            
+
             if time_str not in booked_times:
                 day_slots.append(time_str)
-            
+
             current_time += timedelta(minutes=30)
-        
+
         slots[current_date.isoformat()] = day_slots
-    
+
     return jsonify(slots)
 
 @main_bp.route('/doctor/<int:doctor_id>')
@@ -858,34 +891,34 @@ def api_doctor_appointments():
     """
     if current_user.role != 'doctor':
         return jsonify({'error': 'Unauthorized'}), 403
-    
+
     doctor_profile = current_user.doctor_profile
     start_str = request.args.get('start')
     end_str = request.args.get('end')
-    
+
     try:
         start_date = datetime.fromisoformat(start_str.replace('Z', '+00:00')).date() if start_str else date.today() - timedelta(days=7)
         end_date = datetime.fromisoformat(end_str.replace('Z', '+00:00')).date() if end_str else date.today() + timedelta(days=30)
     except:
         start_date = date.today() - timedelta(days=7)
         end_date = date.today() + timedelta(days=30)
-    
+
     appointments = Appointment.query.filter(
         Appointment.doctor_id == doctor_profile.id,
         Appointment.appointment_date >= start_date,
         Appointment.appointment_date <= end_date
     ).all()
-    
+
     # Instancier le moteur SmartFlow pour calculer les scores de priorité
     optimizer = QueueOptimizer()
-    
+
     events = []
     for appt in appointments:
         if appt.appointment_time:
             start_dt = datetime.combine(appt.appointment_date, appt.appointment_time)
             duration = appt.consultation_type.duration if appt.consultation_type else 30
             end_dt = start_dt + timedelta(minutes=duration)
-            
+
             # Couleur basée sur le statut ou le type de consultation
             if appt.consultation_type and appt.consultation_type.color:
                 color = appt.consultation_type.color
@@ -899,14 +932,14 @@ def api_doctor_appointments():
                 color = '#ef4444'
             else:
                 color = '#14b999'
-            
+
             # Calcul dynamique du score de priorité SmartFlow
             try:
                 priority_score = optimizer._calculate_priority_score(appt)
             except Exception:
                 # Fallback si le calcul échoue (pas d'arrival_time, etc.)
                 priority_score = (getattr(appt, 'urgency_level', 1) or 1) * 100
-            
+
             events.append({
                 'id': appt.id,
                 'title': appt.patient.name,
@@ -932,7 +965,7 @@ def api_doctor_appointments():
                     'priority_score': priority_score  # Score calculé dynamiquement
                 }
             })
-    
+
     return jsonify(events)
 
 
@@ -941,7 +974,7 @@ def api_doctor_appointments():
 def update_appointment_status(appointment_id):
     if current_user.role != 'doctor':
         return jsonify({'error': 'Unauthorized'}), 403
-    
+
     try:
         appointment = Appointment.query.get_or_404(appointment_id)
         if appointment.doctor_id != current_user.doctor_profile.id:
@@ -993,15 +1026,15 @@ def update_appointment_status(appointment_id):
 def update_appointment_notes(appointment_id):
     if current_user.role != 'doctor':
         return jsonify({'error': 'Unauthorized'}), 403
-    
+
     appointment = Appointment.query.get_or_404(appointment_id)
     if appointment.doctor_id != current_user.doctor_profile.id:
         return jsonify({'error': 'Unauthorized'}), 403
-    
+
     data = request.get_json()
     appointment.doctor_notes = data.get('notes', '')
     db.session.commit()
-    
+
     return jsonify({'success': True})
 
 
@@ -1010,10 +1043,10 @@ def update_appointment_notes(appointment_id):
 def doctor_patients():
     if current_user.role != 'doctor':
         return redirect(url_for('main.home'))
-    
+
     doctor_profile = current_user.doctor_profile
     search_query = request.args.get('q', '').strip()
-    
+
     patient_subquery = db.session.query(
         Appointment.patient_id,
         db.func.max(Appointment.appointment_date).label('last_visit'),
@@ -1021,24 +1054,24 @@ def doctor_patients():
     ).filter(
         Appointment.doctor_id == doctor_profile.id
     ).group_by(Appointment.patient_id).subquery()
-    
+
     query = db.session.query(
         User,
         patient_subquery.c.last_visit,
         patient_subquery.c.visit_count
     ).join(patient_subquery, User.id == patient_subquery.c.patient_id)
-    
+
     if search_query:
         query = query.filter(User.name.ilike(f'%{search_query}%'))
-    
+
     patients_data = query.order_by(patient_subquery.c.last_visit.desc()).all()
-    
+
     patients = [{
         'user': p[0],
         'last_visit': p[1],
         'visit_count': p[2]
     } for p in patients_data]
-    
+
     return render_template('doctor_patients.html',
                            patients=patients,
                            search_query=search_query,
@@ -1051,26 +1084,26 @@ def doctor_patients():
 def get_patient_history(patient_id):
     if current_user.role != 'doctor':
         return jsonify({'error': 'Unauthorized'}), 403
-    
+
     doctor_profile = current_user.doctor_profile
-    
+
     # In a real app, verify relationship. For now, allow if doctor.
     # has_relationship = Appointment.query.filter(
     #     Appointment.doctor_id == doctor_profile.id,
     #     Appointment.patient_id == patient_id
     # ).first()
-    
+
     # if not has_relationship:
     #     return jsonify({'error': 'Patient not found'}), 404
-    
+
     patient = User.query.get_or_404(patient_id)
     health_record = patient.health_record
-    
+
     appointments = Appointment.query.filter(
         Appointment.doctor_id == doctor_profile.id,
         Appointment.patient_id == patient_id
     ).order_by(Appointment.appointment_date.desc(), Appointment.appointment_time.desc()).all()
-    
+
     history = [{
         'id': a.id,
         'date': a.appointment_date.strftime('%d/%m/%Y'),
@@ -1079,12 +1112,12 @@ def get_patient_history(patient_id):
         'status': a.status,
         'notes': a.doctor_notes or ''
     } for a in appointments]
-    
+
     age = None
     if patient.birth_date:
         today = date.today()
         age = today.year - patient.birth_date.year - ((today.month, today.day) < (patient.birth_date.month, patient.birth_date.day))
-    
+
     return jsonify({
         'patient': {
             'id': patient.id,
@@ -1107,14 +1140,14 @@ def get_patient_history(patient_id):
 def doctor_settings():
     if current_user.role != 'doctor':
         return redirect(url_for('main.home'))
-    
+
     doctor_profile = current_user.doctor_profile
     consultation_types = ConsultationType.query.filter_by(doctor_id=doctor_profile.id, is_active=True).all()
     absences = DoctorAbsence.query.filter(
         DoctorAbsence.doctor_id == doctor_profile.id,
         DoctorAbsence.end_date >= datetime.now()
     ).order_by(DoctorAbsence.start_date).all()
-    
+
     availability_slots = DoctorAvailability.query.filter_by(doctor_id=doctor_profile.id).all()
     availability = {}
     for slot in availability_slots:
@@ -1123,7 +1156,7 @@ def doctor_settings():
             'start_time': slot.start_time.strftime('%H:%M') if slot.start_time else '08:00',
             'end_time': slot.end_time.strftime('%H:%M') if slot.end_time else '17:00'
         }
-    
+
     return render_template('doctor_settings.html',
                            doctor=doctor_profile,
                            consultation_types=consultation_types,
@@ -1138,9 +1171,9 @@ def doctor_settings():
 def doctor_settings_profile():
     if current_user.role != 'doctor':
         return redirect(url_for('main.home'))
-    
+
     doctor = current_user.doctor_profile
-    
+
     current_user.name = request.form.get('name', current_user.name)
     doctor.specialty = request.form.get('specialty', doctor.specialty)
     doctor.city = request.form.get('city', doctor.city)
@@ -1151,7 +1184,7 @@ def doctor_settings_profile():
     doctor.payment_methods = request.form.get('payment_methods', '')
     doctor.expertises = request.form.get('expertises', '')
     doctor.diplomas = request.form.get('diplomas', '')
-    
+
     db.session.commit()
     flash('Modifications enregistrées !', 'success')
     return redirect(url_for('main.doctor_settings'))
@@ -1162,23 +1195,23 @@ def doctor_settings_profile():
 def doctor_settings_availability():
     if current_user.role != 'doctor':
         return redirect(url_for('main.home'))
-    
+
     doctor_id = current_user.doctor_profile.id
-    
+
     DoctorAvailability.query.filter_by(doctor_id=doctor_id).delete()
-    
+
     for day in range(7):
         is_active = request.form.get(f'day_{day}_active') == '1'
         start_str = request.form.get(f'day_{day}_start', '08:00')
         end_str = request.form.get(f'day_{day}_end', '17:00')
-        
+
         try:
             start_time = datetime.strptime(start_str, '%H:%M').time()
             end_time = datetime.strptime(end_str, '%H:%M').time()
         except:
             start_time = time(8, 0)
             end_time = time(17, 0)
-        
+
         slot = DoctorAvailability(
             doctor_id=doctor_id,
             day_of_week=day,
@@ -1187,7 +1220,7 @@ def doctor_settings_availability():
             is_available=is_active
         )
         db.session.add(slot)
-    
+
     db.session.commit()
     flash('Horaires enregistrés !', 'success')
     return redirect(url_for('main.doctor_settings'))
@@ -1198,9 +1231,9 @@ def doctor_settings_availability():
 def add_consultation_type():
     if current_user.role != 'doctor':
         return jsonify({'error': 'Unauthorized'}), 403
-    
+
     data = request.get_json()
-    
+
     consultation_type = ConsultationType(
         doctor_id=current_user.doctor_profile.id,
         name=data.get('name', 'Consultation'),
@@ -1210,10 +1243,10 @@ def add_consultation_type():
         is_emergency_only=data.get('is_emergency_only', False),
         require_existing_patient=data.get('require_existing_patient', False)
     )
-    
+
     db.session.add(consultation_type)
     db.session.commit()
-    
+
     return jsonify({
         'success': True,
         'id': consultation_type.id,
@@ -1226,14 +1259,14 @@ def add_consultation_type():
 def delete_consultation_type(type_id):
     if current_user.role != 'doctor':
         return jsonify({'error': 'Unauthorized'}), 403
-    
+
     ct = ConsultationType.query.get_or_404(type_id)
     if ct.doctor_id != current_user.doctor_profile.id:
         return jsonify({'error': 'Unauthorized'}), 403
-    
+
     ct.is_active = False
     db.session.commit()
-    
+
     return jsonify({'success': True})
 
 
@@ -1242,15 +1275,15 @@ def delete_consultation_type(type_id):
 def add_absence():
     if current_user.role != 'doctor':
         return jsonify({'error': 'Unauthorized'}), 403
-    
+
     data = request.get_json()
-    
+
     try:
         start_date = datetime.fromisoformat(data.get('start_date'))
         end_date = datetime.fromisoformat(data.get('end_date'))
     except:
         return jsonify({'error': 'Invalid dates'}), 400
-    
+
     force = data.get('force', False)
     doctor_id = current_user.doctor_profile.id
 
@@ -1271,10 +1304,10 @@ def add_absence():
         end_date=end_date,
         reason=data.get('reason', '')
     )
-    
+
     db.session.add(absence)
     db.session.commit()
-    
+
     return jsonify({
         'success': True,
         'id': absence.id
@@ -1286,14 +1319,14 @@ def add_absence():
 def delete_absence(absence_id):
     if current_user.role != 'doctor':
         return jsonify({'error': 'Unauthorized'}), 403
-    
+
     absence = DoctorAbsence.query.get_or_404(absence_id)
     if absence.doctor_id != current_user.doctor_profile.id:
         return jsonify({'error': 'Unauthorized'}), 403
-    
+
     db.session.delete(absence)
     db.session.commit()
-    
+
     return jsonify({'success': True})
 
 
@@ -1301,7 +1334,7 @@ def delete_absence(absence_id):
 def get_consultation_types(doctor_id):
     doctor = DoctorProfile.query.get_or_404(doctor_id)
     types = ConsultationType.query.filter_by(doctor_id=doctor_id, is_active=True).all()
-    
+
     if not types:
         return jsonify([{
             'id': None,
@@ -1312,7 +1345,7 @@ def get_consultation_types(doctor_id):
             'is_emergency_only': False,
             'require_existing_patient': False
         }])
-    
+
     return jsonify([{
         'id': ct.id,
         'name': ct.name,
@@ -1330,28 +1363,28 @@ def get_smart_slots(doctor_id):
     start_date_str = request.args.get('start_date', date.today().isoformat())
     days = request.args.get('days', 3, type=int)
     consultation_type_id = request.args.get('type_id', type=int)
-    
+
     try:
         start_date = datetime.strptime(start_date_str, '%Y-%m-%d').date()
     except ValueError:
         start_date = date.today()
-    
+
     duration = 30
     is_emergency_only = False
     require_existing_patient = False
-    
+
     if consultation_type_id:
         ct = ConsultationType.query.get(consultation_type_id)
         if ct and ct.doctor_id == doctor_id:
             duration = ct.duration
             is_emergency_only = ct.is_emergency_only
             require_existing_patient = ct.require_existing_patient
-    
+
     if is_emergency_only:
         max_date = date.today() + timedelta(days=1)
         if start_date > max_date:
             return jsonify({'error': 'Emergency slots only available for next 24h', 'slots': {}})
-    
+
     if require_existing_patient and current_user.is_authenticated:
         past_appointments = Appointment.query.filter(
             Appointment.patient_id == current_user.id,
@@ -1360,50 +1393,50 @@ def get_smart_slots(doctor_id):
         ).count()
         if past_appointments == 0:
             return jsonify({'error': 'This consultation type requires existing patients', 'slots': {}})
-    
+
     if current_user.is_authenticated and (current_user.no_show_count or 0) >= 3:
         return jsonify({'error': 'Your account is blocked due to repeated no-shows', 'slots': {}})
-    
+
     absences = DoctorAbsence.query.filter(
         DoctorAbsence.doctor_id == doctor_id,
         DoctorAbsence.end_date >= datetime.combine(start_date, time(0, 0))
     ).all()
-    
+
     slots = {}
-    
+
     for i in range(days):
         current_date = start_date + timedelta(days=i)
         day_of_week = current_date.weekday()
-        
+
         is_absent = False
         for absence in absences:
             if absence.start_date.date() <= current_date <= absence.end_date.date():
                 is_absent = True
                 break
-        
+
         if is_absent:
             slots[current_date.isoformat()] = []
             continue
-        
+
         availability = DoctorAvailability.query.filter_by(
             doctor_id=doctor_id,
             day_of_week=day_of_week,
             is_available=True
         ).first()
-        
+
         if availability:
             slot_start_time = availability.start_time
             slot_end_time = availability.end_time
         else:
             slot_start_time = time(9, 0)
             slot_end_time = time(17, 0)
-        
+
         existing_appointments = Appointment.query.filter(
             Appointment.doctor_id == doctor_id,
             Appointment.appointment_date == current_date,
             Appointment.status.in_(['confirmed', 'waiting'])
         ).all()
-        
+
         booked_ranges = []
         for appt in existing_appointments:
             if appt.appointment_time:
@@ -1411,33 +1444,33 @@ def get_smart_slots(doctor_id):
                 appt_start = datetime.combine(current_date, appt.appointment_time)
                 appt_end = appt_start + timedelta(minutes=appt_duration)
                 booked_ranges.append((appt_start, appt_end))
-        
+
         day_slots = []
         current_time = datetime.combine(current_date, slot_start_time)
         end_datetime = datetime.combine(current_date, slot_end_time)
-        
+
         now = datetime.now()
-        
+
         while current_time + timedelta(minutes=duration) <= end_datetime:
             slot_end = current_time + timedelta(minutes=duration)
-            
+
             if current_date == date.today() and current_time <= now:
                 current_time += timedelta(minutes=15)
                 continue
-            
+
             conflict = False
             for booked_start, booked_end in booked_ranges:
                 if not (slot_end <= booked_start or current_time >= booked_end):
                     conflict = True
                     break
-            
+
             if not conflict:
                 day_slots.append(current_time.strftime('%H:%M'))
-            
+
             current_time += timedelta(minutes=15)
-        
+
         slots[current_date.isoformat()] = day_slots
-    
+
     return jsonify({'slots': slots})
 
 
@@ -1446,29 +1479,29 @@ def initialize_database():
     secret_key = request.args.get('key')
     if secret_key != 'tbib_secret_key':
         return "Unauthorized", 403
-    
+
     existing_doctor = DoctorProfile.query.first()
     if existing_doctor:
         return "Database already has data. No action taken."
-    
+
     import random
-    
+
     cities = ["Alger", "Oran", "Constantine", "Annaba", "Setif", "Bejaia", "Tlemcen", "Blida"]
     specialties = ["Médecin Généraliste", "Dentiste", "Cardiologue", "Pédiatre", "Dermatologue", "Gynécologue", "Ophtalmologue"]
     first_names = ["Mohamed", "Amine", "Sarah", "Fatima", "Youssef", "Karim", "Nadia", "Amina", "Rachid", "Leila"]
     last_names = ["Benali", "Saidi", "Dahmani", "Boudiaf", "Hadj", "Mebarki", "Hamidi", "Cherif", "Bouzid", "Belkacem"]
-    
+
     doctors_created = 0
-    
+
     for i in range(50):
         first = random.choice(first_names)
         last = random.choice(last_names)
         full_name = f"Dr. {first} {last}"
         city = random.choice(cities)
         specialty = random.choice(specialties)
-        
+
         email = f"doctor{i+1}@tbib.dz"
-        
+
         user = User(
             email=email,
             role='doctor',
@@ -1479,7 +1512,7 @@ def initialize_database():
         user.set_password('doctor123')
         db.session.add(user)
         db.session.flush()
-        
+
         street_names = ['Didouche Mourad', 'Ben Mhidi', 'Abane Ramdane', 'Amirouche', 'Pasteur']
         doctor_profile = DoctorProfile(
             user_id=user.id,
@@ -1493,7 +1526,7 @@ def initialize_database():
         )
         db.session.add(doctor_profile)
         db.session.flush()
-        
+
         start_t = time(9, 0)
         end_t = time(17, 0)
         for day in range(5):
@@ -1505,7 +1538,7 @@ def initialize_database():
                 is_available=True
             )
             db.session.add(availability)
-        
+
         default_consultation = ConsultationType(
             doctor_id=doctor_profile.id,
             name="Consultation standard",
@@ -1515,22 +1548,22 @@ def initialize_database():
             is_active=True
         )
         db.session.add(default_consultation)
-        
+
         doctors_created += 1
-    
+
     db.session.commit()
-    
+
     return f"✅ SUCCESS: {doctors_created} Doctors & Schedules Created!"
 
 
 @main_bp.route('/admin/seed_lite')
 def seed_lite():
     import random
-    
+
     doctor_count = DoctorProfile.query.count()
     if doctor_count > 5:
         return "⚠️ Database already has data. Aborted."
-    
+
     cities = ["Alger", "Oran", "Constantine", "Setif", "Bejaia"]
     specialties = ["Médecin Généraliste", "Dentiste", "Pédiatre"]
     names = [
@@ -1538,7 +1571,7 @@ def seed_lite():
         ("Fatima", "Boudiaf"), ("Karim", "Hadj"), ("Yasmine", "Mebarki"),
         ("Omar", "Hamidi"), ("Leila", "Cherif"), ("Youcef", "Bouzid"), ("Amina", "Belkacem")
     ]
-    
+
     for i, (first, last) in enumerate(names):
         user = User(
             email=f"medecin{i+1}@tbib.dz",
@@ -1550,7 +1583,7 @@ def seed_lite():
         user.set_password('123456')
         db.session.add(user)
         db.session.flush()
-        
+
         profile = DoctorProfile(
             user_id=user.id,
             specialty=specialties[i % len(specialties)],
@@ -1561,7 +1594,7 @@ def seed_lite():
         )
         db.session.add(profile)
         db.session.flush()
-        
+
         for day in range(5):
             avail = DoctorAvailability(
                 doctor_id=profile.id,
@@ -1571,7 +1604,7 @@ def seed_lite():
                 is_available=True
             )
             db.session.add(avail)
-        
+
         consult = ConsultationType(
             doctor_id=profile.id,
             name="Consultation",
@@ -1581,7 +1614,7 @@ def seed_lite():
             is_active=True
         )
         db.session.add(consult)
-    
+
     db.session.commit()
     return "✅ SUCCÈS : 10 Médecins ajoutés à la Production !"
 
@@ -1589,15 +1622,15 @@ def seed_lite():
 @main_bp.route('/demo/force_login')
 def demo_force_login():
     user = User.query.filter_by(email='medecin1@tbib.dz').first()
-    
+
     if not user:
         user = User.query.filter_by(role='doctor').first()
-    
+
     if user:
         login_user(user)
         flash("🔓 Mode Démo : Connexion Médecin forcée avec succès.", "success")
         return redirect(url_for('main.doctor_dashboard'))
-    
+
     return "Erreur: Aucun médecin en base."
 
 
