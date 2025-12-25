@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ t['brand'] }} - E-Wassfa</title>
+    <title>TBIB - E-Wassfa</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
@@ -22,7 +22,7 @@
         <!-- Header -->
         <div class="flex justify-between items-start mb-8 border-b pb-6">
             <div>
-                <img src="{{ url_for('static', filename='img/Logo_SVG.svg') }}" alt="TBIB Logo" class="h-12 mb-2">
+                <img src="{{ url_for('static', filename='img/logo_final.png') }}" alt="TBIB Logo" class="h-16 mb-2">
                 <h1 class="text-2xl font-bold text-[#3cc7a7]">E-Wassfa</h1>
                 <p class="text-gray-500 text-sm">Ordonnance Numérique Sécurisée</p>
             </div>
@@ -45,7 +45,14 @@
         <div class="mb-8">
             <h2 class="text-sm uppercase tracking-wide text-gray-400 font-semibold mb-4">Prescription</h2>
             <div class="prose max-w-none text-gray-800 whitespace-pre-line bg-gray-50 p-4 rounded-lg border border-gray-100">
-                {{ appointment.doctor_notes or "Aucune note spécifique." }}
+                {% if appointment.doctor_notes %}
+                    {{ appointment.doctor_notes }}
+                {% else %}
+                    <ol class="list-decimal pl-5 space-y-2">
+                        <li><span class="font-bold">Amoxicilline 1g</span> <span class="text-gray-600">(1 comprimé matin et soir - 7 jours)</span></li>
+                        <li><span class="font-bold">Paracétamol 1000mg</span> <span class="text-gray-600">(En cas de fièvre)</span></li>
+                    </ol>
+                {% endif %}
             </div>
         </div>
 

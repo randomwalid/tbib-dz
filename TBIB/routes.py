@@ -968,7 +968,6 @@ def generate_prescription(appointment_id):
                            appointment=appointment,
                            prescription=prescription,
                            qr_code=img_str,
-                           t=get_t(),
                            lang=session.get('lang', 'fr'))
 
 @main_bp.route('/verify/prescription/<token>')
@@ -992,7 +991,6 @@ def verify_prescription(token):
                            prescription=prescription,
                            status_display=status_display,
                            is_valid=is_valid,
-                           t=get_t(),
                            lang=session.get('lang', 'fr'))
 
 @main_bp.route('/appointment/<int:appt_id>/present', methods=['POST'])
