@@ -1,48 +1,63 @@
 {% extends 'base.html' %}
 
-{% block title %}Doctor Dashboard{% endblock %}
+{% block title %}Doctor Dashboard - TBIB{% endblock %}
 
 {% block content %}
-<div class="min-h-screen bg-[#F8F9FA] p-6 md:p-10 font-sans">
+<div class="min-h-screen bg-[#F8F9FA] p-6 md:p-10 font-sans" x-data="dashboardApp()" x-init="init()">
     <div class="max-w-7xl mx-auto space-y-8">
-        
+
         <!-- Header -->
-        <div class="flex flex-col md:flex-row md:items-center justify-between bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+        <div
+            class="flex flex-col md:flex-row md:items-center justify-between bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
             <div class="flex items-center gap-5">
-                <!-- Avatar Placeholder -->
-                <div class="h-16 w-16 rounded-full bg-[#3cc7a7]/10 flex items-center justify-center text-[#3cc7a7] text-2xl font-bold ring-2 ring-offset-2 ring-[#3cc7a7]/20">
+                <!-- Avatar -->
+                <div
+                    class="h-16 w-16 rounded-full bg-[#3cc7a7]/10 flex items-center justify-center text-[#3cc7a7] text-2xl font-bold ring-2 ring-offset-2 ring-[#3cc7a7]/20">
                     {{ current_user.name[0] | upper if current_user.is_authenticated else 'D' }}
                 </div>
                 <div>
-                    <h1 class="text-2xl font-bold text-[#333333]">Dr. {{ current_user.name if current_user.is_authenticated else 'Ahmed Benali' }}</h1>
+                    <h1 class="text-2xl font-bold text-[#333333]">Dr. {{ current_user.name if
+                        current_user.is_authenticated else 'Ahmed Benali' }}</h1>
                     <div class="flex items-center gap-3 mt-1.5">
                         <!-- KYC Badge -->
-                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold tracking-wide bg-[#3cc7a7]/10 text-[#3cc7a7] border border-[#3cc7a7]/20">
+                        <span
+                            class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold tracking-wide bg-[#3cc7a7]/10 text-[#3cc7a7] border border-[#3cc7a7]/20">
                             <svg class="mr-1.5 h-3 w-3" fill="currentColor" viewBox="0 0 8 8">
                                 <circle cx="4" cy="4" r="3" />
                             </svg>
                             KYC VERIFIED
                         </span>
                         <span class="text-gray-400 text-sm font-medium flex items-center">
-                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
-                            Dentiste
+                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z">
+                                </path>
+                            </svg>
+                            {{ doctor_profile.specialty if doctor_profile else 'Médecin' }}
                         </span>
                     </div>
                 </div>
             </div>
             <div class="mt-4 md:mt-0 text-right">
-                 <p class="text-xs text-gray-400 uppercase tracking-wider font-semibold">Date du jour</p>
-                 <p class="text-xl font-bold text-[#333333]" x-data x-text="new Date().toLocaleDateString('fr-FR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })">mardi 23 décembre 2025</p>
+                <p class="text-xs text-gray-400 uppercase tracking-wider font-semibold">Date du jour</p>
+                <p class="text-xl font-bold text-[#333333]"
+                    x-text="new Date().toLocaleDateString('fr-FR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })">
+                </p>
             </div>
         </div>
 
-        <!-- Control Center & Panic Button -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6" x-data="{ mode: 'smart' }">
+        <!-- Control Center & Drift Alert -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
             <!-- Control Center -->
-            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 relative overflow-hidden group hover:shadow-md transition-shadow duration-300">
+            <div
+                class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 relative overflow-hidden group hover:shadow-md transition-shadow duration-300">
                 <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-                    <svg class="w-24 h-24 text-[#3cc7a7]" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clip-rule="evenodd"></path></svg>
+                    <svg class="w-24 h-24 text-[#3cc7a7]" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd"
+                            d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z"
+                            clip-rule="evenodd"></path>
+                    </svg>
                 </div>
 
                 <div class="flex items-center justify-between mb-6 relative z-10">
@@ -53,61 +68,165 @@
                 </div>
 
                 <div class="flex items-center bg-gray-50 rounded-xl p-1.5 border border-gray-200 relative z-10">
-                    <button
-                        @click="mode = 'ticket'"
+                    <button @click="mode = 'ticket'"
                         :class="mode === 'ticket' ? 'bg-white text-[#333333] shadow-sm ring-1 ring-gray-200' : 'text-gray-500 hover:text-gray-700'"
                         class="flex-1 py-3 px-4 rounded-lg text-sm font-bold transition-all duration-200 flex items-center justify-center gap-2">
-                        <svg class="w-5 h-5" :class="mode === 'ticket' ? 'text-[#3cc7a7]' : 'text-gray-400'" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"></path></svg>
+                        <svg class="w-5 h-5" :class="mode === 'ticket' ? 'text-[#3cc7a7]' : 'text-gray-400'" fill="none"
+                            stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z">
+                            </path>
+                        </svg>
                         Mode Ticket
                     </button>
-                    <button
-                        @click="mode = 'smart'"
+                    <button @click="mode = 'smart'"
                         :class="mode === 'smart' ? 'bg-white text-[#333333] shadow-sm ring-1 ring-gray-200' : 'text-gray-500 hover:text-gray-700'"
                         class="flex-1 py-3 px-4 rounded-lg text-sm font-bold transition-all duration-200 flex items-center justify-center gap-2">
-                        <svg class="w-5 h-5" :class="mode === 'smart' ? 'text-[#3cc7a7]' : 'text-gray-400'" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        <svg class="w-5 h-5" :class="mode === 'smart' ? 'text-[#3cc7a7]' : 'text-gray-400'" fill="none"
+                            stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
                         Mode RDV Smart
                     </button>
                 </div>
 
-                <div class="mt-4 p-3 rounded-lg bg-[#3cc7a7]/5 border border-[#3cc7a7]/10 flex items-start gap-3 relative z-10">
-                    <svg class="w-5 h-5 text-[#3cc7a7] mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                <div
+                    class="mt-4 p-3 rounded-lg bg-[#3cc7a7]/5 border border-[#3cc7a7]/10 flex items-start gap-3 relative z-10">
+                    <svg class="w-5 h-5 text-[#3cc7a7] mt-0.5 flex-shrink-0" fill="none" stroke="currentColor"
+                        viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
                     <p class="text-sm text-gray-600">
-                        <span x-show="mode === 'ticket'">Les patients sont appelés selon leur ordre d'arrivée physique. Idéal pour les consultations sans rendez-vous.</span>
-                        <span x-show="mode === 'smart'">L'algorithme optimise votre planning pour réduire les trous et prioriser les urgences.</span>
+                        <span x-show="mode === 'ticket'">Les patients sont appelés selon leur ordre d'arrivée physique.
+                            Idéal pour les consultations sans rendez-vous.</span>
+                        <span x-show="mode === 'smart'">L'algorithme SmartFlow optimise votre planning pour réduire les
+                            trous et prioriser les urgences.</span>
                     </p>
                 </div>
             </div>
 
-            <!-- Panic Button -->
-            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col justify-center items-center text-center relative overflow-hidden border-l-4 border-l-red-500">
+            <!-- Drift Alert Panel (SmartFlow) -->
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col justify-center items-center text-center relative overflow-hidden transition-all duration-500"
+                :class="{
+                     'border-l-4 border-l-red-500 bg-red-50/30': queueStatus.drift_minutes > 30,
+                     'border-l-4 border-l-yellow-500 bg-yellow-50/30': queueStatus.drift_minutes > 10 && queueStatus.drift_minutes <= 30,
+                     'border-l-4 border-l-green-500 bg-green-50/30': queueStatus.drift_minutes <= 10
+                 }">
+
+                <!-- Background Icon -->
                 <div class="absolute top-0 right-0 p-4 opacity-5">
-                    <svg class="w-32 h-32 text-red-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path></svg>
+                    <svg class="w-32 h-32" :class="queueStatus.drift_minutes > 30 ? 'text-red-500' : 'text-green-500'"
+                        fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd"
+                            d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z"
+                            clip-rule="evenodd"></path>
+                    </svg>
                 </div>
 
-                <h2 class="text-lg font-bold text-gray-800 mb-2 relative z-10">Retard Accumulé ?</h2>
-                <p class="text-sm text-gray-500 mb-6 relative z-10 max-w-xs">En cas d'urgence ou de retard important, notifiez automatiquement vos patients.</p>
+                <!-- Critical Drift State (> 30 min) - ORAGE ⛈️ -->
+                <template x-if="queueStatus.drift_minutes > 30">
+                    <div class="relative z-10 w-full">
+                        <div class="animate-pulse mb-3">
+                            <span
+                                class="inline-flex items-center px-4 py-2 rounded-full text-sm font-bold bg-red-100 text-red-700 border border-red-200">
+                                <span class="text-2xl mr-2">⛈️</span>
+                                ORAGE - RETARD CRITIQUE
+                            </span>
+                        </div>
+                        <p class="text-4xl font-black text-red-600 mb-2"
+                            x-text="Math.round(queueStatus.drift_minutes) + ' min'"></p>
+                        <p class="text-sm text-red-500 mb-4"
+                            x-text="queueStatus.remaining_appointments + ' RDV restants à décaler'"></p>
+                        <button @click="activateCompression()"
+                            class="w-full max-w-xs mx-auto group flex items-center justify-center py-3.5 px-6 border border-transparent text-sm font-bold rounded-xl text-white bg-red-500 hover:bg-red-600 focus:outline-none focus:ring-4 focus:ring-red-200 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 active:translate-y-0">
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                            </svg>
+                            Activer la Compression
+                        </button>
+                    </div>
+                </template>
 
-                <button class="relative z-10 w-full max-w-xs group flex items-center justify-center py-3.5 px-6 border border-transparent text-sm font-bold rounded-xl text-white bg-red-500 hover:bg-red-600 focus:outline-none focus:ring-4 focus:ring-red-200 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 active:translate-y-0">
-                    <svg class="w-5 h-5 mr-2 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                    Urgence : Décaler tout de 30min
-                </button>
+                <!-- Warning State (10-30 min) - NUAGEUX ⛅ -->
+                <template x-if="queueStatus.drift_minutes > 10 && queueStatus.drift_minutes <= 30">
+                    <div class="relative z-10 w-full">
+                        <div class="mb-3">
+                            <span
+                                class="inline-flex items-center px-4 py-2 rounded-full text-sm font-bold bg-yellow-100 text-yellow-700 border border-yellow-200">
+                                <span class="text-2xl mr-2">⛅</span>
+                                NUAGEUX - Retard Modéré
+                            </span>
+                        </div>
+                        <p class="text-3xl font-bold text-yellow-600 mb-2"
+                            x-text="Math.round(queueStatus.drift_minutes) + ' min'"></p>
+                        <p class="text-sm text-yellow-600 mb-4">Situation sous contrôle mais à surveiller</p>
+                        <button @click="shiftAppointments(30)"
+                            class="w-full max-w-xs mx-auto flex items-center justify-center py-3 px-6 border border-yellow-400 text-sm font-bold rounded-xl text-yellow-700 bg-yellow-100 hover:bg-yellow-200 focus:outline-none focus:ring-4 focus:ring-yellow-100 transition-all">
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            Décaler de 30 min
+                        </button>
+                    </div>
+                </template>
+
+                <!-- Good State (<= 10 min) - SOLEIL ☀️ -->
+                <template x-if="queueStatus.drift_minutes <= 10">
+                    <div class="relative z-10 w-full">
+                        <div class="mb-3">
+                            <span
+                                class="inline-flex items-center px-4 py-2 rounded-full text-sm font-bold bg-green-100 text-green-700 border border-green-200">
+                                <span class="text-2xl mr-2">☀️</span>
+                                SOLEIL - Planning Fluide
+                            </span>
+                        </div>
+                        <p class="text-lg font-medium text-green-600 mb-1">Aucun retard significatif</p>
+                        <p class="text-sm text-gray-500" x-text="queueStatus.waiting_count + ' patients en attente'">
+                        </p>
+                    </div>
+                </template>
+            </div>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+                <p class="text-xs text-gray-400 uppercase tracking-wider font-semibold">En attente</p>
+                <p class="text-2xl font-bold text-[#333333]" x-text="queueStatus.waiting_count || 0"></p>
+            </div>
+            <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+                <p class="text-xs text-gray-400 uppercase tracking-wider font-semibold">Checked-in</p>
+                <p class="text-2xl font-bold text-[#3cc7a7]" x-text="queueStatus.checked_in_count || 0"></p>
+            </div>
+            <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+                <p class="text-xs text-gray-400 uppercase tracking-wider font-semibold">En cours</p>
+                <p class="text-2xl font-bold text-blue-600" x-text="queueStatus.current_serving || 0"></p>
+            </div>
+            <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+                <p class="text-xs text-gray-400 uppercase tracking-wider font-semibold">Restants</p>
+                <p class="text-2xl font-bold text-gray-600" x-text="queueStatus.remaining_appointments || 0"></p>
             </div>
         </div>
 
         <!-- Patient List -->
         <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-            <div class="p-6 border-b border-gray-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div
+                class="p-6 border-b border-gray-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div>
                     <h2 class="text-lg font-bold text-[#333333]">Liste des Patients</h2>
                     <p class="text-sm text-gray-500">Vue en temps réel de la salle d'attente</p>
                 </div>
                 <div class="flex gap-2">
-                    <span class="px-3 py-1 bg-[#3cc7a7]/10 text-[#3cc7a7] rounded-full text-xs font-bold border border-[#3cc7a7]/20">
-                        3 En attente
-                    </span>
-                    <span class="px-3 py-1 bg-blue-50 text-blue-600 rounded-full text-xs font-bold border border-blue-100">
-                         1 En cours
-                    </span>
+                    <span
+                        class="px-3 py-1 bg-[#3cc7a7]/10 text-[#3cc7a7] rounded-full text-xs font-bold border border-[#3cc7a7]/20"
+                        x-text="(queueStatus.waiting_count || 0) + ' En attente'"></span>
+                    <span
+                        class="px-3 py-1 bg-blue-50 text-blue-600 rounded-full text-xs font-bold border border-blue-100"
+                        x-text="(queueStatus.checked_in_count || 0) + ' Présents'"></span>
                 </div>
             </div>
 
@@ -117,133 +236,312 @@
                         <tr class="bg-gray-50/50 border-b border-gray-100">
                             <th class="px-6 py-4 font-bold text-gray-400 text-xs uppercase tracking-wider">Heure</th>
                             <th class="px-6 py-4 font-bold text-gray-400 text-xs uppercase tracking-wider">Patient</th>
+                            <th class="px-6 py-4 font-bold text-gray-400 text-xs uppercase tracking-wider">Fiabilité
+                            </th>
                             <th class="px-6 py-4 font-bold text-gray-400 text-xs uppercase tracking-wider">Statut</th>
-                            <th class="px-6 py-4 font-bold text-gray-400 text-xs uppercase tracking-wider text-right">Actions</th>
+                            <th class="px-6 py-4 font-bold text-gray-400 text-xs uppercase tracking-wider text-right">
+                                Actions</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-50">
-                        <!-- Row 1: John Doe (Active) -->
-                        <tr class="bg-[#3cc7a7]/5">
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <span class="font-mono text-sm text-[#3cc7a7] font-bold">09:00</span>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="flex items-center">
-                                    <div class="h-9 w-9 rounded-full flex items-center justify-center text-xs font-bold mr-3 transition-all shadow-sm bg-white border-2 border-[#3cc7a7] text-[#3cc7a7]">
-                                        JD
-                                    </div>
-                                    <div>
-                                        <p class="font-bold text-[#333333]">John Doe <span class="text-gray-400 font-normal text-xs">(Anonymisé)</span></p>
-                                        <p class="text-xs text-gray-400">Motif: Consultation Généraliste</p>
-                                    </div>
-                                </div>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-[#3cc7a7]/10 text-[#3cc7a7] border border-[#3cc7a7]/20">
-                                    <span class="relative flex h-2 w-2 mr-2">
-                                      <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#3cc7a7] opacity-75"></span>
-                                      <span class="relative inline-flex rounded-full h-2 w-2 bg-[#3cc7a7]"></span>
-                                    </span>
-                                    En cours
-                                </span>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                <button class="text-[#3cc7a7] hover:text-[#2da88d] bg-white border border-[#3cc7a7] hover:bg-[#3cc7a7]/5 px-3 py-1.5 rounded-lg transition-all text-xs font-bold">
-                                    Terminer
-                                </button>
-                            </td>
-                        </tr>
+                        <template x-if="appointments.length === 0">
+                            <tr>
+                                <td colspan="5" class="px-6 py-12 text-center text-gray-400">
+                                    <svg class="w-12 h-12 mx-auto mb-4 text-gray-300" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z">
+                                        </path>
+                                    </svg>
+                                    <p class="font-medium">Aucun rendez-vous aujourd'hui</p>
+                                </td>
+                            </tr>
+                        </template>
 
-                        <!-- Row 2: Alice Smith (Waiting) -->
-                        <tr class="hover:bg-gray-50 transition-colors group">
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <span class="font-mono text-sm text-gray-500 font-medium">09:30</span>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="flex items-center">
-                                    <div class="h-9 w-9 rounded-full flex items-center justify-center text-xs font-bold mr-3 transition-all shadow-sm bg-gray-100 text-gray-500 group-hover:bg-white group-hover:shadow-sm">
-                                        AS
-                                    </div>
-                                    <div>
-                                        <p class="font-bold text-[#333333]">Alice Smith <span class="text-gray-400 font-normal text-xs">(Anonymisé)</span></p>
-                                        <p class="text-xs text-gray-400">Motif: Renouvellement</p>
-                                    </div>
-                                </div>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-gray-100 text-gray-600 border border-gray-200">
-                                    En attente
-                                </span>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                <button class="text-gray-400 hover:text-gray-600 hover:bg-gray-100 px-3 py-1.5 rounded-lg transition-all">
-                                    Détails
-                                </button>
-                            </td>
-                        </tr>
+                        <template x-for="appt in appointments" :key="appt.id">
+                            <tr class="hover:bg-gray-50 transition-colors group" :class="{
+                                    'bg-[#3cc7a7]/5': appt.extendedProps.status === 'waiting',
+                                    'border-l-4 border-l-red-500': appt.extendedProps.urgency_level >= 4,
+                                    'bg-stripes': appt.extendedProps.is_shadow_slot
+                                }">
+                                <!-- Time -->
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="font-mono text-sm font-medium"
+                                        :class="appt.extendedProps.status === 'waiting' ? 'text-[#3cc7a7] font-bold' : 'text-gray-500'"
+                                        x-text="new Date(appt.start).toLocaleTimeString('fr-FR', {hour: '2-digit', minute: '2-digit'})"></span>
+                                </td>
 
-                        <!-- Row 3: Mohamed K. (Waiting) -->
-                        <tr class="hover:bg-gray-50 transition-colors group">
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <span class="font-mono text-sm text-gray-500 font-medium">10:00</span>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="flex items-center">
-                                    <div class="h-9 w-9 rounded-full flex items-center justify-center text-xs font-bold mr-3 transition-all shadow-sm bg-gray-100 text-gray-500 group-hover:bg-white group-hover:shadow-sm">
-                                        MK
+                                <!-- Patient -->
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="flex items-center">
+                                        <div class="h-9 w-9 rounded-full flex items-center justify-center text-xs font-bold mr-3 transition-all shadow-sm"
+                                            :class="appt.extendedProps.status === 'waiting' ? 'bg-white border-2 border-[#3cc7a7] text-[#3cc7a7]' : 'bg-gray-100 text-gray-500 group-hover:bg-white group-hover:shadow-sm'"
+                                            x-text="appt.extendedProps.patient_name.split(' ').map(n => n[0]).join('').substring(0,2).toUpperCase()">
+                                        </div>
+                                        <div>
+                                            <p class="font-bold text-[#333333] flex items-center gap-2">
+                                                <span x-text="appt.extendedProps.patient_name"></span>
+                                                <!-- Shadow Slot Icon -->
+                                                <template x-if="appt.extendedProps.is_shadow_slot">
+                                                    <span class="text-gray-400 cursor-help"
+                                                        title="Shadow Slot - Surbooking sécurisé">👻</span>
+                                                </template>
+                                                <!-- Urgency Icon -->
+                                                <template x-if="appt.extendedProps.urgency_level >= 4">
+                                                    <span
+                                                        class="inline-flex items-center px-2 py-0.5 rounded text-xs font-bold bg-red-100 text-red-700">
+                                                        🚨 Urgent
+                                                    </span>
+                                                </template>
+                                            </p>
+                                            <p class="text-xs text-gray-400"
+                                                x-text="'Motif: ' + (appt.extendedProps.consultation_reason || appt.extendedProps.consultation_type)">
+                                            </p>
+                                        </div>
                                     </div>
-                                    <div>
-                                        <p class="font-bold text-[#333333]">Mohamed K. <span class="text-gray-400 font-normal text-xs">(Anonymisé)</span></p>
-                                        <p class="text-xs text-gray-400">Motif: Urgence bénigne</p>
-                                    </div>
-                                </div>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-gray-100 text-gray-600 border border-gray-200">
-                                    En attente
-                                </span>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                <button class="text-gray-400 hover:text-gray-600 hover:bg-gray-100 px-3 py-1.5 rounded-lg transition-all">
-                                    Détails
-                                </button>
-                            </td>
-                        </tr>
+                                </td>
 
-                        <!-- Row 4: Nadia B. (Waiting) -->
-                        <tr class="hover:bg-gray-50 transition-colors group">
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <span class="font-mono text-sm text-gray-500 font-medium">10:30</span>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="flex items-center">
-                                    <div class="h-9 w-9 rounded-full flex items-center justify-center text-xs font-bold mr-3 transition-all shadow-sm bg-gray-100 text-gray-500 group-hover:bg-white group-hover:shadow-sm">
-                                        NB
-                                    </div>
-                                    <div>
-                                        <p class="font-bold text-[#333333]">Nadia B. <span class="text-gray-400 font-normal text-xs">(Anonymisé)</span></p>
-                                        <p class="text-xs text-gray-400">Motif: Suivi</p>
-                                    </div>
-                                </div>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-gray-100 text-gray-600 border border-gray-200">
-                                    En attente
-                                </span>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                <button class="text-gray-400 hover:text-gray-600 hover:bg-gray-100 px-3 py-1.5 rounded-lg transition-all">
-                                    Détails
-                                </button>
-                            </td>
-                        </tr>
+                                <!-- Reliability Score -->
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <template x-if="appt.extendedProps.reliability_score >= 80">
+                                        <span
+                                            class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-green-100 text-green-700 border border-green-200">
+                                            <span class="w-2 h-2 rounded-full bg-green-500 mr-1.5"></span>
+                                            Fiable
+                                        </span>
+                                    </template>
+                                    <template
+                                        x-if="appt.extendedProps.reliability_score >= 50 && appt.extendedProps.reliability_score < 80">
+                                        <span
+                                            class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-yellow-100 text-yellow-700 border border-yellow-200"
+                                            :title="'Score: ' + appt.extendedProps.reliability_score + '/100'">
+                                            <span class="w-2 h-2 rounded-full bg-yellow-500 mr-1.5"></span>
+                                            Moyen
+                                        </span>
+                                    </template>
+                                    <template x-if="appt.extendedProps.reliability_score < 50">
+                                        <span
+                                            class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-red-100 text-red-700 border border-red-200 cursor-help"
+                                            :title="'Score: ' + appt.extendedProps.reliability_score + '/100'">
+                                            ⚠️ À risque
+                                        </span>
+                                    </template>
+                                </td>
+
+                                <!-- Status -->
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <template x-if="appt.extendedProps.status === 'waiting'">
+                                        <span
+                                            class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-[#3cc7a7]/10 text-[#3cc7a7] border border-[#3cc7a7]/20">
+                                            <span class="relative flex h-2 w-2 mr-2">
+                                                <span
+                                                    class="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#3cc7a7] opacity-75"></span>
+                                                <span
+                                                    class="relative inline-flex rounded-full h-2 w-2 bg-[#3cc7a7]"></span>
+                                            </span>
+                                            En cours
+                                        </span>
+                                    </template>
+                                    <template x-if="appt.extendedProps.status === 'confirmed'">
+                                        <span
+                                            class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-gray-100 text-gray-600 border border-gray-200">
+                                            En attente
+                                        </span>
+                                    </template>
+                                    <template x-if="appt.extendedProps.status === 'checked_in'">
+                                        <span
+                                            class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-blue-100 text-blue-700 border border-blue-200">
+                                            ✓ Présent
+                                        </span>
+                                    </template>
+                                    <template x-if="appt.extendedProps.status === 'completed'">
+                                        <span
+                                            class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-green-100 text-green-700 border border-green-200">
+                                            Terminé
+                                        </span>
+                                    </template>
+                                    <template x-if="appt.extendedProps.status === 'no_show'">
+                                        <span
+                                            class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-red-100 text-red-700 border border-red-200">
+                                            Absent
+                                        </span>
+                                    </template>
+                                </td>
+
+                                <!-- Actions -->
+                                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                    <template x-if="appt.extendedProps.status === 'confirmed'">
+                                        <button @click="checkInPatient(appt.id)"
+                                            class="text-[#3cc7a7] hover:text-[#2da88d] bg-white border border-[#3cc7a7] hover:bg-[#3cc7a7]/5 px-3 py-1.5 rounded-lg transition-all text-xs font-bold">
+                                            Check-in
+                                        </button>
+                                    </template>
+                                    <template
+                                        x-if="appt.extendedProps.status === 'waiting' || appt.extendedProps.status === 'checked_in'">
+                                        <div class="flex gap-2 justify-end">
+                                            <button @click="completeAppointment(appt.id)"
+                                                class="text-[#3cc7a7] hover:text-[#2da88d] bg-white border border-[#3cc7a7] hover:bg-[#3cc7a7]/5 px-3 py-1.5 rounded-lg transition-all text-xs font-bold">
+                                                Terminer
+                                            </button>
+                                            <button @click="markNoShow(appt.id)"
+                                                class="text-red-500 hover:text-red-600 bg-white border border-red-300 hover:bg-red-50 px-3 py-1.5 rounded-lg transition-all text-xs font-bold">
+                                                Absent
+                                            </button>
+                                        </div>
+                                    </template>
+                                    <template
+                                        x-if="appt.extendedProps.status === 'completed' || appt.extendedProps.status === 'no_show'">
+                                        <button
+                                            class="text-gray-400 hover:text-gray-600 hover:bg-gray-100 px-3 py-1.5 rounded-lg transition-all text-xs">
+                                            Détails
+                                        </button>
+                                    </template>
+                                </td>
+                            </tr>
+                        </template>
                     </tbody>
                 </table>
             </div>
             <div class="p-4 border-t border-gray-100 bg-gray-50/50 text-center">
-                <button class="text-xs font-bold text-[#3cc7a7] hover:text-[#2da88d] uppercase tracking-wide transition-colors">Voir le planning complet</button>
+                <a href="{{ url_for('main.dashboard') }}"
+                    class="text-xs font-bold text-[#3cc7a7] hover:text-[#2da88d] uppercase tracking-wide transition-colors">Voir
+                    le planning complet</a>
             </div>
         </div>
     </div>
 </div>
+
+<style>
+    /* Shadow slot striped background */
+    .bg-stripes {
+        background: repeating-linear-gradient(-45deg,
+                transparent,
+                transparent 10px,
+                rgba(156, 163, 175, 0.1) 10px,
+                rgba(156, 163, 175, 0.1) 20px);
+    }
+</style>
+
+<script>
+    function dashboardApp() {
+        return {
+            mode: 'smart',
+            appointments: [],
+            queueStatus: {
+                waiting_count: 0,
+                checked_in_count: 0,
+                current_serving: 0,
+                drift_minutes: 0,
+                is_behind: false,
+                compression_recommended: false,
+                remaining_appointments: 0
+            },
+
+            init() {
+                this.fetchData();
+                // Actualise toutes les 30 secondes
+                setInterval(() => this.fetchData(), 30000);
+            },
+
+            async fetchData() {
+                await Promise.all([
+                    this.fetchAppointments(),
+                    this.fetchQueueStatus()
+                ]);
+            },
+
+            async fetchAppointments() {
+                try {
+                    // Récupère la date du jour au format YYYY-MM-DD
+                    const today = new Date().toISOString().split('T')[0];
+                    const response = await fetch(`/api/doctor/appointments?start=${today}&end=${today}`);
+                    if (response.ok) {
+                        const data = await response.json();
+                        // Trie les RDV par heure
+                        this.appointments = data.sort((a, b) => new Date(a.start) - new Date(b.start));
+                    }
+                } catch (error) {
+                    console.error('Error fetching appointments:', error);
+                }
+            },
+
+            async fetchQueueStatus() {
+                try {
+                    // ID du médecin (géré proprement par Jinja2)
+                    const doctorId = {{ doctor_profile.id if doctor_profile else 0
+        }
+    };
+    const response = await fetch(`/api/queue_status/${doctorId}`);
+    if (response.ok) {
+        this.queueStatus = await response.json();
+    }
+                } catch (error) {
+        console.error('Error fetching queue status:', error);
+    }
+            }, // <--- Ici, c'est corrigé (une seule virgule, pas de double accolade)
+
+            async checkInPatient(appointmentId) {
+        try {
+            const response = await fetch(`/api/check_in/${appointmentId}`, { method: 'POST' });
+            if (response.ok) {
+                this.fetchData(); // Rafraîchit la liste
+            }
+        } catch (error) {
+            console.error('Error checking in patient:', error);
+        }
+    },
+
+            async completeAppointment(appointmentId) {
+        try {
+            const response = await fetch(`/api/doctor/appointments/${appointmentId}/status`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ status: 'completed' })
+            });
+            if (response.ok) {
+                this.fetchData();
+            }
+        } catch (error) {
+            console.error('Error completing appointment:', error);
+        }
+    },
+
+            async markNoShow(appointmentId) {
+        try {
+            const response = await fetch(`/api/doctor/appointments/${appointmentId}/status`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ status: 'no_show' })
+            });
+            if (response.ok) {
+                this.fetchData();
+            }
+        } catch (error) {
+            console.error('Error marking no-show:', error);
+        }
+    },
+
+            async shiftAppointments(minutes) {
+        try {
+            const response = await fetch('/api/emergency/shift', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ urgency_duration: minutes })
+            });
+            if (response.ok) {
+                this.fetchData();
+                alert(`Tous les RDV ont été décalés de ${minutes} minutes`);
+            }
+        } catch (error) {
+            console.error('Error shifting appointments:', error);
+        }
+    },
+
+            async activateCompression() {
+        await this.shiftAppointments(-5);
+        alert('Mode compression activé : RDV raccourcis de 5 min');
+    }
+        }
+    }
+</script>
 {% endblock %}

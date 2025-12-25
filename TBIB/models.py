@@ -31,6 +31,10 @@ class User(UserMixin, db.Model):
     no_show_count = db.Column(db.Integer, default=0)
     is_blocked = db.Column(db.Boolean, default=False)
     
+    # SmartFlow: Score de fiabilité du patient (0-100)
+    # - No-Show: -20 pts | Retard >15min: -5 pts | Ponctuel: +2 pts (max 100)
+    reliability_score = db.Column(db.Float, default=100.0, nullable=False)
+    
     doctor_profile = db.relationship('DoctorProfile', backref='user', uselist=False, cascade='all, delete-orphan')
     
     def set_password(self, password):
@@ -119,6 +123,16 @@ class Appointment(db.Model):
     relative = db.relationship('Relative', backref='appointments')
 
     doctor_notes = db.Column(db.Text)
+    
+    # === SmartFlow Fields ===
+    # Shadow Slot: Surbooking sécurisé pour patients peu fiables (score < 50)
+    is_shadow_slot = db.Column(db.Boolean, default=False)
+    # Niveau d'urgence: 1 (Normal) à 5 (Vitale)
+    urgency_level = db.Column(db.Integer, default=1)
+    # Heure d'arrivée réelle du patient
+    arrival_time = db.Column(db.DateTime, nullable=True)
+    # Heure de check-in confirmé
+    check_in_time = db.Column(db.DateTime, nullable=True)
 
 
 class ConsultationType(db.Model):

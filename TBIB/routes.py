@@ -3,6 +3,7 @@ from flask_login import login_user, logout_user, login_required, current_user
 from extensions import db
 from models import User, DoctorProfile, Appointment, HealthRecord, DoctorAvailability, ConsultationType, DoctorAbsence, Relative
 from utils.engine import calculate_wait_time, shift_appointments, get_conflicting_appointments, cancel_appointments_in_range
+from utils.smart_engine import QueueOptimizer
 from datetime import date, datetime, timedelta, time
 
 main_bp = Blueprint('main', __name__)
@@ -528,7 +529,7 @@ def doctor_dashboard():
             Appointment.status.in_(['confirmed', 'waiting'])
         ).count()
 
-        return render_template('doctor_cockpit.html',
+        return render_template('doctor_dashboard.html',
                             doctor_profile=doctor_profile,
                             waiting_count=waiting_count,
                             t=get_t(),
@@ -688,13 +689,23 @@ def shift_appointments_api():
 
 @main_bp.route('/api/queue_status/<int:doctor_id>')
 def get_queue_status(doctor_id):
+    """Retourne l'état de la file d'attente avec données SmartFlow."""
     doctor = DoctorProfile.query.get_or_404(doctor_id)
+    
+    # Comptage des patients en attente
     waiting_count = Appointment.query.filter_by(
         doctor_id=doctor_id,
         appointment_date=date.today(),
         status='confirmed'
     ).count()
     
+    checked_in_count = Appointment.query.filter_by(
+        doctor_id=doctor_id,
+        appointment_date=date.today(),
+        status='waiting'
+    ).count()
+    
+    # Patient actuel
     current_patient = None
     current_appt = Appointment.query.filter_by(
         doctor_id=doctor_id,
@@ -704,10 +715,21 @@ def get_queue_status(doctor_id):
     if current_appt:
         current_patient = current_appt.patient.name
     
+    # === SmartFlow: Détection du Drift ===
+    optimizer = QueueOptimizer()
+    drift_info = optimizer.detect_drift(doctor_id)
+    
     return jsonify({
         'current_serving': doctor.waiting_room_count,
         'waiting_count': waiting_count,
-        'current_patient': current_patient
+        'checked_in_count': checked_in_count,
+        'current_patient': current_patient,
+        # SmartFlow Drift Data
+        'drift_minutes': drift_info.get('drift_minutes', 0),
+        'is_behind': drift_info.get('is_behind', False),
+        'compression_recommended': drift_info.get('should_compress', False),
+        'compression_suggestion': drift_info.get('compression_suggestion'),
+        'remaining_appointments': drift_info.get('remaining_appointments', 0)
     })
 
 @main_bp.route('/api/check_in/<int:appointment_id>', methods=['POST'])
@@ -827,6 +849,10 @@ def admin_reset_and_seed():
 @main_bp.route('/api/doctor/appointments')
 @login_required
 def api_doctor_appointments():
+    """
+    Retourne les RDV d'un médecin avec les données SmartFlow.
+    Inclut le priority_score calculé dynamiquement par le moteur.
+    """
     if current_user.role != 'doctor':
         return jsonify({'error': 'Unauthorized'}), 403
     
@@ -847,6 +873,9 @@ def api_doctor_appointments():
         Appointment.appointment_date <= end_date
     ).all()
     
+    # Instancier le moteur SmartFlow pour calculer les scores de priorité
+    optimizer = QueueOptimizer()
+    
     events = []
     for appt in appointments:
         if appt.appointment_time:
@@ -854,6 +883,7 @@ def api_doctor_appointments():
             duration = appt.consultation_type.duration if appt.consultation_type else 30
             end_dt = start_dt + timedelta(minutes=duration)
             
+            # Couleur basée sur le statut ou le type de consultation
             if appt.consultation_type and appt.consultation_type.color:
                 color = appt.consultation_type.color
             elif appt.status == 'completed':
@@ -866,6 +896,13 @@ def api_doctor_appointments():
                 color = '#ef4444'
             else:
                 color = '#14b999'
+            
+            # Calcul dynamique du score de priorité SmartFlow
+            try:
+                priority_score = optimizer._calculate_priority_score(appt)
+            except Exception:
+                # Fallback si le calcul échoue (pas d'arrival_time, etc.)
+                priority_score = (getattr(appt, 'urgency_level', 1) or 1) * 100
             
             events.append({
                 'id': appt.id,
@@ -884,7 +921,12 @@ def api_doctor_appointments():
                     'consultation_type': appt.consultation_type.name if appt.consultation_type else 'Consultation',
                     'booking_type': appt.booking_type,
                     'doctor_notes': appt.doctor_notes or '',
-                    'no_show_count': appt.patient.no_show_count or 0
+                    'no_show_count': appt.patient.no_show_count or 0,
+                    # === SmartFlow Fields ===
+                    'reliability_score': getattr(appt.patient, 'reliability_score', 100.0),
+                    'is_shadow_slot': getattr(appt, 'is_shadow_slot', False),
+                    'urgency_level': getattr(appt, 'urgency_level', 1),
+                    'priority_score': priority_score  # Score calculé dynamiquement
                 }
             })
     
