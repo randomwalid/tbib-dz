@@ -209,6 +209,14 @@ def initialize_demo_data():
     print("✅ DATABASE INITIALIZED: 50 Doctors & Schedules Created!")
 
 
+@main_bp.route('/legal/cgu')
+def legal_cgu():
+    return render_template('legal/cgu.html', t=get_t(), lang=session.get('lang', 'fr'))
+
+@main_bp.route('/legal/privacy')
+def legal_privacy():
+    return render_template('legal/privacy.html', t=get_t(), lang=session.get('lang', 'fr'))
+
 @main_bp.route('/')
 def home():
     if current_user.is_authenticated and current_user.role == 'doctor':

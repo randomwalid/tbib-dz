@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+
+{% block title %}Conditions Générales d'Utilisation{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8 max-w-4xl">
+    <div class="prose prose-lg prose-indigo mx-auto text-gray-700 bg-white p-8 rounded-xl shadow-sm border border-gray-100">
+        <h1 class="text-3xl font-bold text-gray-900 mb-8 pb-4 border-b border-gray-200">Conditions Générales d'Utilisation (CGU) - TBIB</h1>
+
+        <div class="space-y-8">
+            <section>
+                <h2 class="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+                    <span class="bg-gray-100 text-gray-600 px-2 py-1 rounded text-sm">ARTICLE 1</span>
+                    OBJET
+                </h2>
+                <p class="text-gray-600 leading-relaxed">
+                    TBIB est une solution technique de prise de rendez-vous et de gestion de cabinet.
+                    <strong class="text-gray-900">TBIB N'EST PAS un prestataire de soins.</strong>
+                    Nous ne fournissons aucun conseil médical. Le service se limite à la mise en relation technique entre les patients et les professionnels de santé.
+                </p>
+            </section>
+
+            <section>
+                <h2 class="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+                    <span class="bg-gray-100 text-gray-600 px-2 py-1 rounded text-sm">ARTICLE 2</span>
+                    RESPONSABILITÉ
+                </h2>
+                <p class="text-gray-600 leading-relaxed mb-4">
+                    L'Administrateur (TBIB) met en œuvre tous les moyens pour assurer la disponibilité du service. Toutefois, TBIB ne saurait être tenu responsable en cas de :
+                </p>
+                <ul class="list-disc pl-5 space-y-2 text-gray-600 bg-gray-50 p-4 rounded-lg">
+                    <li>Coupure d'internet ou panne serveur (obligation de moyens, non de résultat).</li>
+                    <li>Erreur de saisie par le médecin ou la secrétaire (contenu des rendez-vous, dossiers médicaux).</li>
+                    <li>Usage frauduleux des identifiants (vol de mot de passe, accès non autorisé dû à la négligence de l'utilisateur).</li>
+                    <li>Retards ou annulations de rendez-vous du fait du praticien.</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2 class="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+                    <span class="bg-gray-100 text-gray-600 px-2 py-1 rounded text-sm">ARTICLE 3</span>
+                    MODULE ORDONNANCE (E-WASSFA)
+                </h2>
+                <p class="text-gray-600 leading-relaxed">
+                    Le module de génération d'ordonnance est une aide à la rédaction. Le médecin reste
+                    <strong class="text-red-600">SEUL RESPONSABLE</strong> du contenu, des dosages et des interactions médicamenteuses prescrits.
+                    Le QR Code est un outil de sécurisation technique et ne remplace pas la vigilance du pharmacien lors de la délivrance.
+                </p>
+            </section>
+
+            <section>
+                <h2 class="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+                    <span class="bg-gray-100 text-gray-600 px-2 py-1 rounded text-sm">ARTICLE 4</span>
+                    ACCESSIBILITÉ
+                </h2>
+                <p class="text-gray-600 leading-relaxed">
+                    L'accès à la plateforme peut être interrompu pour maintenance, mise à jour ou pour toute autre raison technique, sans que cela puisse ouvrir droit à une quelconque indemnisation.
+                </p>
+            </section>
+        </div>
+
+        <div class="mt-12 pt-8 border-t border-gray-200 text-sm text-gray-500 text-center">
+            Dernière mise à jour : {{ today_date if today_date else '18 Octobre 2023' }}
+        </div>
+    </div>
+</div>
+{% endblock %}
