@@ -467,80 +467,77 @@
 
             async fetchQueueStatus() {
                 try {
-                    // ID du médecin (géré proprement par Jinja2)
-                    const doctorId = {{ doctor_profile.id if doctor_profile else 0
-        }
-    };
-    const response = await fetch(`/api/queue_status/${doctorId}`);
-    if (response.ok) {
-        this.queueStatus = await response.json();
-    }
+                    const doctorId = {{ doctor_profile.id if doctor_profile else 0 }};
+                    const response = await fetch(`/api/queue_status/${doctorId}`);
+                    if (response.ok) {
+                        this.queueStatus = await response.json();
+                    }
                 } catch (error) {
-        console.error('Error fetching queue status:', error);
-    }
-            }, // <--- Ici, c'est corrigé (une seule virgule, pas de double accolade)
+                    console.error('Error fetching queue status:', error);
+                }
+            },
 
             async checkInPatient(appointmentId) {
-        try {
-            const response = await fetch(`/api/check_in/${appointmentId}`, { method: 'POST' });
-            if (response.ok) {
-                this.fetchData(); // Rafraîchit la liste
-            }
-        } catch (error) {
-            console.error('Error checking in patient:', error);
-        }
-    },
+                try {
+                    const response = await fetch(`/api/check_in/${appointmentId}`, { method: 'POST' });
+                    if (response.ok) {
+                        this.fetchData();
+                    }
+                } catch (error) {
+                    console.error('Error checking in patient:', error);
+                }
+            },
 
             async completeAppointment(appointmentId) {
-        try {
-            const response = await fetch(`/api/doctor/appointments/${appointmentId}/status`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ status: 'completed' })
-            });
-            if (response.ok) {
-                this.fetchData();
-            }
-        } catch (error) {
-            console.error('Error completing appointment:', error);
-        }
-    },
+                try {
+                    const response = await fetch(`/api/doctor/appointments/${appointmentId}/status`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ status: 'completed' })
+                    });
+                    if (response.ok) {
+                        this.fetchData();
+                    }
+                } catch (error) {
+                    console.error('Error completing appointment:', error);
+                }
+            },
 
             async markNoShow(appointmentId) {
-        try {
-            const response = await fetch(`/api/doctor/appointments/${appointmentId}/status`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ status: 'no_show' })
-            });
-            if (response.ok) {
-                this.fetchData();
-            }
-        } catch (error) {
-            console.error('Error marking no-show:', error);
-        }
-    },
+                try {
+                    const response = await fetch(`/api/doctor/appointments/${appointmentId}/status`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ status: 'no_show' })
+                    });
+                    if (response.ok) {
+                        this.fetchData();
+                    }
+                } catch (error) {
+                    console.error('Error marking no-show:', error);
+                }
+            },
 
             async shiftAppointments(minutes) {
-        try {
-            const response = await fetch('/api/emergency/shift', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ urgency_duration: minutes })
-            });
-            if (response.ok) {
-                this.fetchData();
-                alert(`Tous les RDV ont été décalés de ${minutes} minutes`);
-            }
-        } catch (error) {
-            console.error('Error shifting appointments:', error);
-        }
-    },
+                try {
+                    const response = await fetch('/api/emergency/shift', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ urgency_duration: minutes })
+                    });
+                    if (response.ok) {
+                        this.fetchData();
+                        alert(`Tous les RDV ont été décalés de ${minutes} minutes`);
+                    }
+                } catch (error) {
+                    console.error('Error shifting appointments:', error);
+                }
+            },
 
             async activateCompression() {
-        await this.shiftAppointments(-5);
-        alert('Mode compression activé : RDV raccourcis de 5 min');
-    }
+                await this.shiftAppointments(-5);
+                alert('Mode compression activé : RDV raccourcis de 5 min');
+            }
         }
     }
 </script>
