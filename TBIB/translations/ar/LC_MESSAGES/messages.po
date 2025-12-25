@@ -1,0 +1,57 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2024-03-01 12:00+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.9.1\n"
+
+msgid "Recherchez par spécialité et ville"
+msgstr "ابحث حسب التخصص والمدينة"
+
+msgid "Toutes les spécialités"
+msgstr "جميع التخصصات"
+
+msgid "Toutes les villes"
+msgstr "جميع المدن"
+
+msgid "Rechercher"
+msgstr "بحث"
+
+msgid "Médecins disponibles"
+msgstr "الأطباء المتاحون"
+
+msgid "Centre de Contrôle"
+msgstr "لوحة التحكم"
+
+msgid "Gérez votre flux de patients"
+msgstr "إدارة تدفق المرضى"
+
+msgid "Mode Ticket"
+msgstr "وضع التذكرة"
+
+msgid "Mode RDV Smart"
+msgstr "وضع الموعد الذكي"
+
+msgid "En attente"
+msgstr "في الانتظار"
+
+msgid "En cours"
+msgstr "الحالي"
+
+msgid "Restants"
+msgstr "المتبقي"
+
+msgid "Recette du jour"
+msgstr "إيرادات اليوم"
+
+msgid "Liste des Patients"
+msgstr "قائمة المرضى"
+
+msgid "Vue en temps réel de la salle d'attente"
+msgstr "عرض في الوقت الفعلي لغرفة الانتظار"

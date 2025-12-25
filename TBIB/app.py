@@ -2,7 +2,10 @@ import os
 import logging
 from logging.handlers import RotatingFileHandler
 from flask import Flask, session, render_template, request, jsonify
-from extensions import db, migrate, login_manager
+from extensions import db, migrate, login_manager, babel
+
+def get_locale():
+    return session.get('lang', 'fr')
 
 def configure_logging(app):
     if not app.debug:
@@ -29,6 +32,7 @@ def create_app():
     db.init_app(app)
     migrate.init_app(app, db)
     login_manager.init_app(app)
+    babel.init_app(app, locale_selector=get_locale)
     login_manager.login_view = 'main.login'
 
     configure_logging(app)

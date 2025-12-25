@@ -1,0 +1,57 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2024-03-01 12:00+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.9.1\n"
+
+msgid "Recherchez par spécialité et ville"
+msgstr "Recherchez par spécialité et ville"
+
+msgid "Toutes les spécialités"
+msgstr "Toutes les spécialités"
+
+msgid "Toutes les villes"
+msgstr "Toutes les villes"
+
+msgid "Rechercher"
+msgstr "Rechercher"
+
+msgid "Médecins disponibles"
+msgstr "Médecins disponibles"
+
+msgid "Centre de Contrôle"
+msgstr "Centre de Contrôle"
+
+msgid "Gérez votre flux de patients"
+msgstr "Gérez votre flux de patients"
+
+msgid "Mode Ticket"
+msgstr "Mode Ticket"
+
+msgid "Mode RDV Smart"
+msgstr "Mode RDV Smart"
+
+msgid "En attente"
+msgstr "En attente"
+
+msgid "En cours"
+msgstr "En cours"
+
+msgid "Restants"
+msgstr "Restants"
+
+msgid "Recette du jour"
+msgstr "Recette du jour"
+
+msgid "Liste des Patients"
+msgstr "Liste des Patients"
+
+msgid "Vue en temps réel de la salle d'attente"
+msgstr "Vue en temps réel de la salle d'attente"

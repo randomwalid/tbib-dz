@@ -252,7 +252,7 @@ def home():
                            t=get_t(), 
                            lang=session.get('lang', 'fr'))
 
-@main_bp.route('/set-language/<lang>')
+@main_bp.route('/set_language/<lang>')
 def set_language(lang):
     if lang in ['fr', 'ar']:
         session['lang'] = lang

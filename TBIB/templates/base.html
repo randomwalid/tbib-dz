@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{{ lang }}" {% if lang == 'ar' %}dir="rtl"{% endif %}>
+<html lang="{{ session.get('lang', 'fr') }}" {% if session.get('lang', 'fr') == 'ar' %}dir="rtl"{% endif %}>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -16,7 +16,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/navigation.css') }}">
     <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
     <style>
-        {% if lang == 'ar' %}
+        {% if session.get('lang', 'fr') == 'ar' %}
         body { font-family: 'Cairo', sans-serif; }
         {% else %}
         body { font-family: 'Inter', sans-serif; }
@@ -114,9 +114,9 @@
                     {% endif %}
                     
                     <div class="flex gap-1 text-xs text-gray-400 border-l border-gray-200 pl-3 ml-2">
-                        <a href="{{ url_for('main.set_language', lang='fr') }}" class="{% if lang == 'fr' %}text-[#14b999] font-medium{% endif %}">FR</a>
+                        <a href="{{ url_for('main.set_language', lang='fr') }}" class="{% if session.get('lang', 'fr') == 'fr' %}text-[#14b999] font-medium{% endif %}">FR</a>
                         <span>/</span>
-                        <a href="{{ url_for('main.set_language', lang='ar') }}" class="{% if lang == 'ar' %}text-[#14b999] font-medium{% endif %}">AR</a>
+                        <a href="{{ url_for('main.set_language', lang='ar') }}" class="{% if session.get('lang', 'fr') == 'ar' %}text-[#14b999] font-medium{% endif %}">AR</a>
                     </div>
                 </div>
             </div>
