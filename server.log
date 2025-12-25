@@ -1,0 +1,368 @@
+[2025-12-25 23:18:58,964] INFO in app: TBIB startup
+ * Serving Flask app 'app'
+ * Debug mode: on
+[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.0.2:5000
+[33mPress CTRL+C to quit[0m
+ * Restarting with stat
+[2025-12-25 23:19:00,431] INFO in app: TBIB startup
+ * Debugger is active!
+ * Debugger PIN: 435-484-703
+127.0.0.1 - - [25/Dec/2025 23:20:13] "[32mGET / HTTP/1.1[0m" 302 -
+127.0.0.1 - - [25/Dec/2025 23:21:39] "GET /login HTTP/1.1" 200 -
+127.0.0.1 - - [25/Dec/2025 23:21:39] "GET /static/img/logo_final.png HTTP/1.1" 200 -
+127.0.0.1 - - [25/Dec/2025 23:21:39] "GET /static/css/style.css HTTP/1.1" 200 -
+127.0.0.1 - - [25/Dec/2025 23:21:39] "GET /static/css/navigation.css HTTP/1.1" 200 -
+127.0.0.1 - - [25/Dec/2025 23:21:39] "GET /static/css/animations.css HTTP/1.1" 200 -
+127.0.0.1 - - [25/Dec/2025 23:21:39] "GET /static/css/tokens.css HTTP/1.1" 200 -
+127.0.0.1 - - [25/Dec/2025 23:21:39] "GET /static/img/Logo_SVG.svg HTTP/1.1" 200 -
+127.0.0.1 - - [25/Dec/2025 23:21:39] "GET /static/img/logo_accueil.png HTTP/1.1" 200 -
+127.0.0.1 - - [25/Dec/2025 23:21:39] "GET /static/sw.js HTTP/1.1" 200 -
+127.0.0.1 - - [25/Dec/2025 23:21:43] "[32mPOST /login HTTP/1.1[0m" 302 -
+[2025-12-25 23:21:43,196] INFO in routes: Dashboard access by Doctor 1
+[2025-12-25 23:21:43,220] ERROR in routes: Error accessing doctor dashboard for user 1: unexpected '}'
+Traceback (most recent call last):
+  File "/app/TBIB/routes.py", line 644, in doctor_dashboard
+    return render_template('doctor_dashboard.html',
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/TBIB/.venv/lib/python3.12/site-packages/flask/templating.py", line 149, in render_template
+    template = app.jinja_env.get_or_select_template(template_name_or_list)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/TBIB/.venv/lib/python3.12/site-packages/jinja2/environment.py", line 1087, in get_or_select_template
+    return self.get_template(template_name_or_list, parent, globals)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/TBIB/.venv/lib/python3.12/site-packages/jinja2/environment.py", line 1016, in get_template
+    return self._load_template(name, globals)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/TBIB/.venv/lib/python3.12/site-packages/jinja2/environment.py", line 975, in _load_template
+    template = self.loader.load(self, name, self.make_globals(globals))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/TBIB/.venv/lib/python3.12/site-packages/jinja2/loaders.py", line 138, in load
+    code = environment.compile(source, name, filename)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/TBIB/.venv/lib/python3.12/site-packages/jinja2/environment.py", line 771, in compile
+    self.handle_exception(source=source_hint)
+  File "/app/TBIB/.venv/lib/python3.12/site-packages/jinja2/environment.py", line 942, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "/app/TBIB/templates/doctor_dashboard.html", line 831, in template
+    }
+jinja2.exceptions.TemplateSyntaxError: unexpected '}'
+127.0.0.1 - - [25/Dec/2025 23:21:43] "[32mGET /doctor/dashboard HTTP/1.1[0m" 302 -
+127.0.0.1 - - [25/Dec/2025 23:21:43] "[32mGET / HTTP/1.1[0m" 302 -
+[2025-12-25 23:21:43,234] INFO in routes: Dashboard access by Doctor 1
+[2025-12-25 23:21:43,253] ERROR in routes: Error accessing doctor dashboard for user 1: unexpected '}'
+Traceback (most recent call last):
+  File "/app/TBIB/routes.py", line 644, in doctor_dashboard
+    return render_template('doctor_dashboard.html',
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/TBIB/.venv/lib/python3.12/site-packages/flask/templating.py", line 149, in render_template
+    template = app.jinja_env.get_or_select_template(template_name_or_list)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/TBIB/.venv/lib/python3.12/site-packages/jinja2/environment.py", line 1087, in get_or_select_template
+    return self.get_template(template_name_or_list, parent, globals)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/TBIB/.venv/lib/python3.12/site-packages/jinja2/environment.py", line 1016, in get_template
+    return self._load_template(name, globals)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/TBIB/.venv/lib/python3.12/site-packages/jinja2/environment.py", line 975, in _load_template
+    template = self.loader.load(self, name, self.make_globals(globals))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/TBIB/.venv/lib/python3.12/site-packages/jinja2/loaders.py", line 138, in load
+    code = environment.compile(source, name, filename)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/TBIB/.venv/lib/python3.12/site-packages/jinja2/environment.py", line 771, in compile
+    self.handle_exception(source=source_hint)
+  File "/app/TBIB/.venv/lib/python3.12/site-packages/jinja2/environment.py", line 942, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "/app/TBIB/templates/doctor_dashboard.html", line 831, in template
+    }
+jinja2.exceptions.TemplateSyntaxError: unexpected '}'
+127.0.0.1 - - [25/Dec/2025 23:21:43] "[32mGET /doctor/dashboard HTTP/1.1[0m" 302 -
+127.0.0.1 - - [25/Dec/2025 23:21:43] "[32mGET / HTTP/1.1[0m" 302 -
+[2025-12-25 23:21:43,265] INFO in routes: Dashboard access by Doctor 1
+[2025-12-25 23:21:43,276] ERROR in routes: Error accessing doctor dashboard for user 1: unexpected '}'
+Traceback (most recent call last):
+  File "/app/TBIB/routes.py", line 644, in doctor_dashboard
+    return render_template('doctor_dashboard.html',
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/TBIB/.venv/lib/python3.12/site-packages/flask/templating.py", line 149, in render_template
+    template = app.jinja_env.get_or_select_template(template_name_or_list)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/TBIB/.venv/lib/python3.12/site-packages/jinja2/environment.py", line 1087, in get_or_select_template
+    return self.get_template(template_name_or_list, parent, globals)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/TBIB/.venv/lib/python3.12/site-packages/jinja2/environment.py", line 1016, in get_template
+    return self._load_template(name, globals)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/TBIB/.venv/lib/python3.12/site-packages/jinja2/environment.py", line 975, in _load_template
+    template = self.loader.load(self, name, self.make_globals(globals))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/TBIB/.venv/lib/python3.12/site-packages/jinja2/loaders.py", line 138, in load
+    code = environment.compile(source, name, filename)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/TBIB/.venv/lib/python3.12/site-packages/jinja2/environment.py", line 771, in compile
+    self.handle_exception(source=source_hint)
+  File "/app/TBIB/.venv/lib/python3.12/site-packages/jinja2/environment.py", line 942, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "/app/TBIB/templates/doctor_dashboard.html", line 831, in template
+    }
+jinja2.exceptions.TemplateSyntaxError: unexpected '}'
+127.0.0.1 - - [25/Dec/2025 23:21:43] "[32mGET /doctor/dashboard HTTP/1.1[0m" 302 -
+127.0.0.1 - - [25/Dec/2025 23:21:43] "[32mGET / HTTP/1.1[0m" 302 -
+[2025-12-25 23:21:43,288] INFO in routes: Dashboard access by Doctor 1
+[2025-12-25 23:21:43,299] ERROR in routes: Error accessing doctor dashboard for user 1: unexpected '}'
+Traceback (most recent call last):
+  File "/app/TBIB/routes.py", line 644, in doctor_dashboard
+    return render_template('doctor_dashboard.html',
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/TBIB/.venv/lib/python3.12/site-packages/flask/templating.py", line 149, in render_template
+    template = app.jinja_env.get_or_select_template(template_name_or_list)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/TBIB/.venv/lib/python3.12/site-packages/jinja2/environment.py", line 1087, in get_or_select_template
+    return self.get_template(template_name_or_list, parent, globals)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/TBIB/.venv/lib/python3.12/site-packages/jinja2/environment.py", line 1016, in get_template
+    return self._load_template(name, globals)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/TBIB/.venv/lib/python3.12/site-packages/jinja2/environment.py", line 975, in _load_template
+    template = self.loader.load(self, name, self.make_globals(globals))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/TBIB/.venv/lib/python3.12/site-packages/jinja2/loaders.py", line 138, in load
+    code = environment.compile(source, name, filename)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/TBIB/.venv/lib/python3.12/site-packages/jinja2/environment.py", line 771, in compile
+    self.handle_exception(source=source_hint)
+  File "/app/TBIB/.venv/lib/python3.12/site-packages/jinja2/environment.py", line 942, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "/app/TBIB/templates/doctor_dashboard.html", line 831, in template
+    }
+jinja2.exceptions.TemplateSyntaxError: unexpected '}'
+127.0.0.1 - - [25/Dec/2025 23:21:43] "[32mGET /doctor/dashboard HTTP/1.1[0m" 302 -
+127.0.0.1 - - [25/Dec/2025 23:21:43] "[32mGET / HTTP/1.1[0m" 302 -
+[2025-12-25 23:21:43,311] INFO in routes: Dashboard access by Doctor 1
+[2025-12-25 23:21:43,324] ERROR in routes: Error accessing doctor dashboard for user 1: unexpected '}'
+Traceback (most recent call last):
+  File "/app/TBIB/routes.py", line 644, in doctor_dashboard
+    return render_template('doctor_dashboard.html',
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/TBIB/.venv/lib/python3.12/site-packages/flask/templating.py", line 149, in render_template
+    template = app.jinja_env.get_or_select_template(template_name_or_list)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/TBIB/.venv/lib/python3.12/site-packages/jinja2/environment.py", line 1087, in get_or_select_template
+    return self.get_template(template_name_or_list, parent, globals)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/TBIB/.venv/lib/python3.12/site-packages/jinja2/environment.py", line 1016, in get_template
+    return self._load_template(name, globals)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/TBIB/.venv/lib/python3.12/site-packages/jinja2/environment.py", line 975, in _load_template
+    template = self.loader.load(self, name, self.make_globals(globals))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/TBIB/.venv/lib/python3.12/site-packages/jinja2/loaders.py", line 138, in load
+    code = environment.compile(source, name, filename)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/TBIB/.venv/lib/python3.12/site-packages/jinja2/environment.py", line 771, in compile
+    self.handle_exception(source=source_hint)
+  File "/app/TBIB/.venv/lib/python3.12/site-packages/jinja2/environment.py", line 942, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "/app/TBIB/templates/doctor_dashboard.html", line 831, in template
+    }
+jinja2.exceptions.TemplateSyntaxError: unexpected '}'
+127.0.0.1 - - [25/Dec/2025 23:21:43] "[32mGET /doctor/dashboard HTTP/1.1[0m" 302 -
+127.0.0.1 - - [25/Dec/2025 23:21:43] "[32mGET / HTTP/1.1[0m" 302 -
+[2025-12-25 23:21:43,336] INFO in routes: Dashboard access by Doctor 1
+[2025-12-25 23:21:43,347] ERROR in routes: Error accessing doctor dashboard for user 1: unexpected '}'
+Traceback (most recent call last):
+  File "/app/TBIB/routes.py", line 644, in doctor_dashboard
+    return render_template('doctor_dashboard.html',
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/TBIB/.venv/lib/python3.12/site-packages/flask/templating.py", line 149, in render_template
+    template = app.jinja_env.get_or_select_template(template_name_or_list)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/TBIB/.venv/lib/python3.12/site-packages/jinja2/environment.py", line 1087, in get_or_select_template
+    return self.get_template(template_name_or_list, parent, globals)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/TBIB/.venv/lib/python3.12/site-packages/jinja2/environment.py", line 1016, in get_template
+    return self._load_template(name, globals)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/TBIB/.venv/lib/python3.12/site-packages/jinja2/environment.py", line 975, in _load_template
+    template = self.loader.load(self, name, self.make_globals(globals))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/TBIB/.venv/lib/python3.12/site-packages/jinja2/loaders.py", line 138, in load
+    code = environment.compile(source, name, filename)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/TBIB/.venv/lib/python3.12/site-packages/jinja2/environment.py", line 771, in compile
+    self.handle_exception(source=source_hint)
+  File "/app/TBIB/.venv/lib/python3.12/site-packages/jinja2/environment.py", line 942, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "/app/TBIB/templates/doctor_dashboard.html", line 831, in template
+    }
+jinja2.exceptions.TemplateSyntaxError: unexpected '}'
+127.0.0.1 - - [25/Dec/2025 23:21:43] "[32mGET /doctor/dashboard HTTP/1.1[0m" 302 -
+127.0.0.1 - - [25/Dec/2025 23:21:43] "[32mGET / HTTP/1.1[0m" 302 -
+[2025-12-25 23:21:43,362] INFO in routes: Dashboard access by Doctor 1
+[2025-12-25 23:21:43,373] ERROR in routes: Error accessing doctor dashboard for user 1: unexpected '}'
+Traceback (most recent call last):
+  File "/app/TBIB/routes.py", line 644, in doctor_dashboard
+    return render_template('doctor_dashboard.html',
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/TBIB/.venv/lib/python3.12/site-packages/flask/templating.py", line 149, in render_template
+    template = app.jinja_env.get_or_select_template(template_name_or_list)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/TBIB/.venv/lib/python3.12/site-packages/jinja2/environment.py", line 1087, in get_or_select_template
+    return self.get_template(template_name_or_list, parent, globals)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/TBIB/.venv/lib/python3.12/site-packages/jinja2/environment.py", line 1016, in get_template
+    return self._load_template(name, globals)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/TBIB/.venv/lib/python3.12/site-packages/jinja2/environment.py", line 975, in _load_template
+    template = self.loader.load(self, name, self.make_globals(globals))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/TBIB/.venv/lib/python3.12/site-packages/jinja2/loaders.py", line 138, in load
+    code = environment.compile(source, name, filename)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/TBIB/.venv/lib/python3.12/site-packages/jinja2/environment.py", line 771, in compile
+    self.handle_exception(source=source_hint)
+  File "/app/TBIB/.venv/lib/python3.12/site-packages/jinja2/environment.py", line 942, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "/app/TBIB/templates/doctor_dashboard.html", line 831, in template
+    }
+jinja2.exceptions.TemplateSyntaxError: unexpected '}'
+127.0.0.1 - - [25/Dec/2025 23:21:43] "[32mGET /doctor/dashboard HTTP/1.1[0m" 302 -
+127.0.0.1 - - [25/Dec/2025 23:21:43] "[32mGET / HTTP/1.1[0m" 302 -
+[2025-12-25 23:21:43,385] INFO in routes: Dashboard access by Doctor 1
+[2025-12-25 23:21:43,396] ERROR in routes: Error accessing doctor dashboard for user 1: unexpected '}'
+Traceback (most recent call last):
+  File "/app/TBIB/routes.py", line 644, in doctor_dashboard
+    return render_template('doctor_dashboard.html',
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/TBIB/.venv/lib/python3.12/site-packages/flask/templating.py", line 149, in render_template
+    template = app.jinja_env.get_or_select_template(template_name_or_list)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/TBIB/.venv/lib/python3.12/site-packages/jinja2/environment.py", line 1087, in get_or_select_template
+    return self.get_template(template_name_or_list, parent, globals)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/TBIB/.venv/lib/python3.12/site-packages/jinja2/environment.py", line 1016, in get_template
+    return self._load_template(name, globals)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/TBIB/.venv/lib/python3.12/site-packages/jinja2/environment.py", line 975, in _load_template
+    template = self.loader.load(self, name, self.make_globals(globals))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/TBIB/.venv/lib/python3.12/site-packages/jinja2/loaders.py", line 138, in load
+    code = environment.compile(source, name, filename)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/TBIB/.venv/lib/python3.12/site-packages/jinja2/environment.py", line 771, in compile
+    self.handle_exception(source=source_hint)
+  File "/app/TBIB/.venv/lib/python3.12/site-packages/jinja2/environment.py", line 942, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "/app/TBIB/templates/doctor_dashboard.html", line 831, in template
+    }
+jinja2.exceptions.TemplateSyntaxError: unexpected '}'
+127.0.0.1 - - [25/Dec/2025 23:21:43] "[32mGET /doctor/dashboard HTTP/1.1[0m" 302 -
+127.0.0.1 - - [25/Dec/2025 23:21:43] "[32mGET / HTTP/1.1[0m" 302 -
+[2025-12-25 23:21:43,407] INFO in routes: Dashboard access by Doctor 1
+[2025-12-25 23:21:43,418] ERROR in routes: Error accessing doctor dashboard for user 1: unexpected '}'
+Traceback (most recent call last):
+  File "/app/TBIB/routes.py", line 644, in doctor_dashboard
+    return render_template('doctor_dashboard.html',
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/TBIB/.venv/lib/python3.12/site-packages/flask/templating.py", line 149, in render_template
+    template = app.jinja_env.get_or_select_template(template_name_or_list)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/TBIB/.venv/lib/python3.12/site-packages/jinja2/environment.py", line 1087, in get_or_select_template
+    return self.get_template(template_name_or_list, parent, globals)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/TBIB/.venv/lib/python3.12/site-packages/jinja2/environment.py", line 1016, in get_template
+    return self._load_template(name, globals)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/TBIB/.venv/lib/python3.12/site-packages/jinja2/environment.py", line 975, in _load_template
+    template = self.loader.load(self, name, self.make_globals(globals))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/TBIB/.venv/lib/python3.12/site-packages/jinja2/loaders.py", line 138, in load
+    code = environment.compile(source, name, filename)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/TBIB/.venv/lib/python3.12/site-packages/jinja2/environment.py", line 771, in compile
+    self.handle_exception(source=source_hint)
+  File "/app/TBIB/.venv/lib/python3.12/site-packages/jinja2/environment.py", line 942, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "/app/TBIB/templates/doctor_dashboard.html", line 831, in template
+    }
+jinja2.exceptions.TemplateSyntaxError: unexpected '}'
+127.0.0.1 - - [25/Dec/2025 23:21:43] "[32mGET /doctor/dashboard HTTP/1.1[0m" 302 -
+127.0.0.1 - - [25/Dec/2025 23:21:43] "[32mGET / HTTP/1.1[0m" 302 -
+[2025-12-25 23:21:43,432] INFO in routes: Dashboard access by Doctor 1
+[2025-12-25 23:21:43,442] ERROR in routes: Error accessing doctor dashboard for user 1: unexpected '}'
+Traceback (most recent call last):
+  File "/app/TBIB/routes.py", line 644, in doctor_dashboard
+    return render_template('doctor_dashboard.html',
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/TBIB/.venv/lib/python3.12/site-packages/flask/templating.py", line 149, in render_template
+    template = app.jinja_env.get_or_select_template(template_name_or_list)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/TBIB/.venv/lib/python3.12/site-packages/jinja2/environment.py", line 1087, in get_or_select_template
+    return self.get_template(template_name_or_list, parent, globals)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/TBIB/.venv/lib/python3.12/site-packages/jinja2/environment.py", line 1016, in get_template
+    return self._load_template(name, globals)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/TBIB/.venv/lib/python3.12/site-packages/jinja2/environment.py", line 975, in _load_template
+    template = self.loader.load(self, name, self.make_globals(globals))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/TBIB/.venv/lib/python3.12/site-packages/jinja2/loaders.py", line 138, in load
+    code = environment.compile(source, name, filename)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/TBIB/.venv/lib/python3.12/site-packages/jinja2/environment.py", line 771, in compile
+    self.handle_exception(source=source_hint)
+  File "/app/TBIB/.venv/lib/python3.12/site-packages/jinja2/environment.py", line 942, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "/app/TBIB/templates/doctor_dashboard.html", line 831, in template
+    }
+jinja2.exceptions.TemplateSyntaxError: unexpected '}'
+127.0.0.1 - - [25/Dec/2025 23:21:43] "[32mGET /doctor/dashboard HTTP/1.1[0m" 302 -
+127.0.0.1 - - [25/Dec/2025 23:22:41] "GET /login HTTP/1.1" 200 -
+127.0.0.1 - - [25/Dec/2025 23:22:41] "GET /static/img/logo_final.png HTTP/1.1" 200 -
+127.0.0.1 - - [25/Dec/2025 23:22:41] "GET /static/css/tokens.css HTTP/1.1" 200 -
+127.0.0.1 - - [25/Dec/2025 23:22:41] "GET /static/css/style.css HTTP/1.1" 200 -
+127.0.0.1 - - [25/Dec/2025 23:22:41] "GET /static/css/animations.css HTTP/1.1" 200 -
+127.0.0.1 - - [25/Dec/2025 23:22:41] "GET /static/img/Logo_SVG.svg HTTP/1.1" 200 -
+127.0.0.1 - - [25/Dec/2025 23:22:41] "GET /static/css/navigation.css HTTP/1.1" 200 -
+127.0.0.1 - - [25/Dec/2025 23:22:41] "GET /static/img/logo_accueil.png HTTP/1.1" 200 -
+127.0.0.1 - - [25/Dec/2025 23:22:41] "GET /static/sw.js HTTP/1.1" 200 -
+127.0.0.1 - - [25/Dec/2025 23:22:44] "[32mPOST /login HTTP/1.1[0m" 302 -
+[2025-12-25 23:22:44,023] INFO in routes: Dashboard access by Doctor 1
+127.0.0.1 - - [25/Dec/2025 23:22:44] "GET /doctor/dashboard HTTP/1.1" 200 -
+127.0.0.1 - - [25/Dec/2025 23:22:44] "GET /static/css/tokens.css HTTP/1.1" 200 -
+127.0.0.1 - - [25/Dec/2025 23:22:44] "GET /static/img/logo_final.png HTTP/1.1" 200 -
+127.0.0.1 - - [25/Dec/2025 23:22:44] "GET /static/css/style.css HTTP/1.1" 200 -
+127.0.0.1 - - [25/Dec/2025 23:22:44] "GET /static/css/animations.css HTTP/1.1" 200 -
+127.0.0.1 - - [25/Dec/2025 23:22:44] "GET /api/doctor/appointments?start=2025-12-25&end=2025-12-25 HTTP/1.1" 200 -
+127.0.0.1 - - [25/Dec/2025 23:22:44] "GET /api/doctor/appointments?start=2025-12-25&end=2025-12-25 HTTP/1.1" 200 -
+127.0.0.1 - - [25/Dec/2025 23:22:44] "GET /api/queue_status/1 HTTP/1.1" 200 -
+127.0.0.1 - - [25/Dec/2025 23:22:44] "GET /api/queue_status/1 HTTP/1.1" 200 -
+127.0.0.1 - - [25/Dec/2025 23:22:44] "GET /doctor/prescription/1 HTTP/1.1" 200 -
+127.0.0.1 - - [25/Dec/2025 23:22:44] "GET /static/img/Logo_SVG.svg HTTP/1.1" 200 -
+127.0.0.1 - - [25/Dec/2025 23:23:03] "GET /login HTTP/1.1" 200 -
+127.0.0.1 - - [25/Dec/2025 23:23:03] "GET /static/css/tokens.css HTTP/1.1" 200 -
+127.0.0.1 - - [25/Dec/2025 23:23:03] "GET /static/img/Logo_SVG.svg HTTP/1.1" 200 -
+127.0.0.1 - - [25/Dec/2025 23:23:03] "GET /static/img/logo_final.png HTTP/1.1" 200 -
+127.0.0.1 - - [25/Dec/2025 23:23:03] "GET /static/css/animations.css HTTP/1.1" 200 -
+127.0.0.1 - - [25/Dec/2025 23:23:03] "GET /static/css/style.css HTTP/1.1" 200 -
+127.0.0.1 - - [25/Dec/2025 23:23:03] "GET /static/css/navigation.css HTTP/1.1" 200 -
+127.0.0.1 - - [25/Dec/2025 23:23:03] "GET /static/img/logo_accueil.png HTTP/1.1" 200 -
+127.0.0.1 - - [25/Dec/2025 23:23:03] "GET /static/sw.js HTTP/1.1" 200 -
+127.0.0.1 - - [25/Dec/2025 23:23:05] "[32mPOST /login HTTP/1.1[0m" 302 -
+[2025-12-25 23:23:05,995] INFO in routes: Dashboard access by Doctor 1
+127.0.0.1 - - [25/Dec/2025 23:23:06] "GET /doctor/dashboard HTTP/1.1" 200 -
+127.0.0.1 - - [25/Dec/2025 23:23:06] "GET /static/css/animations.css HTTP/1.1" 200 -
+127.0.0.1 - - [25/Dec/2025 23:23:06] "GET /static/css/style.css HTTP/1.1" 200 -
+127.0.0.1 - - [25/Dec/2025 23:23:06] "GET /static/css/tokens.css HTTP/1.1" 200 -
+127.0.0.1 - - [25/Dec/2025 23:23:06] "GET /static/img/logo_final.png HTTP/1.1" 200 -
+127.0.0.1 - - [25/Dec/2025 23:23:06] "GET /api/doctor/appointments?start=2025-12-25&end=2025-12-25 HTTP/1.1" 200 -
+127.0.0.1 - - [25/Dec/2025 23:23:06] "GET /api/queue_status/1 HTTP/1.1" 200 -
+127.0.0.1 - - [25/Dec/2025 23:23:06] "GET /api/doctor/appointments?start=2025-12-25&end=2025-12-25 HTTP/1.1" 200 -
+127.0.0.1 - - [25/Dec/2025 23:23:06] "GET /api/queue_status/1 HTTP/1.1" 200 -
+127.0.0.1 - - [25/Dec/2025 23:23:06] "GET /doctor/prescription/1 HTTP/1.1" 200 -
+127.0.0.1 - - [25/Dec/2025 23:23:06] "GET /static/img/Logo_SVG.svg HTTP/1.1" 200 -
+127.0.0.1 - - [25/Dec/2025 23:23:06] "GET /verify/prescription/7dbe5d666b88466b83e24c01bcf91075 HTTP/1.1" 200 -
+127.0.0.1 - - [25/Dec/2025 23:23:06] "GET /static/img/Logo_SVG.svg HTTP/1.1" 200 -
