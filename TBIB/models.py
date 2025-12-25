@@ -14,13 +14,28 @@ class KYCStatus(enum.Enum):
     VERIFIED = 'VERIFIED'
     REJECTED = 'REJECTED'
 
+class PaymentMethod(enum.Enum):
+    ESPECES = 'Espèces'
+    CHIFA = 'Chifa'
+    CIB = 'CIB'
+    GRATUITE = 'Gratuité'
+
+class ReferralStatus(enum.Enum):
+    PENDING = 'pending'
+    ACCEPTED = 'accepted'
+    COMPLETED = 'completed'
+    DECLINED = 'declined'
+
 class User(UserMixin, db.Model):
+    """
+    Roles: 'patient', 'doctor', 'secretary'
+    """
     __tablename__ = 'users'
 
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(120), unique=True, nullable=False)
     password_hash = db.Column(db.String(256), nullable=False)
-    role = db.Column(db.String(20), nullable=False)
+    role = db.Column(db.String(20), nullable=False)  # patient, doctor, secretary
     name = db.Column(db.String(100), nullable=False)
     phone = db.Column(db.String(20))
     birth_date = db.Column(db.Date, nullable=True)
@@ -32,16 +47,24 @@ class User(UserMixin, db.Model):
     is_blocked = db.Column(db.Boolean, default=False)
 
     # SmartFlow: Score de fiabilité du patient (0-100)
-    # - No-Show: -20 pts | Retard >15min: -5 pts | Ponctuel: +2 pts (max 100)
     reliability_score = db.Column(db.Float, default=100.0, nullable=False)
+    
+    # === Secrétaire/Assistante ===
+    # Lien vers le médecin (pour rôle secretary)
+    linked_doctor_id = db.Column(db.Integer, db.ForeignKey('doctor_profiles.id'), nullable=True)
+    # Délégation: permet à la secrétaire de voir les dossiers médicaux
+    can_view_medical_records = db.Column(db.Boolean, default=False)
 
-    doctor_profile = db.relationship('DoctorProfile', backref='user', uselist=False, cascade='all, delete-orphan')
+    doctor_profile = db.relationship('DoctorProfile', backref='user', uselist=False, 
+                                      foreign_keys='DoctorProfile.user_id', cascade='all, delete-orphan')
+    linked_doctor = db.relationship('DoctorProfile', foreign_keys=[linked_doctor_id], backref='secretaries')
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password, method='pbkdf2:sha256')
 
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
+
 
 class DoctorProfile(db.Model):
     __tablename__ = 'doctor_profiles'
@@ -78,18 +101,30 @@ class DoctorAvailability(db.Model):
     doctor_profile = db.relationship('DoctorProfile', backref='availability_slots')
 
 class HealthRecord(db.Model):
+    """Carnet de Santé Numérique - Digital Medical Record (DMR)"""
     __tablename__ = 'health_records'
 
     id = db.Column(db.Integer, primary_key=True)
     patient_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False, unique=True)
-    blood_type = db.Column(db.String(10))
-    weight = db.Column(db.Float)
-    height = db.Column(db.Float)
-    allergies = db.Column(db.Text)
-    chronic_conditions = db.Column(db.Text)
-    vaccines = db.Column(db.Text)
-    notes = db.Column(db.Text)
+    
+    # === Données Vitales (Patient peut modifier) ===
+    weight = db.Column(db.Float)                          # Poids en kg
+    height = db.Column(db.Float)                          # Taille en cm
+    emergency_contact = db.Column(db.String(200))         # Nom + Téléphone urgence
+    
+    # === Données Médicales (Médecin uniquement) ===
+    blood_type = db.Column(db.String(10))                 # A+, O-, AB+, etc.
+    allergies = db.Column(db.Text)                        # Médicaments, aliments, latex...
+    chronic_conditions = db.Column(db.Text)               # Diabète, HTA, Asthme...
+    family_history = db.Column(db.Text)                   # Antécédents familiaux (Père/Mère)
+    vaccines = db.Column(db.Text)                         # Suivi vaccinal (dates + types)
+    current_treatments = db.Column(db.Text)               # Traitements en cours
+    prescriptions = db.Column(db.Text)                    # Ordonnances / Documents
+    notes = db.Column(db.Text)                            # Notes privées médecin
+    
+    # === Métadonnées ===
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    updated_by = db.Column(db.String(50))                 # 'patient' ou 'doctor:<id>'
 
     patient = db.relationship('User', backref=db.backref('health_record', uselist=False))
 
@@ -133,7 +168,10 @@ class Appointment(db.Model):
     arrival_time = db.Column(db.DateTime, nullable=True)
     # Heure de check-in confirmé
     check_in_time = db.Column(db.DateTime, nullable=True)
-
+    
+    # === Caisse & Honoraires ===
+    price_paid = db.Column(db.Float, nullable=True)        # Montant perçu
+    payment_method = db.Column(db.String(20), nullable=True)  # Espèces, Chifa, CIB, Gratuité
 
 class ConsultationType(db.Model):
     __tablename__ = 'consultation_types'
@@ -214,3 +252,24 @@ class EpidemiologyData(db.Model):
     age_group = db.Column(db.String(50), nullable=False)
     gender = db.Column(db.String(20), nullable=False)
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+
+
+class Referral(db.Model):
+    """Réseau d'Adressage - Orienter un patient vers un confrère."""
+    __tablename__ = 'referrals'
+
+    id = db.Column(db.Integer, primary_key=True)
+    from_doctor_id = db.Column(db.Integer, db.ForeignKey('doctor_profiles.id'), nullable=False)
+    to_doctor_id = db.Column(db.Integer, db.ForeignKey('doctor_profiles.id'), nullable=False)
+    patient_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    reason = db.Column(db.Text)                           # Motif de l'orientation
+    notes = db.Column(db.Text)                            # Notes pour le confrère
+    status = db.Column(db.String(20), default='pending')  # pending, accepted, completed, declined
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    
+    # Relations
+    from_doctor = db.relationship('DoctorProfile', foreign_keys=[from_doctor_id], backref='referrals_sent')
+    to_doctor = db.relationship('DoctorProfile', foreign_keys=[to_doctor_id], backref='referrals_received')
+    patient = db.relationship('User', backref='referrals')
+

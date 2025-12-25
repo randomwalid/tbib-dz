@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, redirect, url_for, request, flash, session, jsonify, current_app
 from flask_login import login_user, logout_user, login_required, current_user
 from extensions import db
-from models import User, DoctorProfile, Appointment, HealthRecord, DoctorAvailability, ConsultationType, DoctorAbsence, Relative
+from models import User, DoctorProfile, Appointment, HealthRecord, DoctorAvailability, ConsultationType, DoctorAbsence, Relative, Referral
 from utils.engine import calculate_wait_time, shift_appointments, get_conflicting_appointments, cancel_appointments_in_range
 from utils.smart_engine import QueueOptimizer
 from datetime import date, datetime, timedelta, time
@@ -491,14 +491,20 @@ def patient_profile(section='info'):
             db.session.commit()
             flash('Informations mises à jour', 'success')
         elif section == 'health':
-            health_record.blood_type = request.form.get('blood_type')
-            health_record.weight = request.form.get('weight', type=float)
-            health_record.height = request.form.get('height', type=float)
-            health_record.allergies = request.form.get('allergies')
-            health_record.vaccines = request.form.get('vaccines')
-            health_record.chronic_conditions = request.form.get('chronic_conditions')
+            # Patient peut UNIQUEMENT modifier: poids, taille, contact urgence
+            weight = request.form.get('weight')
+            height = request.form.get('height')
+            emergency_contact = request.form.get('emergency_contact')
+            
+            if weight:
+                health_record.weight = float(weight)
+            if height:
+                health_record.height = float(height)
+            health_record.emergency_contact = emergency_contact
+            health_record.updated_by = 'patient'
+            
             db.session.commit()
-            flash('Carnet de santé mis à jour', 'success')
+            flash('Constantes mises à jour', 'success')
         elif section == 'security':
             new_password = request.form.get('new_password')
             if new_password:
@@ -513,6 +519,63 @@ def patient_profile(section='info'):
                            health_record=health_record,
                            t=get_t(),
                            lang=session.get('lang', 'fr'))
+
+
+@main_bp.route('/patient/health-record')
+@login_required
+def patient_health_record():
+    """Page Carnet de Santé du Patient."""
+    if current_user.role != 'patient':
+        return redirect(url_for('main.home'))
+    
+    health_record = current_user.health_record
+    if not health_record:
+        health_record = HealthRecord(patient_id=current_user.id)
+        db.session.add(health_record)
+        db.session.commit()
+    
+    return render_template('patient_health_record.html',
+                           health_record=health_record,
+                           today=date.today(),
+                           t=get_t(),
+                           lang=session.get('lang', 'fr'))
+
+
+@main_bp.route('/api/patient/health-record', methods=['POST'])
+@login_required
+def api_patient_health_record():
+    """API pour que le patient mette à jour SES propres données (limitées)."""
+    if current_user.role != 'patient':
+        return jsonify({'error': 'Unauthorized'}), 403
+    
+    try:
+        health_record = current_user.health_record
+        if not health_record:
+            health_record = HealthRecord(patient_id=current_user.id)
+            db.session.add(health_record)
+        
+        data = request.get_json()
+        
+        # Patient peut UNIQUEMENT modifier ces champs
+        if 'weight' in data and data['weight']:
+            health_record.weight = float(data['weight'])
+        if 'height' in data and data['height']:
+            health_record.height = float(data['height'])
+        if 'emergency_contact' in data:
+            health_record.emergency_contact = data['emergency_contact']
+        
+        health_record.updated_by = 'patient'
+        db.session.commit()
+        
+        return jsonify({
+            'success': True,
+            'message': 'Données mises à jour'
+        })
+    except Exception as e:
+        db.session.rollback()
+        current_app.logger.error(f"Error updating patient health record: {str(e)}")
+        return jsonify({'error': 'Erreur lors de la mise à jour'}), 500
+
 
 @main_bp.route('/patient/relatives/add', methods=['POST'])
 @login_required
@@ -564,16 +627,184 @@ def doctor_dashboard():
             Appointment.queue_number.isnot(None),
             Appointment.status.in_(['confirmed', 'waiting'])
         ).count()
+        
+        # Calcul recette du jour
+        today_revenue = db.session.query(db.func.sum(Appointment.price_paid)).filter(
+            Appointment.doctor_id == doctor_profile.id,
+            Appointment.appointment_date == date.today(),
+            Appointment.status == 'completed',
+            Appointment.price_paid.isnot(None)
+        ).scalar() or 0
 
         return render_template('doctor_dashboard.html',
                             doctor_profile=doctor_profile,
                             waiting_count=waiting_count,
+                            today_revenue=today_revenue,
                             t=get_t(),
                             lang=session.get('lang', 'fr'))
     except Exception as e:
         current_app.logger.error(f"Error accessing doctor dashboard for user {current_user.id}: {str(e)}", exc_info=True)
         flash("Une erreur est survenue lors du chargement du tableau de bord.", "error")
         return redirect(url_for('main.home'))
+
+
+# ============================================================
+# SECRÉTARIAT / ASSISTANTE
+# ============================================================
+
+@main_bp.route('/secretary/dashboard')
+@login_required
+def secretary_dashboard():
+    """Dashboard simplifié pour la secrétaire."""
+    if current_user.role != 'secretary':
+        return redirect(url_for('main.home'))
+    
+    doctor = current_user.linked_doctor
+    if not doctor:
+        flash("Votre compte n'est pas lié à un médecin.", "error")
+        return redirect(url_for('main.home'))
+    
+    return render_template('secretary_dashboard.html',
+                           doctor=doctor,
+                           today=date.today(),
+                           t=get_t(),
+                           lang=session.get('lang', 'fr'))
+
+
+@main_bp.route('/api/secretary/appointments')
+@login_required
+def api_secretary_appointments():
+    """API pour récupérer les RDV du jour pour la secrétaire."""
+    if current_user.role != 'secretary':
+        return jsonify({'error': 'Unauthorized'}), 403
+    
+    doctor = current_user.linked_doctor
+    if not doctor:
+        return jsonify({'error': 'No linked doctor'}), 400
+    
+    target_date = request.args.get('date', date.today().isoformat())
+    try:
+        target_date = datetime.strptime(target_date, '%Y-%m-%d').date()
+    except ValueError:
+        target_date = date.today()
+    
+    appointments = Appointment.query.filter(
+        Appointment.doctor_id == doctor.id,
+        Appointment.appointment_date == target_date
+    ).order_by(Appointment.appointment_time).all()
+    
+    # Stats
+    stats = {
+        'waiting': sum(1 for a in appointments if a.status in ['confirmed', 'waiting']),
+        'checked_in': sum(1 for a in appointments if a.status == 'checked_in'),
+        'completed': sum(1 for a in appointments if a.status == 'completed'),
+        'total': len(appointments)
+    }
+    
+    # Waiting room
+    waiting_room = []
+    for a in appointments:
+        if a.status == 'checked_in' and a.check_in_time:
+            wait_mins = int((datetime.now() - a.check_in_time).total_seconds() / 60)
+            waiting_room.append({
+                'id': a.id,
+                'name': a.patient.name if a.patient else 'Patient',
+                'arrival_time': a.check_in_time.strftime('%H:%M'),
+                'wait_time': wait_mins
+            })
+    
+    return jsonify({
+        'appointments': [{
+            'id': a.id,
+            'patient_name': a.patient.name if a.patient else 'Patient',
+            'time': a.appointment_time.strftime('%H:%M') if a.appointment_time else '--:--',
+            'status': a.status,
+            'reason': a.consultation_reason
+        } for a in appointments],
+        'waiting_room': waiting_room,
+        'stats': stats
+    })
+
+
+@main_bp.route('/api/secretary/checkin/<int:appointment_id>', methods=['POST'])
+@login_required
+def api_secretary_checkin(appointment_id):
+    """Check-in d'un patient par la secrétaire."""
+    if current_user.role != 'secretary':
+        return jsonify({'error': 'Unauthorized'}), 403
+    
+    doctor = current_user.linked_doctor
+    if not doctor:
+        return jsonify({'error': 'No linked doctor'}), 400
+    
+    appointment = Appointment.query.get_or_404(appointment_id)
+    if appointment.doctor_id != doctor.id:
+        return jsonify({'error': 'Unauthorized'}), 403
+    
+    appointment.status = 'checked_in'
+    appointment.check_in_time = datetime.now()
+    db.session.commit()
+    
+    return jsonify({'success': True, 'message': 'Patient enregistré'})
+
+
+@main_bp.route('/api/secretary/quick-appointment', methods=['POST'])
+@login_required
+def api_secretary_quick_appointment():
+    """Création rapide d'un RDV par la secrétaire (appel téléphonique)."""
+    if current_user.role != 'secretary':
+        return jsonify({'error': 'Unauthorized'}), 403
+    
+    doctor = current_user.linked_doctor
+    if not doctor:
+        return jsonify({'error': 'No linked doctor'}), 400
+    
+    data = request.get_json()
+    patient_name = data.get('patient_name', '').strip()
+    phone = data.get('phone', '').strip()
+    appt_date = data.get('date')
+    appt_time = data.get('time')
+    reason = data.get('reason', 'Consultation')
+    
+    if not patient_name or not phone:
+        return jsonify({'error': 'Nom et téléphone requis'}), 400
+    
+    # Cherche ou crée le patient
+    patient = User.query.filter_by(phone=phone).first()
+    if not patient:
+        patient = User(
+            email=f"{phone}@tbib.temp",
+            name=patient_name,
+            phone=phone,
+            role='patient'
+        )
+        patient.set_password(phone)  # Mot de passe temporaire
+        db.session.add(patient)
+        db.session.flush()
+    
+    # Parse date/time
+    try:
+        appt_date = datetime.strptime(appt_date, '%Y-%m-%d').date() if appt_date else date.today()
+        appt_time = datetime.strptime(appt_time, '%H:%M').time() if appt_time else None
+    except ValueError:
+        appt_date = date.today()
+        appt_time = None
+    
+    # Crée le RDV
+    appointment = Appointment(
+        patient_id=patient.id,
+        doctor_id=doctor.id,
+        appointment_date=appt_date,
+        appointment_time=appt_time,
+        consultation_reason=reason,
+        status='confirmed'
+    )
+    db.session.add(appointment)
+    db.session.commit()
+    
+    return jsonify({'success': True, 'appointment_id': appointment.id})
+
+
 
 @main_bp.route('/dashboard')
 @login_required
@@ -1226,6 +1457,135 @@ def get_patient_history(patient_id):
         },
         'history': history
     })
+
+
+@main_bp.route('/api/doctor/patient/<int:patient_id>/health-record', methods=['POST'])
+@login_required
+def update_patient_health_record(patient_id):
+    """API pour que le médecin mette à jour le dossier médical d'un patient."""
+    if current_user.role != 'doctor':
+        return jsonify({'error': 'Unauthorized'}), 403
+
+    try:
+        patient = User.query.get_or_404(patient_id)
+        
+        # Crée le HealthRecord si inexistant
+        health_record = patient.health_record
+        if not health_record:
+            health_record = HealthRecord(patient_id=patient_id)
+            db.session.add(health_record)
+        
+        data = request.get_json()
+        
+        # Champs modifiables par le médecin (données médicales)
+        if 'blood_type' in data:
+            health_record.blood_type = data['blood_type']
+        if 'weight' in data and data['weight']:
+            health_record.weight = float(data['weight'])
+        if 'height' in data and data['height']:
+            health_record.height = float(data['height'])
+        if 'allergies' in data:
+            health_record.allergies = data['allergies']
+        if 'chronic_conditions' in data:
+            health_record.chronic_conditions = data['chronic_conditions']
+        if 'family_history' in data:
+            health_record.family_history = data['family_history']
+        if 'vaccines' in data:
+            health_record.vaccines = data['vaccines']
+        if 'current_treatments' in data:
+            health_record.current_treatments = data['current_treatments']
+        if 'prescriptions' in data:
+            health_record.prescriptions = data['prescriptions']
+        if 'notes' in data:
+            health_record.notes = data['notes']
+        
+        health_record.updated_by = f'doctor:{current_user.id}'
+        db.session.commit()
+        current_app.logger.info(f"Doctor {current_user.id} updated health record for patient {patient_id}")
+        
+        return jsonify({
+            'success': True,
+            'message': 'Dossier médical mis à jour',
+            'health_record': {
+                'blood_type': health_record.blood_type,
+                'weight': health_record.weight,
+                'height': health_record.height,
+                'allergies': health_record.allergies,
+                'chronic_conditions': health_record.chronic_conditions,
+                'family_history': health_record.family_history,
+                'vaccines': health_record.vaccines,
+                'current_treatments': health_record.current_treatments,
+                'prescriptions': health_record.prescriptions
+            }
+        })
+        
+    except Exception as e:
+        db.session.rollback()
+        current_app.logger.error(f"Error updating health record: {str(e)}", exc_info=True)
+        return jsonify({'error': 'Erreur lors de la mise à jour'}), 500
+
+
+@main_bp.route('/api/doctor/appointments/<int:appointment_id>/complete', methods=['POST'])
+@login_required
+def complete_consultation(appointment_id):
+    """Termine une consultation avec diagnostic optionnel et montant."""
+    if current_user.role != 'doctor':
+        return jsonify({'error': 'Unauthorized'}), 403
+
+    try:
+        appointment = Appointment.query.get_or_404(appointment_id)
+        if appointment.doctor_id != current_user.doctor_profile.id:
+            return jsonify({'error': 'Unauthorized'}), 403
+
+        data = request.get_json()
+        diagnosis = data.get('diagnosis', '')
+        amount = data.get('amount', '')
+        payment_method = data.get('payment_method', 'Espèces')
+        notes = data.get('notes', '')
+        
+        # Mise à jour du statut
+        appointment.status = 'completed'
+        
+        # Enregistrer le paiement
+        if amount:
+            try:
+                appointment.price_paid = float(amount)
+            except (ValueError, TypeError):
+                pass
+        appointment.payment_method = payment_method
+        
+        # Construction des notes médicales
+        medical_notes = []
+        if diagnosis:
+            medical_notes.append(f"DIAGNOSTIC: {diagnosis}")
+        if amount:
+            medical_notes.append(f"MONTANT: {amount} DA ({payment_method})")
+        if notes:
+            medical_notes.append(f"NOTES: {notes}")
+        
+        existing_notes = appointment.doctor_notes or ''
+        if medical_notes:
+            appointment.doctor_notes = '\n'.join(medical_notes) + '\n\n' + existing_notes
+        
+        # Mise à jour du score de fiabilité du patient
+        patient = appointment.patient
+        if patient:
+            current_score = patient.reliability_score if patient.reliability_score is not None else 100.0
+            patient.reliability_score = min(100.0, current_score + 2.0)
+        
+        db.session.commit()
+        current_app.logger.info(f"Consultation {appointment_id} completed by doctor {current_user.id}")
+        
+        return jsonify({
+            'success': True,
+            'message': 'Consultation terminée avec succès',
+            'appointment_id': appointment.id
+        })
+        
+    except Exception as e:
+        db.session.rollback()
+        current_app.logger.error(f"Error completing consultation: {str(e)}", exc_info=True)
+        return jsonify({'error': 'Erreur lors de la finalisation'}), 500
 
 
 @main_bp.route('/doctor/settings')
