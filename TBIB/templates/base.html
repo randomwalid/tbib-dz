@@ -52,6 +52,12 @@
     </script>
 </head>
 <body class="bg-white min-h-screen flex flex-col" x-data="{ offline: !navigator.onLine }" @offline.window="offline = true" @online.window="offline = false">
+    <!-- Global Page Loader -->
+    <div class="page-loader" id="globalLoader">
+        <div class="loader-content">
+            <img src="{{ url_for('static', filename='img/Logo_SVG.svg') }}" alt="Chargement..." class="w-24 h-24 animate-pulse-fade">
+        </div>
+    </div>
     <!-- Network Status Banner -->
     <div x-show="offline"
          x-transition:enter="transition ease-out duration-300"
@@ -205,5 +211,16 @@
         </div>
     </div>
     {% endif %}
+    <script>
+        window.addEventListener('load', function() {
+            setTimeout(function() {
+                var loader = document.getElementById('globalLoader');
+                if(loader) {
+                    loader.style.opacity = '0';
+                    setTimeout(function(){ loader.style.display = 'none'; }, 500);
+                }
+            }, 1000);
+        });
+    </script>
 </body>
 </html>
