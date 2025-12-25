@@ -684,6 +684,77 @@ def mark_no_show(appointment_id):
 
     return redirect(url_for('main.doctor_dashboard'))
 
+@main_bp.route('/appointment/<int:appt_id>/present', methods=['POST'])
+@login_required
+def mark_patient_present(appt_id):
+    """Marque le patient comme présent et met à jour son score de fiabilité."""
+    if current_user.role != 'doctor':
+        return jsonify({'error': 'Unauthorized'}), 403
+
+    try:
+        appointment = Appointment.query.get_or_404(appt_id)
+        if appointment.doctor_id != current_user.doctor_profile.id:
+            return jsonify({'error': 'Unauthorized'}), 403
+
+        appointment.status = 'completed'
+        
+        patient = appointment.patient
+        if patient:
+            current_score = patient.reliability_score if patient.reliability_score is not None else 100.0
+            patient.reliability_score = min(100.0, current_score + 2.0)
+            patient.total_appointments = (patient.total_appointments or 0) + 1
+        
+        db.session.commit()
+        current_app.logger.info(f"Appointment {appt_id} marked as present by doctor {current_user.id}")
+        flash("Patient confirmé. Score de fiabilité augmenté (+2).", "success")
+        
+        return jsonify({
+            'success': True,
+            'message': 'Patient confirmé. Score de fiabilité augmenté.',
+            'new_score': patient.reliability_score if patient else None
+        })
+
+    except Exception as e:
+        db.session.rollback()
+        current_app.logger.error(f"Error marking appointment {appt_id} as present: {str(e)}", exc_info=True)
+        return jsonify({'error': 'Internal Server Error'}), 500
+
+@main_bp.route('/appointment/<int:appt_id>/noshow', methods=['POST'])
+@login_required
+def mark_patient_noshow(appt_id):
+    """Marque le patient comme absent et met à jour son score de fiabilité."""
+    if current_user.role != 'doctor':
+        return jsonify({'error': 'Unauthorized'}), 403
+
+    try:
+        appointment = Appointment.query.get_or_404(appt_id)
+        if appointment.doctor_id != current_user.doctor_profile.id:
+            return jsonify({'error': 'Unauthorized'}), 403
+
+        appointment.status = 'no_show'
+        
+        patient = appointment.patient
+        if patient:
+            current_score = patient.reliability_score if patient.reliability_score is not None else 100.0
+            patient.reliability_score = max(0.0, current_score - 20.0)
+            patient.no_show_count = (patient.no_show_count or 0) + 1
+            patient.total_appointments = (patient.total_appointments or 0) + 1
+        
+        db.session.commit()
+        current_app.logger.info(f"Appointment {appt_id} marked as no-show by doctor {current_user.id}")
+        flash("Absence signalée. Score de fiabilité diminué (-20).", "warning")
+        
+        return jsonify({
+            'success': True,
+            'message': 'Absence signalée. Score de fiabilité diminué.',
+            'new_score': patient.reliability_score if patient else None
+        })
+
+    except Exception as e:
+        db.session.rollback()
+        current_app.logger.error(f"Error marking appointment {appt_id} as no-show: {str(e)}", exc_info=True)
+        return jsonify({'error': 'Internal Server Error'}), 500
+
 @main_bp.route('/cancel/<int:appointment_id>', methods=['POST'])
 @login_required
 def cancel_appointment(appointment_id):

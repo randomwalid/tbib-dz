@@ -1,0 +1,47 @@
+@routes.py @templates/ (dossier)
+
+Agis comme un Senior Full-Stack Developer (Flask + TailwindCSS).
+
+OBJECTIF : Transformer le tableau de bord du médecin en un "Cockpit SmartFlow" intelligent.
+Je veux que le médecin puisse VISUALISER la fiabilité des patients et CONTRÔLER l'algorithme d'IA.
+
+Voici les 3 tâches précises à exécuter :
+
+TÂCHE 1 : BACKEND (routes.py)
+Ajoute deux nouvelles routes pour permettre au médecin de donner un feedback à l'IA :
+1. `/appointment/<int:appt_id>/present` :
+   - Change le statut du RDV à 'completed'.
+   - Incrémente `patient.total_appointments` (+1).
+   - Flash message : "Patient confirmé. Score de fiabilité augmenté."
+2. `/appointment/<int:appt_id>/noshow` :
+   - Change le statut du RDV à 'no_show'.
+   - Incrémente `patient.total_appointments` (+1) ET `patient.no_show_count` (+1).
+   - Flash message : "Absence signalée. Score de fiabilité diminué."
+   - IMPORTANT : N'oublie pas le `db.session.commit()` pour sauvegarder les stats.
+
+TÂCHE 2 : FRONTEND (Le Cockpit Visuel)
+Dans le fichier qui liste les rendez-vous du médecin (probablement `templates/main/my_appointments.html` ou `dashboard.html`), remplace la liste actuelle par des "Smart Cards" avec ce design :
+
+- CODE COULEUR FIABILITÉ :
+  - Si `patient.reliability_score` >= 80 : Badge VERT ("Fiable").
+  - Si score entre 50 et 79 : Badge ORANGE ("Moyen").
+  - Si score < 50 : Badge ROUGE ("⚠️ Risque élevé").
+
+- GESTION "GHOST SLOT" (Overbooking) :
+  - Si `appointment.is_shadow_slot` est True :
+    - Le fond de la carte doit être jaune clair (bg-yellow-50).
+    - Ajoute une bordure spécifique (border-yellow-500).
+    - Ajoute un petit texte explicatif : "🤖 SmartFlow : Créneau doublé par sécurité (Risque d'absence détecté)."
+
+- BOUTONS D'ACTION :
+  - Ajoute deux boutons visibles sur chaque carte :
+    - [✅ Présent] (pointe vers la route /present).
+    - [❌ Absent] (pointe vers la route /noshow).
+
+TÂCHE 3 : BOUTON "FORCER RDV"
+Ajoute un bouton "Urgence / Forcer RDV" en haut du dashboard qui redirige vers la page de prise de RDV (ou ouvre une modale) pour permettre au médecin de réserver manuellement même si c'est complet (bypass SmartFlow).
+
+CONTRAINTES TECHNIQUES :
+- Ne touche pas aux modèles (User/Appointment), ils contiennent déjà les champs nécessaires (`reliability_score`, `is_shadow_slot`).
+- Utilise Tailwind CSS pour le style.
+- Garde le reste de la page intact (header, sidebar).
