@@ -1011,6 +1011,24 @@ def api_doctor_appointments():
                 # Fallback si le calcul échoue (pas d'arrival_time, etc.)
                 priority_score = (getattr(appt, 'urgency_level', 1) or 1) * 100
 
+            # Calculate patient age if birth_date available
+            patient_age = ''
+            if hasattr(appt.patient, 'birth_date') and appt.patient.birth_date:
+                from datetime import date as dt_date
+                today = dt_date.today()
+                birth = appt.patient.birth_date
+                patient_age = today.year - birth.year - ((today.month, today.day) < (birth.month, birth.day))
+
+            # Get health record info if available
+            health_record = getattr(appt.patient, 'health_record', None)
+            blood_type = ''
+            allergies = ''
+            medical_history = ''
+            if health_record:
+                blood_type = getattr(health_record, 'blood_type', '') or ''
+                allergies = getattr(health_record, 'allergies', '') or ''
+                medical_history = getattr(health_record, 'medical_history', '') or ''
+
             events.append({
                 'id': appt.id,
                 'title': appt.patient.name,
@@ -1022,6 +1040,10 @@ def api_doctor_appointments():
                     'patient_name': appt.patient.name,
                     'patient_phone': appt.patient.phone or '',
                     'patient_email': appt.patient.email,
+                    'patient_age': patient_age,
+                    'blood_type': blood_type,
+                    'allergies': allergies,
+                    'medical_history': medical_history,
                     'status': appt.status,
                     'queue_number': appt.queue_number,
                     'consultation_reason': appt.consultation_reason or '',
@@ -1033,7 +1055,7 @@ def api_doctor_appointments():
                     'reliability_score': getattr(appt.patient, 'reliability_score', 100.0),
                     'is_shadow_slot': getattr(appt, 'is_shadow_slot', False),
                     'urgency_level': getattr(appt, 'urgency_level', 1),
-                    'priority_score': priority_score  # Score calculé dynamiquement
+                    'priority_score': priority_score
                 }
             })
 
@@ -1744,6 +1766,111 @@ def ministry_dashboard():
                            underserved_cities=underserved_cities,
                            health_trends=health_trends,
                            report=report,
-                           t=get_t(),                      # <--- C'est ça qui manquait !
-                           lang=session.get('lang', 'fr')  # <--- Et ça !
+                           t=get_t(),
+                           lang=session.get('lang', 'fr')
                            )
+
+
+@main_bp.route('/doctor/agenda')
+@login_required
+def doctor_agenda():
+    """Full calendar view for doctors."""
+    if current_user.role != 'doctor':
+        return redirect(url_for('main.home'))
+
+    doctor_profile = current_user.doctor_profile
+    return render_template('doctor_agenda.html',
+                           doctor_profile=doctor_profile,
+                           doctor=doctor_profile,
+                           t=get_t(),
+                           lang=session.get('lang', 'fr'))
+
+
+@main_bp.route('/doctor/public-profile')
+@login_required
+def doctor_public_profile():
+    """Shows what the public sees for this doctor."""
+    if current_user.role != 'doctor':
+        return redirect(url_for('main.home'))
+
+    doctor_profile = current_user.doctor_profile
+    consultation_types = ConsultationType.query.filter_by(doctor_id=doctor_profile.id, is_active=True).all()
+
+    return render_template('doctor_public_view.html',
+                           doctor=doctor_profile,
+                           doctor_profile=doctor_profile,
+                           consultation_types=consultation_types,
+                           t=get_t(),
+                           lang=session.get('lang', 'fr'))
+
+
+@main_bp.route('/doctor/walkin', methods=['POST'])
+@login_required
+def add_walkin():
+    """Add a walk-in or emergency patient."""
+    if current_user.role != 'doctor':
+        return redirect(url_for('main.home'))
+
+    import uuid
+    import secrets
+    from werkzeug.security import generate_password_hash
+    from sqlalchemy.exc import IntegrityError
+
+    max_retries = 3
+    for retry in range(max_retries):
+        try:
+            doctor_profile = current_user.doctor_profile
+            patient_name = request.form.get('patient_name', 'Walk-in Patient')
+            phone = request.form.get('phone', '')
+            urgency_level = int(request.form.get('urgency_level', 1))
+
+            existing_patient = User.query.filter_by(phone=phone).first() if phone else None
+
+            if not existing_patient:
+                temp_email = f"walkin_{uuid.uuid4().hex}@temp.tbib.dz"
+                secure_random_password = secrets.token_urlsafe(32)
+                existing_patient = User(
+                    name=patient_name,
+                    email=temp_email,
+                    phone=phone if phone else None,
+                    role='patient',
+                    password_hash=generate_password_hash(secure_random_password),
+                    reliability_score=100.0
+                )
+                db.session.add(existing_patient)
+                db.session.flush()
+
+            queue_number = Appointment.query.filter_by(
+                doctor_id=doctor_profile.id,
+                appointment_date=date.today()
+            ).count() + 1
+
+            appointment = Appointment(
+                patient_id=existing_patient.id,
+                doctor_id=doctor_profile.id,
+                appointment_date=date.today(),
+                appointment_time=datetime.now().time(),
+                status='waiting',
+                queue_number=queue_number,
+                urgency_level=urgency_level,
+                consultation_reason='Walk-in / Urgence'
+            )
+            db.session.add(appointment)
+            db.session.commit()
+
+            flash(f"Patient {patient_name} ajouté en urgence (Ticket #{queue_number}).", "success")
+            break
+
+        except IntegrityError:
+            db.session.rollback()
+            if retry == max_retries - 1:
+                current_app.logger.error("Failed to create walk-in patient after retries")
+                flash("Erreur lors de l'ajout du patient. Veuillez réessayer.", "error")
+            continue
+        except Exception as e:
+            db.session.rollback()
+            current_app.logger.error(f"Error adding walk-in: {str(e)}", exc_info=True)
+            flash("Erreur lors de l'ajout du patient.", "error")
+            break
+
+    return redirect(url_for('main.doctor_dashboard'))

@@ -1,28 +1,10 @@
-{% extends 'base.html' %}
-{% block title %}Configuration - {{ t.dashboard }}{% endblock %}
+{% extends 'layout_doctor.html' %}
+{% block title %}Configuration - TBIB{% endblock %}
+{% block page_title %}Configuration{% endblock %}
+{% block page_subtitle %}Gérez votre profil, consultations et disponibilités{% endblock %}
 
 {% block content %}
-<div class="max-w-5xl mx-auto px-4 py-8">
-    <div class="flex items-center justify-between mb-6">
-        <div>
-            <h1 class="text-xl font-bold text-gray-900">Configuration</h1>
-            <p class="text-sm text-gray-500">Gérez votre profil, consultations et disponibilités</p>
-        </div>
-        <a href="{{ url_for('main.doctor_dashboard') }}" class="text-sm text-[#14b999] font-medium hover:underline">
-            ← Retour au tableau de bord
-        </a>
-    </div>
-    
-    {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-            {% for category, message in messages %}
-                <div class="mb-4 p-4 rounded-lg {% if category == 'success' %}bg-green-50 text-green-700 border border-green-200{% else %}bg-red-50 text-red-700 border border-red-200{% endif %}">
-                    {{ message }}
-                </div>
-            {% endfor %}
-        {% endif %}
-    {% endwith %}
-    
+<div class="max-w-4xl mx-auto">
     <div x-data="settingsApp()" class="space-y-6">
         <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
             <div class="border-b border-gray-100">

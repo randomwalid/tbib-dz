@@ -1,0 +1,53 @@
+@routes.py @templates/ (folder)
+
+Agis comme un Lead Product Designer & Flask Developer.
+L'application a perdu sa navigation et ses fonctionnalités de gestion médicale lors de la dernière update. Nous devons transformer le simple "Dashboard" en une véritable "Console Médicale".
+
+TÂCHE 1 : STRUCTURE & NAVIGATION (Layout)
+Crée un fichier `templates/layout_doctor.html` qui servira de base pour toutes les pages médecin.
+Il doit contenir :
+- Une SIDEBAR GAUCHE fixe (couleur blanche ou vert très pâle #f0fdfa) avec :
+  - Logo TBIB
+  - Liens :
+    1. 📊 Cockpit (Dashboard actuel)
+    2. 📅 Agenda (Vue Calendrier complète, pas juste "aujourd'hui")
+    3. 📂 Mes Patients (Liste complète + Recherche)
+    4. 👤 Mon Profil Public (Vue de ce que voient les patients)
+    5. ⚙️ Configuration (Les réglages horaires/types de consultation)
+  - Bouton Déconnexion en bas.
+- Un HEADER en haut avec :
+  - Bouton "Urgence / Walk-in" (Rouge) qui ouvre une Modale d'ajout rapide.
+  - Notifications.
+
+TÂCHE 2 : LA VUE "DÉTAIL PATIENT" (Dossier Médical Électronique)
+Dans le Dashboard et la liste des patients, cliquer sur un patient ne doit rien recharger, mais ouvrir une MODALE (Dialog) ou un OFF-CANVAS (Panneau latéral droit) contenant :
+- En-tête : Nom, Âge, Groupe Sanguin, Badge SmartFlow (Score fiabilité).
+- Onglet 1 "Consultation Actuelle" :
+  - Zone de texte "Notes du médecin" (Privé).
+  - Zone de texte "Ordonnance / Diagnostic".
+  - Boutons d'action : [✅ Confirmer Présence] [❌ Marquer Absent] (Jolis boutons Tailwind, PAS de `window.confirm` natif).
+- Onglet 2 "Historique" : Liste des RDV passés de ce patient.
+- Onglet 3 "Info Médicales" : Allergies, antécédents (Lecture seule ou modifiable).
+
+TÂCHE 3 : CORRECTION "MARK ABSENT" (UI)
+Remplace l'alerte native JavaScript moche par une Modale de Confirmation Tailwind :
+"Êtes-vous sûr de marquer [Nom] comme absent ?
+⚠️ Conséquence : Son score de fiabilité sera réduit de 20 points."
+[Annuler] [Confirmer l'absence]
+
+TÂCHE 4 : PAGE MINISTÈRE (Nouvelle Feature)
+Crée une route `/ministry/dashboard` et un template `admin/ministry.html`.
+Design : Très épuré, "Data-Viz", fond gris clair.
+Contenu :
+- Cartes de Statut : "Médecins Actifs", "Villes Couvertes", "Taux de No-Show National".
+- Section "Alertes Sanitaires" : Liste des foyers épidémiques potentiels détectés par TBIB.
+- Section "Carte de Chaleur" (Placeholder visuel) : "Déserts médicaux identifiés".
+
+TÂCHE 5 : PAGE PROFIL MÉDECIN (Vue Publique)
+Assure-toi que la route `/doctor/profile` (vue publique) est belle et accessible via le bouton "Mon Profil Public" de la sidebar. Elle doit montrer : Photo, Bio, Spécialités, et le Calendrier de réservation pour les patients.
+
+RÉSUMÉ TECHNIQUE :
+- Utilise Tailwind CSS pour tout.
+- Conserve la logique SmartFlow (Overbooking) existante.
+- Restaure l'accès aux pages `doctor_settings.html`.
+- Ne casse pas la base de données existante.

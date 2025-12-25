@@ -1,59 +1,12 @@
-{% extends 'base.html' %}
+{% extends 'layout_doctor.html' %}
 
-{% block title %}Doctor Dashboard - TBIB{% endblock %}
+{% block title %}Cockpit - TBIB{% endblock %}
+{% block page_title %}Cockpit{% endblock %}
+{% block page_subtitle %}Vue en temps réel de votre journée{% endblock %}
 
 {% block content %}
-<div class="min-h-screen bg-[#F8F9FA] p-6 md:p-10 font-sans" x-data="dashboardApp()" x-init="init()">
-    <div class="max-w-7xl mx-auto space-y-8">
-
-        <!-- Header -->
-        <div
-            class="flex flex-col md:flex-row md:items-center justify-between bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-            <div class="flex items-center gap-5">
-                <!-- Avatar -->
-                <div
-                    class="h-16 w-16 rounded-full bg-[#3cc7a7]/10 flex items-center justify-center text-[#3cc7a7] text-2xl font-bold ring-2 ring-offset-2 ring-[#3cc7a7]/20">
-                    {{ current_user.name[0] | upper if current_user.is_authenticated else 'D' }}
-                </div>
-                <div>
-                    <h1 class="text-2xl font-bold text-[#333333]">Dr. {{ current_user.name if
-                        current_user.is_authenticated else 'Ahmed Benali' }}</h1>
-                    <div class="flex items-center gap-3 mt-1.5">
-                        <!-- KYC Badge -->
-                        <span
-                            class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold tracking-wide bg-[#3cc7a7]/10 text-[#3cc7a7] border border-[#3cc7a7]/20">
-                            <svg class="mr-1.5 h-3 w-3" fill="currentColor" viewBox="0 0 8 8">
-                                <circle cx="4" cy="4" r="3" />
-                            </svg>
-                            KYC VERIFIED
-                        </span>
-                        <span class="text-gray-400 text-sm font-medium flex items-center">
-                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z">
-                                </path>
-                            </svg>
-                            {{ doctor_profile.specialty if doctor_profile else 'Médecin' }}
-                        </span>
-                    </div>
-                </div>
-            </div>
-            <div class="mt-4 md:mt-0 flex flex-col items-end gap-3">
-                <a href="{{ url_for('main.doctor_patients') }}" 
-                   class="inline-flex items-center gap-2 px-4 py-2.5 bg-red-500 hover:bg-red-600 text-white font-bold rounded-xl shadow-sm transition-all text-sm">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
-                    </svg>
-                    Urgence / Forcer RDV
-                </a>
-                <div class="text-right">
-                    <p class="text-xs text-gray-400 uppercase tracking-wider font-semibold">Date du jour</p>
-                    <p class="text-lg font-bold text-[#333333]"
-                        x-text="new Date().toLocaleDateString('fr-FR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })">
-                    </p>
-                </div>
-            </div>
-        </div>
+<div x-data="dashboardApp()" x-init="init()">
+    <div class="space-y-6">
 
         <!-- Control Center & Drift Alert -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -451,8 +404,8 @@
             },
 
             init() {
+                window.tbibDashboard = this;
                 this.fetchData();
-                // Actualise toutes les 30 secondes
                 setInterval(() => this.fetchData(), 30000);
             },
 
