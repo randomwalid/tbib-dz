@@ -274,6 +274,8 @@ def login():
             login_user(user)
             if user.role == 'doctor':
                 return redirect(url_for('main.doctor_dashboard'))
+            if user.role == 'secretary':
+                return redirect(url_for('main.secretary_dashboard'))
             if next_url:
                 return redirect(next_url)
             return redirect(url_for('main.home'))
@@ -1609,12 +1611,16 @@ def doctor_settings():
             'start_time': slot.start_time.strftime('%H:%M') if slot.start_time else '08:00',
             'end_time': slot.end_time.strftime('%H:%M') if slot.end_time else '17:00'
         }
+    
+    # Charger les secrétaires liées à ce médecin
+    secretaries = User.query.filter_by(role='secretary', linked_doctor_id=doctor_profile.id).all()
 
     return render_template('doctor_settings.html',
                            doctor=doctor_profile,
                            consultation_types=consultation_types,
                            absences=absences,
                            availability=availability,
+                           secretaries=secretaries,
                            t=get_t(),
                            lang=session.get('lang', 'fr'))
 
@@ -1782,6 +1788,80 @@ def delete_absence(absence_id):
 
     return jsonify({'success': True})
 
+
+# ============================================================
+# GESTION D'ÉQUIPE - SECRÉTAIRES
+# ============================================================
+
+@main_bp.route('/doctor/settings/secretary', methods=['POST'])
+@login_required
+def add_secretary():
+    """Créer un compte secrétaire lié à ce médecin."""
+    if current_user.role != 'doctor':
+        return jsonify({'error': 'Unauthorized'}), 403
+    
+    data = request.get_json()
+    name = data.get('name', '').strip()
+    email = data.get('email', '').strip()
+    password = data.get('password', '')
+    can_view_medical = data.get('can_view_medical', False)
+    
+    if not name or not email or not password:
+        return jsonify({'error': 'Tous les champs sont requis'}), 400
+    
+    # Vérifier si l'email existe déjà
+    if User.query.filter_by(email=email).first():
+        return jsonify({'error': 'Cet email est déjà utilisé'}), 400
+    
+    secretary = User(
+        email=email,
+        name=name,
+        role='secretary',
+        linked_doctor_id=current_user.doctor_profile.id,
+        can_view_medical_records=can_view_medical
+    )
+    secretary.set_password(password)
+    
+    db.session.add(secretary)
+    db.session.commit()
+    
+    current_app.logger.info(f"Secretary {secretary.id} created by doctor {current_user.id}")
+    return jsonify({'success': True, 'id': secretary.id})
+
+
+@main_bp.route('/doctor/settings/secretary/<int:secretary_id>', methods=['DELETE'])
+@login_required
+def delete_secretary(secretary_id):
+    """Supprimer un compte secrétaire."""
+    if current_user.role != 'doctor':
+        return jsonify({'error': 'Unauthorized'}), 403
+    
+    secretary = User.query.get_or_404(secretary_id)
+    if secretary.linked_doctor_id != current_user.doctor_profile.id:
+        return jsonify({'error': 'Unauthorized'}), 403
+    
+    db.session.delete(secretary)
+    db.session.commit()
+    
+    return jsonify({'success': True})
+
+
+@main_bp.route('/doctor/settings/secretary/<int:secretary_id>/delegation', methods=['POST'])
+@login_required
+def toggle_secretary_delegation(secretary_id):
+    """Activer/désactiver l'accès aux dossiers médicaux pour une secrétaire."""
+    if current_user.role != 'doctor':
+        return jsonify({'error': 'Unauthorized'}), 403
+    
+    secretary = User.query.get_or_404(secretary_id)
+    if secretary.linked_doctor_id != current_user.doctor_profile.id:
+        return jsonify({'error': 'Unauthorized'}), 403
+    
+    data = request.get_json()
+    secretary.can_view_medical_records = data.get('can_view_medical_records', False)
+    db.session.commit()
+    
+    return jsonify({'success': True})
 
 @main_bp.route('/api/doctors/<int:doctor_id>/consultation-types')
 def get_consultation_types(doctor_id):

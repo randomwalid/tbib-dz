@@ -9,135 +9,149 @@
         <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
             <div class="border-b border-gray-100">
                 <nav class="flex -mb-px">
-                    <button @click="activeTab = 'profile'" 
-                            :class="activeTab === 'profile' ? 'border-[#14b999] text-[#14b999]' : 'border-transparent text-gray-500 hover:text-gray-700'"
-                            class="px-6 py-4 text-sm font-medium border-b-2 transition">
+                    <button @click="activeTab = 'profile'"
+                        :class="activeTab === 'profile' ? 'border-[#14b999] text-[#14b999]' : 'border-transparent text-gray-500 hover:text-gray-700'"
+                        class="px-6 py-4 text-sm font-medium border-b-2 transition">
                         Informations publiques
                     </button>
-                    <button @click="activeTab = 'consultations'" 
-                            :class="activeTab === 'consultations' ? 'border-[#14b999] text-[#14b999]' : 'border-transparent text-gray-500 hover:text-gray-700'"
-                            class="px-6 py-4 text-sm font-medium border-b-2 transition">
+                    <button @click="activeTab = 'consultations'"
+                        :class="activeTab === 'consultations' ? 'border-[#14b999] text-[#14b999]' : 'border-transparent text-gray-500 hover:text-gray-700'"
+                        class="px-6 py-4 text-sm font-medium border-b-2 transition">
                         Types de consultation
                     </button>
-                    <button @click="activeTab = 'schedule'" 
-                            :class="activeTab === 'schedule' ? 'border-[#14b999] text-[#14b999]' : 'border-transparent text-gray-500 hover:text-gray-700'"
-                            class="px-6 py-4 text-sm font-medium border-b-2 transition">
+                    <button @click="activeTab = 'schedule'"
+                        :class="activeTab === 'schedule' ? 'border-[#14b999] text-[#14b999]' : 'border-transparent text-gray-500 hover:text-gray-700'"
+                        class="px-6 py-4 text-sm font-medium border-b-2 transition">
                         Horaires & Absences
+                    </button>
+                    <button @click="activeTab = 'team'"
+                        :class="activeTab === 'team' ? 'border-[#14b999] text-[#14b999]' : 'border-transparent text-gray-500 hover:text-gray-700'"
+                        class="px-6 py-4 text-sm font-medium border-b-2 transition">
+                        👥 Mon Équipe
                     </button>
                 </nav>
             </div>
-            
+
             <div x-show="activeTab === 'profile'" class="p-6">
                 <form action="{{ url_for('main.doctor_settings_profile') }}" method="POST" class="space-y-6">
                     <div class="grid md:grid-cols-2 gap-6">
                         <div class="md:col-span-2">
                             <label class="block text-sm font-medium text-gray-700 mb-1">Photo de profil (URL)</label>
-                            <input type="text" name="profile_picture" value="{{ doctor.profile_picture or '' }}" 
-                                   class="w-full border border-gray-200 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-[#14b999]/20 focus:border-[#14b999]"
-                                   placeholder="https://example.com/photo.jpg">
+                            <input type="text" name="profile_picture" value="{{ doctor.profile_picture or '' }}"
+                                class="w-full border border-gray-200 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-[#14b999]/20 focus:border-[#14b999]"
+                                placeholder="https://example.com/photo.jpg">
                             {% if doctor.profile_picture %}
-                            <img src="{{ doctor.profile_picture }}" alt="Preview" class="mt-2 w-20 h-20 rounded-full object-cover">
+                            <img src="{{ doctor.profile_picture }}" alt="Preview"
+                                class="mt-2 w-20 h-20 rounded-full object-cover">
                             {% endif %}
                         </div>
-                        
+
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Nom complet</label>
                             <input type="text" name="name" value="{{ doctor.user.name }}" required
-                                   class="w-full border border-gray-200 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-[#14b999]/20 focus:border-[#14b999]">
+                                class="w-full border border-gray-200 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-[#14b999]/20 focus:border-[#14b999]">
                         </div>
-                        
+
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Spécialité</label>
                             <input type="text" name="specialty" value="{{ doctor.specialty }}" required
-                                   class="w-full border border-gray-200 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-[#14b999]/20 focus:border-[#14b999]">
+                                class="w-full border border-gray-200 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-[#14b999]/20 focus:border-[#14b999]">
                         </div>
-                        
+
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Ville</label>
                             <input type="text" name="city" value="{{ doctor.city }}" required
-                                   class="w-full border border-gray-200 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-[#14b999]/20 focus:border-[#14b999]">
+                                class="w-full border border-gray-200 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-[#14b999]/20 focus:border-[#14b999]">
                         </div>
-                        
+
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Adresse du cabinet</label>
                             <input type="text" name="address" value="{{ doctor.address or '' }}"
-                                   class="w-full border border-gray-200 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-[#14b999]/20 focus:border-[#14b999]"
-                                   placeholder="123 Rue Example, Alger">
+                                class="w-full border border-gray-200 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-[#14b999]/20 focus:border-[#14b999]"
+                                placeholder="123 Rue Example, Alger">
                         </div>
-                        
+
                         <div class="md:col-span-2">
                             <label class="block text-sm font-medium text-gray-700 mb-1">Présentation / Bio</label>
                             <textarea name="bio" rows="4"
-                                      class="w-full border border-gray-200 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-[#14b999]/20 focus:border-[#14b999]"
-                                      placeholder="Décrivez votre parcours, votre approche...">{{ doctor.bio or '' }}</textarea>
+                                class="w-full border border-gray-200 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-[#14b999]/20 focus:border-[#14b999]"
+                                placeholder="Décrivez votre parcours, votre approche...">{{ doctor.bio or '' }}</textarea>
                         </div>
-                        
+
                         <div class="md:col-span-2">
                             <label class="block text-sm font-medium text-gray-700 mb-1">Diplômes et formations</label>
                             <textarea name="diplomas" rows="3"
-                                      class="w-full border border-gray-200 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-[#14b999]/20 focus:border-[#14b999]"
-                                      placeholder="Doctorat en médecine, Université d'Alger (2015)&#10;Spécialisation en cardiologie, CHU Mustapha (2020)">{{ doctor.diplomas or '' }}</textarea>
+                                class="w-full border border-gray-200 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-[#14b999]/20 focus:border-[#14b999]"
+                                placeholder="Doctorat en médecine, Université d'Alger (2015)&#10;Spécialisation en cardiologie, CHU Mustapha (2020)">{{ doctor.diplomas or '' }}</textarea>
                         </div>
-                        
+
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Langues parlées</label>
                             <input type="text" name="languages" value="{{ doctor.languages or '' }}"
-                                   class="w-full border border-gray-200 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-[#14b999]/20 focus:border-[#14b999]"
-                                   placeholder="Français, Arabe, Anglais">
+                                class="w-full border border-gray-200 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-[#14b999]/20 focus:border-[#14b999]"
+                                placeholder="Français, Arabe, Anglais">
                         </div>
-                        
+
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Moyens de paiement acceptés</label>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Moyens de paiement
+                                acceptés</label>
                             <input type="text" name="payment_methods" value="{{ doctor.payment_methods or '' }}"
-                                   class="w-full border border-gray-200 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-[#14b999]/20 focus:border-[#14b999]"
-                                   placeholder="Espèces, CIB, Chèque">
+                                class="w-full border border-gray-200 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-[#14b999]/20 focus:border-[#14b999]"
+                                placeholder="Espèces, CIB, Chèque">
                         </div>
-                        
+
                         <div class="md:col-span-2">
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Expertises / Domaines de compétence</label>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Expertises / Domaines de
+                                compétence</label>
                             <input type="text" name="expertises" value="{{ doctor.expertises or '' }}"
-                                   class="w-full border border-gray-200 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-[#14b999]/20 focus:border-[#14b999]"
-                                   placeholder="Échocardiographie, Cardiologie interventionnelle, Prévention cardiovasculaire">
+                                class="w-full border border-gray-200 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-[#14b999]/20 focus:border-[#14b999]"
+                                placeholder="Échocardiographie, Cardiologie interventionnelle, Prévention cardiovasculaire">
                         </div>
                     </div>
-                    
+
                     <div class="flex justify-end pt-4 border-t border-gray-100">
-                        <button type="submit" class="px-6 py-2.5 bg-[#14b999] text-white rounded-lg hover:bg-[#0d9479] transition font-medium">
+                        <button type="submit"
+                            class="px-6 py-2.5 bg-[#14b999] text-white rounded-lg hover:bg-[#0d9479] transition font-medium">
                             Enregistrer les modifications
                         </button>
                     </div>
                 </form>
             </div>
-            
+
             <div x-show="activeTab === 'consultations'" x-cloak class="p-6">
                 <div class="flex items-center justify-between mb-4">
                     <p class="text-sm text-gray-500">Définissez vos types de consultation avec durée et tarif</p>
-                    <button @click="showTypeModal = true" class="text-sm bg-[#14b999] text-white px-4 py-2 rounded-lg hover:bg-[#0d9479] transition font-medium">
+                    <button @click="showTypeModal = true"
+                        class="text-sm bg-[#14b999] text-white px-4 py-2 rounded-lg hover:bg-[#0d9479] transition font-medium">
                         + Ajouter un type
                     </button>
                 </div>
-                
+
                 <div class="border border-gray-100 rounded-lg divide-y divide-gray-50">
                     {% if consultation_types %}
-                        {% for ct in consultation_types %}
-                        <div class="p-4 flex items-center justify-between hover:bg-gray-50" id="type-{{ ct.id }}">
-                            <div class="flex items-center gap-3">
-                                <div class="w-4 h-4 rounded-full flex-shrink-0" style="background-color: {{ ct.color }}"></div>
-                                <div>
-                                    <p class="font-medium text-gray-800">{{ ct.name }}</p>
-                                    <p class="text-sm text-gray-500">
-                                        {{ ct.duration }} min
-                                        {% if ct.price %} · {{ ct.price }} DZD{% endif %}
-                                        {% if ct.is_emergency_only %}<span class="text-amber-600"> · Urgence</span>{% endif %}
-                                        {% if ct.require_existing_patient %}<span class="text-blue-600"> · Suivi</span>{% endif %}
-                                    </p>
-                                </div>
+                    {% for ct in consultation_types %}
+                    <div class="p-4 flex items-center justify-between hover:bg-gray-50" id="type-{{ ct.id }}">
+                        <div class="flex items-center gap-3">
+                            <div class="w-4 h-4 rounded-full flex-shrink-0" style="background-color: {{ ct.color }}">
                             </div>
-                            <button @click="deleteType({{ ct.id }})" class="text-red-500 hover:text-red-600 text-sm font-medium">
-                                Supprimer
-                            </button>
+                            <div>
+                                <p class="font-medium text-gray-800">{{ ct.name }}</p>
+                                <p class="text-sm text-gray-500">
+                                    {{ ct.duration }} min
+                                    {% if ct.price %} · {{ ct.price }} DZD{% endif %}
+                                    {% if ct.is_emergency_only %}<span class="text-amber-600"> · Urgence</span>{% endif
+                                    %}
+                                    {% if ct.require_existing_patient %}<span class="text-blue-600"> · Suivi</span>{%
+                                    endif %}
+                                </p>
+                            </div>
                         </div>
-                        {% endfor %}
+                        <button @click="deleteType({{ ct.id }})"
+                            class="text-red-500 hover:text-red-600 text-sm font-medium">
+                            Supprimer
+                        </button>
+                    </div>
+                    {% endfor %}
                     {% else %}
                     <div class="p-8 text-center text-gray-500">
                         <p>Aucun type de consultation configuré</p>
@@ -146,7 +160,7 @@
                     {% endif %}
                 </div>
             </div>
-            
+
             <div x-show="activeTab === 'schedule'" x-cloak class="p-6 space-y-6">
                 <div>
                     <h3 class="font-semibold text-gray-800 mb-4">Horaires hebdomadaires</h3>
@@ -157,54 +171,58 @@
                             {% set slot = availability.get(i, {}) %}
                             <div class="flex items-center gap-4 p-3 bg-gray-50 rounded-lg">
                                 <label class="flex items-center gap-2 w-32">
-                                    <input type="checkbox" name="day_{{ i }}_active" value="1" 
-                                           {% if slot.get('is_available', False) %}checked{% endif %}
-                                           class="rounded border-gray-300 text-[#14b999] focus:ring-[#14b999]">
+                                    <input type="checkbox" name="day_{{ i }}_active" value="1" {% if
+                                        slot.get('is_available', False) %}checked{% endif %}
+                                        class="rounded border-gray-300 text-[#14b999] focus:ring-[#14b999]">
                                     <span class="text-sm font-medium text-gray-700">{{ days[i] }}</span>
                                 </label>
                                 <div class="flex items-center gap-2">
-                                    <input type="time" name="day_{{ i }}_start" 
-                                           value="{{ slot.get('start_time', '08:00') }}"
-                                           class="border border-gray-200 rounded px-2 py-1 text-sm focus:ring-2 focus:ring-[#14b999]/20 focus:border-[#14b999]">
+                                    <input type="time" name="day_{{ i }}_start"
+                                        value="{{ slot.get('start_time', '08:00') }}"
+                                        class="border border-gray-200 rounded px-2 py-1 text-sm focus:ring-2 focus:ring-[#14b999]/20 focus:border-[#14b999]">
                                     <span class="text-gray-400">à</span>
-                                    <input type="time" name="day_{{ i }}_end" 
-                                           value="{{ slot.get('end_time', '17:00') }}"
-                                           class="border border-gray-200 rounded px-2 py-1 text-sm focus:ring-2 focus:ring-[#14b999]/20 focus:border-[#14b999]">
+                                    <input type="time" name="day_{{ i }}_end"
+                                        value="{{ slot.get('end_time', '17:00') }}"
+                                        class="border border-gray-200 rounded px-2 py-1 text-sm focus:ring-2 focus:ring-[#14b999]/20 focus:border-[#14b999]">
                                 </div>
                             </div>
                             {% endfor %}
                         </div>
                         <div class="mt-4 flex justify-end">
-                            <button type="submit" class="px-6 py-2.5 bg-[#14b999] text-white rounded-lg hover:bg-[#0d9479] transition font-medium">
+                            <button type="submit"
+                                class="px-6 py-2.5 bg-[#14b999] text-white rounded-lg hover:bg-[#0d9479] transition font-medium">
                                 Enregistrer les horaires
                             </button>
                         </div>
                     </form>
                 </div>
-                
+
                 <div class="border-t border-gray-100 pt-6">
                     <div class="flex items-center justify-between mb-4">
                         <h3 class="font-semibold text-gray-800">Absences et congés</h3>
-                        <button @click="showAbsenceModal = true" class="text-sm bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 transition font-medium">
+                        <button @click="showAbsenceModal = true"
+                            class="text-sm bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 transition font-medium">
                             + Poser une absence
                         </button>
                     </div>
-                    
+
                     <div class="border border-gray-100 rounded-lg divide-y divide-gray-50">
                         {% if absences %}
-                            {% for absence in absences %}
-                            <div class="p-4 flex items-center justify-between" id="absence-{{ absence.id }}">
-                                <div>
-                                    <p class="font-medium text-gray-800">
-                                        {{ absence.start_date.strftime('%d/%m/%Y') }} → {{ absence.end_date.strftime('%d/%m/%Y') }}
-                                    </p>
-                                    <p class="text-sm text-gray-500">{{ absence.reason or 'Pas de motif spécifié' }}</p>
-                                </div>
-                                <button @click="deleteAbsence({{ absence.id }})" class="text-red-500 hover:text-red-600 text-sm font-medium">
-                                    Supprimer
-                                </button>
+                        {% for absence in absences %}
+                        <div class="p-4 flex items-center justify-between" id="absence-{{ absence.id }}">
+                            <div>
+                                <p class="font-medium text-gray-800">
+                                    {{ absence.start_date.strftime('%d/%m/%Y') }} → {{
+                                    absence.end_date.strftime('%d/%m/%Y') }}
+                                </p>
+                                <p class="text-sm text-gray-500">{{ absence.reason or 'Pas de motif spécifié' }}</p>
                             </div>
-                            {% endfor %}
+                            <button @click="deleteAbsence({{ absence.id }})"
+                                class="text-red-500 hover:text-red-600 text-sm font-medium">
+                                Supprimer
+                            </button>
+                        </div>
+                        {% endfor %}
                         {% else %}
                         <div class="p-6 text-center text-gray-500">
                             Aucune absence programmée
@@ -213,22 +231,78 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Onglet Mon Équipe -->
+            <div x-show="activeTab === 'team'" x-cloak class="p-6">
+                <div class="flex items-center justify-between mb-6">
+                    <div>
+                        <h3 class="font-semibold text-gray-800">Mon Équipe</h3>
+                        <p class="text-sm text-gray-500">Gérez les comptes de vos secrétaires et assistantes</p>
+                    </div>
+                    <button @click="showSecretaryModal = true"
+                        class="text-sm bg-[#14b999] text-white px-4 py-2 rounded-lg hover:bg-[#0d9479] transition font-medium">
+                        + Ajouter une secrétaire
+                    </button>
+                </div>
+
+                <div class="border border-gray-100 rounded-lg divide-y divide-gray-50">
+                    {% if secretaries %}
+                    {% for secretary in secretaries %}
+                    <div class="p-4 flex items-center justify-between" id="secretary-{{ secretary.id }}">
+                        <div class="flex items-center gap-3">
+                            <div
+                                class="w-10 h-10 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center font-bold">
+                                {{ secretary.name[:2].upper() }}
+                            </div>
+                            <div>
+                                <p class="font-medium text-gray-800">{{ secretary.name }}</p>
+                                <p class="text-sm text-gray-500">{{ secretary.email }}</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <label class="flex items-center gap-2 text-sm">
+                                <input type="checkbox" {% if secretary.can_view_medical_records %}checked{% endif %}
+                                    onchange="toggleDelegation({{ secretary.id }}, this.checked)"
+                                    class="rounded border-gray-300 text-[#14b999] focus:ring-[#14b999]">
+                                Voir dossiers
+                            </label>
+                            <button onclick="deleteSecretary({{ secretary.id }})"
+                                class="text-red-500 hover:text-red-600 text-sm font-medium">
+                                Supprimer
+                            </button>
+                        </div>
+                    </div>
+                    {% endfor %}
+                    {% else %}
+                    <div class="p-8 text-center text-gray-500">
+                        <span class="text-4xl block mb-2">👥</span>
+                        <p>Aucune secrétaire configurée</p>
+                        <p class="text-sm mt-1">Ajoutez une secrétaire pour déléguer la gestion des rendez-vous</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
         </div>
-        
-        <div x-show="showTypeModal" x-cloak class="fixed inset-0 bg-black/50 flex items-center justify-center z-50" @click.self="showTypeModal = false">
+
+
+        <div x-show="showTypeModal" x-cloak class="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
+            @click.self="showTypeModal = false">
             <div class="bg-white rounded-2xl shadow-xl w-full max-w-md mx-4 p-6">
                 <h3 class="text-lg font-semibold text-gray-800 mb-4">Nouveau type de consultation</h3>
-                
+
                 <div class="space-y-4">
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Nom</label>
-                        <input type="text" x-model="newType.name" class="w-full border border-gray-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-[#14b999]/20 focus:border-[#14b999]" placeholder="Ex: Consultation suivi">
+                        <input type="text" x-model="newType.name"
+                            class="w-full border border-gray-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-[#14b999]/20 focus:border-[#14b999]"
+                            placeholder="Ex: Consultation suivi">
                     </div>
-                    
+
                     <div class="grid grid-cols-2 gap-4">
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Durée (min)</label>
-                            <select x-model="newType.duration" class="w-full border border-gray-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-[#14b999]/20 focus:border-[#14b999]">
+                            <select x-model="newType.duration"
+                                class="w-full border border-gray-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-[#14b999]/20 focus:border-[#14b999]">
                                 <option value="15">15 min</option>
                                 <option value="30" selected>30 min</option>
                                 <option value="45">45 min</option>
@@ -237,75 +311,133 @@
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Prix (DZD)</label>
-                            <input type="text" x-model="newType.price" class="w-full border border-gray-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-[#14b999]/20 focus:border-[#14b999]" placeholder="2000">
+                            <input type="text" x-model="newType.price"
+                                class="w-full border border-gray-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-[#14b999]/20 focus:border-[#14b999]"
+                                placeholder="2000">
                         </div>
                     </div>
-                    
+
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Couleur</label>
                         <div class="flex gap-2">
                             <template x-for="color in colors" :key="color">
-                                <button type="button" 
-                                        @click="newType.color = color"
-                                        :class="newType.color === color ? 'ring-2 ring-offset-2 ring-gray-400' : ''"
-                                        class="w-8 h-8 rounded-full transition"
-                                        :style="'background-color: ' + color">
+                                <button type="button" @click="newType.color = color"
+                                    :class="newType.color === color ? 'ring-2 ring-offset-2 ring-gray-400' : ''"
+                                    class="w-8 h-8 rounded-full transition" :style="'background-color: ' + color">
                                 </button>
                             </template>
                         </div>
                     </div>
-                    
+
                     <div class="space-y-2">
                         <label class="flex items-center gap-2 cursor-pointer">
-                            <input type="checkbox" x-model="newType.is_emergency_only" class="rounded border-gray-300 text-[#14b999] focus:ring-[#14b999]">
+                            <input type="checkbox" x-model="newType.is_emergency_only"
+                                class="rounded border-gray-300 text-[#14b999] focus:ring-[#14b999]">
                             <span class="text-sm text-gray-700">Urgence uniquement (réservable 24h avant)</span>
                         </label>
                         <label class="flex items-center gap-2 cursor-pointer">
-                            <input type="checkbox" x-model="newType.require_existing_patient" class="rounded border-gray-300 text-[#14b999] focus:ring-[#14b999]">
+                            <input type="checkbox" x-model="newType.require_existing_patient"
+                                class="rounded border-gray-300 text-[#14b999] focus:ring-[#14b999]">
                             <span class="text-sm text-gray-700">Patients existants uniquement</span>
                         </label>
                     </div>
                 </div>
-                
+
                 <div class="flex gap-3 mt-6">
-                    <button @click="showTypeModal = false" class="flex-1 px-4 py-2 border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-50 transition font-medium">
+                    <button @click="showTypeModal = false"
+                        class="flex-1 px-4 py-2 border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-50 transition font-medium">
                         Annuler
                     </button>
-                    <button @click="addType()" class="flex-1 px-4 py-2 bg-[#14b999] text-white rounded-lg hover:bg-[#0d9479] transition font-medium">
+                    <button @click="addType()"
+                        class="flex-1 px-4 py-2 bg-[#14b999] text-white rounded-lg hover:bg-[#0d9479] transition font-medium">
                         Ajouter
                     </button>
                 </div>
             </div>
         </div>
-        
-        <div x-show="showAbsenceModal" x-cloak class="fixed inset-0 bg-black/50 flex items-center justify-center z-50" @click.self="showAbsenceModal = false">
+
+        <div x-show="showAbsenceModal" x-cloak class="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
+            @click.self="showAbsenceModal = false">
             <div class="bg-white rounded-2xl shadow-xl w-full max-w-md mx-4 p-6">
                 <h3 class="text-lg font-semibold text-gray-800 mb-4">Nouvelle absence</h3>
-                
+
                 <div class="space-y-4">
                     <div class="grid grid-cols-2 gap-4">
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Date de début</label>
-                            <input type="date" x-model="newAbsence.start_date" class="w-full border border-gray-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-[#14b999]/20 focus:border-[#14b999]">
+                            <input type="date" x-model="newAbsence.start_date"
+                                class="w-full border border-gray-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-[#14b999]/20 focus:border-[#14b999]">
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Date de fin</label>
-                            <input type="date" x-model="newAbsence.end_date" class="w-full border border-gray-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-[#14b999]/20 focus:border-[#14b999]">
+                            <input type="date" x-model="newAbsence.end_date"
+                                class="w-full border border-gray-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-[#14b999]/20 focus:border-[#14b999]">
                         </div>
                     </div>
-                    
+
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Motif (optionnel)</label>
-                        <input type="text" x-model="newAbsence.reason" class="w-full border border-gray-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-[#14b999]/20 focus:border-[#14b999]" placeholder="Ex: Vacances, Formation...">
+                        <input type="text" x-model="newAbsence.reason"
+                            class="w-full border border-gray-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-[#14b999]/20 focus:border-[#14b999]"
+                            placeholder="Ex: Vacances, Formation...">
                     </div>
                 </div>
-                
+
                 <div class="flex gap-3 mt-6">
-                    <button @click="showAbsenceModal = false" class="flex-1 px-4 py-2 border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-50 transition font-medium">
+                    <button @click="showAbsenceModal = false"
+                        class="flex-1 px-4 py-2 border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-50 transition font-medium">
                         Annuler
                     </button>
-                    <button @click="addAbsence()" class="flex-1 px-4 py-2 bg-[#14b999] text-white rounded-lg hover:bg-[#0d9479] transition font-medium">
+                    <button @click="addAbsence()"
+                        class="flex-1 px-4 py-2 bg-[#14b999] text-white rounded-lg hover:bg-[#0d9479] transition font-medium">
                         Ajouter
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modale Ajouter Secrétaire -->
+        <div x-show="showSecretaryModal" x-cloak class="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
+            @click.self="showSecretaryModal = false">
+            <div class="bg-white rounded-2xl shadow-xl w-full max-w-md mx-4 p-6">
+                <h3 class="text-lg font-semibold text-gray-800 mb-4">👥 Ajouter une secrétaire</h3>
+
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Nom complet *</label>
+                        <input type="text" x-model="newSecretary.name" dir="auto"
+                            class="w-full border border-gray-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-[#14b999]/20 focus:border-[#14b999]"
+                            placeholder="Sarah / سارة">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Email *</label>
+                        <input type="email" x-model="newSecretary.email"
+                            class="w-full border border-gray-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-[#14b999]/20 focus:border-[#14b999]"
+                            placeholder="sarah@cabinet.dz">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Mot de passe *</label>
+                        <input type="password" x-model="newSecretary.password"
+                            class="w-full border border-gray-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-[#14b999]/20 focus:border-[#14b999]"
+                            placeholder="••••••••">
+                    </div>
+                    <div>
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="checkbox" x-model="newSecretary.can_view_medical"
+                                class="rounded border-gray-300 text-[#14b999] focus:ring-[#14b999]">
+                            <span class="text-sm text-gray-700">Autoriser l'accès aux dossiers médicaux</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="flex gap-3 mt-6">
+                    <button @click="showSecretaryModal = false"
+                        class="flex-1 px-4 py-2 border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-50 transition font-medium">
+                        Annuler
+                    </button>
+                    <button @click="addSecretary()"
+                        class="flex-1 px-4 py-2 bg-[#14b999] text-white rounded-lg hover:bg-[#0d9479] transition font-medium">
+                        Créer le compte
                     </button>
                 </div>
             </div>
@@ -316,106 +448,157 @@
 
 {% block scripts %}
 <script>
-function settingsApp() {
-    return {
-        activeTab: 'profile',
-        showTypeModal: false,
-        showAbsenceModal: false,
-        colors: ['#14b999', '#3b82f6', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'],
-        newType: {
-            name: '',
-            duration: 30,
-            price: '',
-            color: '#14b999',
-            is_emergency_only: false,
-            require_existing_patient: false
-        },
-        newAbsence: {
-            start_date: '',
-            end_date: '',
-            reason: ''
-        },
-        
-        addType() {
-            if (!this.newType.name) {
-                alert('Veuillez entrer un nom');
-                return;
+    function settingsApp() {
+        return {
+            activeTab: 'profile',
+            showTypeModal: false,
+            showAbsenceModal: false,
+            showSecretaryModal: false,
+            colors: ['#14b999', '#3b82f6', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'],
+            newType: {
+                name: '',
+                duration: 30,
+                price: '',
+                color: '#14b999',
+                is_emergency_only: false,
+                require_existing_patient: false
+            },
+            newAbsence: {
+                start_date: '',
+                end_date: '',
+                reason: ''
+            },
+            newSecretary: {
+                name: '',
+                email: '',
+                password: '',
+                can_view_medical: false
+            },
+
+            addSecretary() {
+                if (!this.newSecretary.name || !this.newSecretary.email || !this.newSecretary.password) {
+                    alert('Veuillez remplir tous les champs obligatoires');
+                    return;
+                }
+                fetch('/doctor/settings/secretary', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(this.newSecretary)
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            location.reload();
+                        } else {
+                            alert(data.error || 'Erreur lors de la création');
+                        }
+                    });
+            },
+
+
+            addType() {
+                if (!this.newType.name) {
+                    alert('Veuillez entrer un nom');
+                    return;
+                }
+                fetch('/doctor/settings/consultation-type', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(this.newType)
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            location.reload();
+                        }
+                    });
+            },
+
+            deleteType(id) {
+                if (!confirm('Supprimer ce type de consultation ?')) return;
+
+                fetch(`/doctor/settings/consultation-type/${id}`, {
+                    method: 'DELETE'
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            document.getElementById(`type-${id}`).remove();
+                        }
+                    });
+            },
+
+            addAbsence(force = false) {
+                if (!this.newAbsence.start_date || !this.newAbsence.end_date) {
+                    alert('Veuillez sélectionner les dates');
+                    return;
+                }
+                const data = {
+                    start_date: this.newAbsence.start_date + 'T00:00:00',
+                    end_date: this.newAbsence.end_date + 'T23:59:59',
+                    reason: this.newAbsence.reason,
+                    force: force
+                };
+
+                fetch('/doctor/settings/absence', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                })
+                    .then(async response => {
+                        if (response.status === 409) {
+                            const errorData = await response.json();
+                            if (confirm(`Attention: Cette absence entrera en conflit avec ${errorData.conflict_count} rendez-vous existant(s).\n\nVoulez-vous annuler ces rendez-vous et créer l'absence quand même ?`)) {
+                                this.addAbsence(true);
+                            }
+                            return null;
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (data && data.success) {
+                            location.reload();
+                        }
+                    });
+            },
+
+            deleteAbsence(id) {
+                if (!confirm('Supprimer cette absence ?')) return;
+
+                fetch(`/doctor/settings/absence/${id}`, {
+                    method: 'DELETE'
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            document.getElementById(`absence-${id}`).remove();
+                        }
+                    });
             }
-            fetch('/doctor/settings/consultation-type', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(this.newType)
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    location.reload();
-                }
-            });
-        },
-        
-        deleteType(id) {
-            if (!confirm('Supprimer ce type de consultation ?')) return;
-            
-            fetch(`/doctor/settings/consultation-type/${id}`, {
-                method: 'DELETE'
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    document.getElementById(`type-${id}`).remove();
-                }
-            });
-        },
-        
-        addAbsence(force = false) {
-            if (!this.newAbsence.start_date || !this.newAbsence.end_date) {
-                alert('Veuillez sélectionner les dates');
-                return;
-            }
-            const data = {
-                start_date: this.newAbsence.start_date + 'T00:00:00',
-                end_date: this.newAbsence.end_date + 'T23:59:59',
-                reason: this.newAbsence.reason,
-                force: force
-            };
-            
-            fetch('/doctor/settings/absence', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(data)
-            })
-            .then(async response => {
-                if (response.status === 409) {
-                    const errorData = await response.json();
-                    if (confirm(`Attention: Cette absence entrera en conflit avec ${errorData.conflict_count} rendez-vous existant(s).\n\nVoulez-vous annuler ces rendez-vous et créer l'absence quand même ?`)) {
-                        this.addAbsence(true);
-                    }
-                    return null;
-                }
-                return response.json();
-            })
-            .then(data => {
-                if (data && data.success) {
-                    location.reload();
-                }
-            });
-        },
-        
-        deleteAbsence(id) {
-            if (!confirm('Supprimer cette absence ?')) return;
-            
-            fetch(`/doctor/settings/absence/${id}`, {
-                method: 'DELETE'
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    document.getElementById(`absence-${id}`).remove();
-                }
-            });
         }
     }
-}
+
+    // Fonctions globales pour la gestion d'équipe
+    function toggleDelegation(secretaryId, canView) {
+        fetch(`/doctor/settings/secretary/${secretaryId}/delegation`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ can_view_medical_records: canView })
+        });
+    }
+
+    function deleteSecretary(id) {
+        if (!confirm('Supprimer cette secrétaire ? Elle ne pourra plus accéder au système.')) return;
+
+        fetch(`/doctor/settings/secretary/${id}`, {
+            method: 'DELETE'
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById(`secretary-${id}`).remove();
+                }
+            });
+    }
 </script>
 {% endblock %}
