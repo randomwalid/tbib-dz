@@ -82,4 +82,11 @@ def create_app():
 
 if __name__ == '__main__':
     app = create_app()
+
+    # ✅ CRÉATION AUTOMATIQUE DES TABLES MANQUANTES (FIX E-WASSFA)
+    with app.app_context():
+        from models import Prescription  # Force la détection du modèle
+        db.create_all()
+        print("✅ Tables vérifiées/créées (y compris prescriptions)")
+
     app.run(host='0.0.0.0', port=5000, debug=True)
