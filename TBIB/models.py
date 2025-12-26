@@ -5,6 +5,13 @@ from datetime import datetime, date, time
 
 from extensions import db
 
+class Clinic(db.Model):
+    __tablename__ = 'clinics'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(150), nullable=False)
+    address = db.Column(db.String(255))
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
 class AppointmentMode(enum.Enum):
     TICKET_QUEUE = 'TICKET_QUEUE'
     SMART_RDV = 'SMART_RDV'
@@ -52,6 +59,11 @@ class User(UserMixin, db.Model):
     # === Secrétaire/Assistante ===
     # Lien vers le médecin (pour rôle secretary)
     linked_doctor_id = db.Column(db.Integer, db.ForeignKey('doctor_profiles.id'), nullable=True)
+
+    # Clinic Mesh
+    clinic_id = db.Column(db.Integer, db.ForeignKey('clinics.id'), nullable=True)
+    clinic = db.relationship('Clinic', backref='users')
+
     # Délégation: permet à la secrétaire de voir les dossiers médicaux
     can_view_medical_records = db.Column(db.Boolean, default=False)
 
