@@ -227,46 +227,46 @@ def contact():
 
 @main_bp.route('/')
 def home():
-    if current_user.is_authenticated and current_user.role == 'doctor':
-        return redirect(url_for('main.doctor_dashboard'))
+        if current_user.is_authenticated and current_user.role == 'doctor':
+            return redirect(url_for('main.doctor_dashboard'))
 
-    try:
-        doctor_count = DoctorProfile.query.count()
-    except:
-        db.create_all()
-        doctor_count = 0
+        try:
+            doctor_count = DoctorProfile.query.count()
+        except:
+            db.create_all()
+            doctor_count = 0
 
-    if doctor_count == 0:
-        print("⚠️ DATABASE EMPTY. INITIALIZING DEMO DATA...")
-        initialize_demo_data()
-        return redirect(url_for('main.home'))
+        if doctor_count == 0:
+            print("⚠ DATABASE EMPTY. INITIALIZING DEMO DATA...")
+            initialize_demo_data()
+            return redirect(url_for('main.home'))
 
-    specialty = request.args.get('specialty', '')
-    city = request.args.get('city', '')
+        specialty = request.args.get('specialty', '')
+        city = request.args.get('city', '')
+        search_mode = bool(specialty or city)
+        doctors = []
 
-    search_mode = bool(specialty or city)
-    doctors = []
+        if search_mode:
+            # ✅ FIX: Spécifie explicitement la condition de jointure
+            query = DoctorProfile.query.join(User, DoctorProfile.user_id == User.id)
+            if specialty:
+                query = query.filter(DoctorProfile.specialty.ilike(f'%{specialty}%'))
+            if city:
+                query = query.filter(DoctorProfile.city.ilike(f'%{city}%'))
+            doctors = query.all()
 
-    if search_mode:
-        query = DoctorProfile.query.join(User)
-        if specialty:
-            query = query.filter(DoctorProfile.specialty.ilike(f'%{specialty}%'))
-        if city:
-            query = query.filter(DoctorProfile.city.ilike(f'%{city}%'))
-        doctors = query.all()
+        specialties = db.session.query(DoctorProfile.specialty).distinct().all()
+        cities = db.session.query(DoctorProfile.city).distinct().all()
 
-    specialties = db.session.query(DoctorProfile.specialty).distinct().all()
-    cities = db.session.query(DoctorProfile.city).distinct().all()
-
-    return render_template('home.html', 
-                           doctors=doctors,
-                           search_mode=search_mode,
-                           specialties=[s[0] for s in specialties],
-                           cities=[c[0] for c in cities],
-                           selected_specialty=specialty,
-                           selected_city=city,
-                           t=get_t(), 
-                           lang=session.get('lang', 'fr'))
+        return render_template('home.html',
+                               doctors=doctors,
+                               search_mode=search_mode,
+                               specialties=[s[0] for s in specialties],
+                               cities=[c[0] for c in cities],
+                               selected_specialty=specialty,
+                               selected_city=city,
+                               t=get_t(),
+                               lang=session.get('lang', 'fr'))
 
 @main_bp.route('/set_language/<lang>')
 def set_language(lang):
