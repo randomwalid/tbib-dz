@@ -1,0 +1,68 @@
+2025-12-26 15:56:18,745 ERROR: Error accessing doctor dashboard for user 1: (sqlite3.OperationalError) no such column: appointments.price_paid
+[SQL: SELECT count(*) AS count_1
+FROM (SELECT appointments.id AS appointments_id, appointments.patient_id AS appointments_patient_id, appointments.doctor_id AS appointments_doctor_id, appointments.status AS appointments_status, appointments.queue_number AS appointments_queue_number, appointments.is_urgent AS appointments_is_urgent, appointments.created_at AS appointments_created_at, appointments.appointment_date AS appointments_appointment_date, appointments.appointment_time AS appointments_appointment_time, appointments.booking_type AS appointments_booking_type, appointments.consultation_reason AS appointments_consultation_reason, appointments.consultation_type_id AS appointments_consultation_type_id, appointments.emergency_type_id AS appointments_emergency_type_id, appointments.relative_id AS appointments_relative_id, appointments.doctor_notes AS appointments_doctor_notes, appointments.is_shadow_slot AS appointments_is_shadow_slot, appointments.urgency_level AS appointments_urgency_level, appointments.arrival_time AS appointments_arrival_time, appointments.check_in_time AS appointments_check_in_time, appointments.price_paid AS appointments_price_paid, appointments.payment_method AS appointments_payment_method
+FROM appointments
+WHERE appointments.doctor_id = ? AND appointments.appointment_date = ? AND appointments.queue_number IS NOT NULL AND appointments.status IN (?, ?)) AS anon_1]
+[parameters: (1, '2025-12-26', 'confirmed', 'waiting')]
+(Background on this error at: https://sqlalche.me/e/20/e3q8) [in /app/TBIB/routes.py:664]
+Traceback (most recent call last):
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1967, in _exec_single_context
+    self.dialect.do_execute(
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/engine/default.py", line 952, in do_execute
+    cursor.execute(statement, parameters)
+sqlite3.OperationalError: no such column: appointments.price_paid
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/app/TBIB/routes.py", line 647, in doctor_dashboard
+    ).count()
+      ^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/orm/query.py", line 3146, in count
+    self._legacy_from_self(col).enable_eagerloads(False).scalar()
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/orm/query.py", line 2835, in scalar
+    ret = self.one()
+          ^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/orm/query.py", line 2808, in one
+    return self._iter().one()  # type: ignore
+           ^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/orm/query.py", line 2857, in _iter
+    result: Union[ScalarResult[_T], Result[_T]] = self.session.execute(
+                                                  ^^^^^^^^^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py", line 2351, in execute
+    return self._execute_internal(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py", line 2249, in _execute_internal
+    result: Result[Any] = compile_state_cls.orm_execute_statement(
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/orm/context.py", line 306, in orm_execute_statement
+    result = conn.execute(
+             ^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1419, in execute
+    return meth(
+           ^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/sql/elements.py", line 527, in _execute_on_connection
+    return connection._execute_clauseelement(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1641, in _execute_clauseelement
+    ret = self._execute_context(
+          ^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1846, in _execute_context
+    return self._exec_single_context(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1986, in _exec_single_context
+    self._handle_dbapi_exception(
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 2363, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1967, in _exec_single_context
+    self.dialect.do_execute(
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/engine/default.py", line 952, in do_execute
+    cursor.execute(statement, parameters)
+sqlalchemy.exc.OperationalError: (sqlite3.OperationalError) no such column: appointments.price_paid
+[SQL: SELECT count(*) AS count_1
+FROM (SELECT appointments.id AS appointments_id, appointments.patient_id AS appointments_patient_id, appointments.doctor_id AS appointments_doctor_id, appointments.status AS appointments_status, appointments.queue_number AS appointments_queue_number, appointments.is_urgent AS appointments_is_urgent, appointments.created_at AS appointments_created_at, appointments.appointment_date AS appointments_appointment_date, appointments.appointment_time AS appointments_appointment_time, appointments.booking_type AS appointments_booking_type, appointments.consultation_reason AS appointments_consultation_reason, appointments.consultation_type_id AS appointments_consultation_type_id, appointments.emergency_type_id AS appointments_emergency_type_id, appointments.relative_id AS appointments_relative_id, appointments.doctor_notes AS appointments_doctor_notes, appointments.is_shadow_slot AS appointments_is_shadow_slot, appointments.urgency_level AS appointments_urgency_level, appointments.arrival_time AS appointments_arrival_time, appointments.check_in_time AS appointments_check_in_time, appointments.price_paid AS appointments_price_paid, appointments.payment_method AS appointments_payment_method
+FROM appointments
+WHERE appointments.doctor_id = ? AND appointments.appointment_date = ? AND appointments.queue_number IS NOT NULL AND appointments.status IN (?, ?)) AS anon_1]
+[parameters: (1, '2025-12-26', 'confirmed', 'waiting')]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2025-12-26 15:56:18,756 INFO: Dashboard access by Doctor 1 [in /app/TBIB/routes.py:639]

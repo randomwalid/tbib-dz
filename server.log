@@ -1,15 +1,4 @@
-Using CPython 3.12.12 interpreter at: /home/jules/.pyenv/versions/3.12.12/bin/python3
-Creating virtual environment at: .venv
-Downloading sqlalchemy (3.2MiB)
-Downloading babel (9.7MiB)
-Downloading pillow (6.7MiB)
-Downloading psycopg2-binary (4.0MiB)
- Downloading psycopg2-binary
- Downloading pillow
- Downloading sqlalchemy
- Downloading babel
-Installed 26 packages in 75ms
-[2025-12-26 13:05:12,724] INFO in app: TBIB startup
+[2025-12-26 15:52:14,944] INFO in app: TBIB startup
  * Serving Flask app 'app'
  * Debug mode: on
 [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
@@ -18,25 +7,1053 @@ Installed 26 packages in 75ms
  * Running on http://192.168.0.2:5000
 [33mPress CTRL+C to quit[0m
  * Restarting with stat
-[2025-12-26 13:05:14,356] INFO in app: TBIB startup
+[2025-12-26 15:52:16,539] INFO in app: TBIB startup
  * Debugger is active!
- * Debugger PIN: 435-484-703
-127.0.0.1 - - [26/Dec/2025 13:06:01] "[32mGET / HTTP/1.1[0m" 302 -
-127.0.0.1 - - [26/Dec/2025 13:06:11] "GET / HTTP/1.1" 200 -
-127.0.0.1 - - [26/Dec/2025 13:06:11] "GET /static/css/style.css HTTP/1.1" 200 -
-127.0.0.1 - - [26/Dec/2025 13:06:11] "GET /static/css/navigation.css HTTP/1.1" 200 -
-127.0.0.1 - - [26/Dec/2025 13:06:11] "GET /static/css/tokens.css HTTP/1.1" 200 -
-127.0.0.1 - - [26/Dec/2025 13:06:11] "GET /static/css/animations.css HTTP/1.1" 200 -
-127.0.0.1 - - [26/Dec/2025 13:06:11] "GET /static/img/Logo_SVG.svg HTTP/1.1" 200 -
-127.0.0.1 - - [26/Dec/2025 13:06:11] "GET /static/img/logo_final.png HTTP/1.1" 200 -
-127.0.0.1 - - [26/Dec/2025 13:06:12] "GET /static/img/logo_accueil.png HTTP/1.1" 200 -
-127.0.0.1 - - [26/Dec/2025 13:06:12] "GET /static/img/logo_final.png HTTP/1.1" 200 -
-127.0.0.1 - - [26/Dec/2025 13:06:12] "GET /static/sw.js HTTP/1.1" 200 -
-127.0.0.1 - - [26/Dec/2025 13:06:13] "GET /contact HTTP/1.1" 200 -
-127.0.0.1 - - [26/Dec/2025 13:06:13] "GET /static/css/animations.css HTTP/1.1" 200 -
-127.0.0.1 - - [26/Dec/2025 13:06:13] "GET /static/css/style.css HTTP/1.1" 200 -
-127.0.0.1 - - [26/Dec/2025 13:06:13] "GET /static/css/tokens.css HTTP/1.1" 200 -
-127.0.0.1 - - [26/Dec/2025 13:06:13] "GET /static/img/logo_final.png HTTP/1.1" 200 -
-127.0.0.1 - - [26/Dec/2025 13:06:13] "GET /static/css/navigation.css HTTP/1.1" 200 -
-127.0.0.1 - - [26/Dec/2025 13:06:13] "GET /static/img/Logo_SVG.svg HTTP/1.1" 200 -
-127.0.0.1 - - [26/Dec/2025 13:06:13] "GET /static/img/logo_final.png HTTP/1.1" 200 -
+ * Debugger PIN: 553-258-307
+127.0.0.1 - - [26/Dec/2025 15:52:25] "GET /login HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 15:52:25] "GET /static/css/tokens.css HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 15:52:25] "GET /static/css/animations.css HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 15:52:25] "GET /static/css/navigation.css HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 15:52:25] "GET /static/css/style.css HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 15:52:25] "GET /static/img/Logo_SVG.svg HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 15:52:25] "GET /static/img/logo_final.png HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 15:52:25] "GET /static/img/logo_accueil.png HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 15:52:26] "GET /static/img/logo_final.png HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 15:52:26] "GET /static/sw.js HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 15:52:28] "[35m[1mPOST /login HTTP/1.1[0m" 500 -
+Traceback (most recent call last):
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1967, in _exec_single_context
+    self.dialect.do_execute(
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/engine/default.py", line 952, in do_execute
+    cursor.execute(statement, parameters)
+sqlite3.OperationalError: no such table: users
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/app/.venv/lib/python3.12/site-packages/flask/app.py", line 1536, in __call__
+    return self.wsgi_app(environ, start_response)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/flask/app.py", line 1514, in wsgi_app
+    response = self.handle_exception(e)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/TBIB/routes.py", line 287, in login
+    user = User.query.filter_by(email=email).first()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/orm/query.py", line 2759, in first
+    return self.limit(1)._iter().first()  # type: ignore
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/orm/query.py", line 2857, in _iter
+    result: Union[ScalarResult[_T], Result[_T]] = self.session.execute(
+                                                  ^^^^^^^^^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py", line 2351, in execute
+    return self._execute_internal(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py", line 2249, in _execute_internal
+    result: Result[Any] = compile_state_cls.orm_execute_statement(
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/orm/context.py", line 306, in orm_execute_statement
+    result = conn.execute(
+             ^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1419, in execute
+    return meth(
+           ^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/sql/elements.py", line 527, in _execute_on_connection
+    return connection._execute_clauseelement(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1641, in _execute_clauseelement
+    ret = self._execute_context(
+          ^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1846, in _execute_context
+    return self._exec_single_context(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1986, in _exec_single_context
+    self._handle_dbapi_exception(
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 2363, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1967, in _exec_single_context
+    self.dialect.do_execute(
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/engine/default.py", line 952, in do_execute
+    cursor.execute(statement, parameters)
+sqlalchemy.exc.OperationalError: (sqlite3.OperationalError) no such table: users
+[SQL: SELECT users.id AS users_id, users.email AS users_email, users.password_hash AS users_password_hash, users.role AS users_role, users.name AS users_name, users.phone AS users_phone, users.birth_date AS users_birth_date, users.gender AS users_gender, users.address AS users_address, users.city AS users_city, users.created_at AS users_created_at, users.no_show_count AS users_no_show_count, users.is_blocked AS users_is_blocked, users.reliability_score AS users_reliability_score, users.linked_doctor_id AS users_linked_doctor_id, users.can_view_medical_records AS users_can_view_medical_records
+FROM users
+WHERE users.email = ?
+ LIMIT ? OFFSET ?]
+[parameters: ('doctor1@tbib.dz', 1, 0)]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+127.0.0.1 - - [26/Dec/2025 15:52:28] "GET /login?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 15:52:28] "GET /login?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 15:52:28] "GET /login?__debugger__=yes&cmd=resource&f=console.png&s=QBBtfzWCV1ujbtaoz0TF HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 15:54:11] "GET /login HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 15:54:11] "GET /static/css/navigation.css HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 15:54:11] "GET /static/css/style.css HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 15:54:11] "GET /static/css/tokens.css HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 15:54:11] "GET /static/img/Logo_SVG.svg HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 15:54:11] "GET /static/css/animations.css HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 15:54:11] "GET /static/img/logo_final.png HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 15:54:11] "GET /static/img/logo_accueil.png HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 15:54:12] "GET /static/img/logo_final.png HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 15:54:12] "GET /static/sw.js HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 15:54:13] "POST /login HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 15:54:13] "GET /static/css/tokens.css HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 15:54:13] "GET /static/img/logo_final.png HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 15:54:13] "GET /static/css/animations.css HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 15:54:13] "GET /static/img/Logo_SVG.svg HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 15:54:13] "GET /static/css/navigation.css HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 15:54:13] "GET /static/css/style.css HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 15:54:13] "GET /static/img/logo_accueil.png HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 15:54:13] "GET /static/img/logo_final.png HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 15:55:03] "GET /login HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 15:55:03] "GET /static/css/animations.css HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 15:55:03] "GET /static/img/logo_final.png HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 15:55:03] "GET /static/css/navigation.css HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 15:55:03] "GET /static/css/style.css HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 15:55:03] "GET /static/css/tokens.css HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 15:55:03] "GET /static/img/Logo_SVG.svg HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 15:55:03] "GET /static/img/logo_accueil.png HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 15:55:04] "GET /static/img/logo_final.png HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 15:55:04] "GET /static/sw.js HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 15:55:05] "POST /login HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 15:55:05] "GET /static/css/navigation.css HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 15:55:05] "GET /static/css/animations.css HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 15:55:05] "GET /static/img/Logo_SVG.svg HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 15:55:05] "GET /static/css/tokens.css HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 15:55:05] "GET /static/img/logo_final.png HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 15:55:05] "GET /static/css/style.css HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 15:55:05] "GET /static/img/logo_accueil.png HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 15:55:05] "GET /static/img/logo_final.png HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 15:56:13] "GET /admin/seed_lite HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 15:56:15] "GET /login HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 15:56:15] "GET /static/css/style.css HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 15:56:15] "GET /static/img/logo_final.png HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 15:56:15] "GET /static/css/navigation.css HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 15:56:15] "GET /static/img/Logo_SVG.svg HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 15:56:15] "GET /static/css/tokens.css HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 15:56:15] "GET /static/css/animations.css HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 15:56:15] "GET /static/img/logo_accueil.png HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 15:56:16] "GET /static/img/logo_final.png HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 15:56:16] "GET /static/sw.js HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 15:56:18] "[32mPOST /login HTTP/1.1[0m" 302 -
+[2025-12-26 15:56:18,660] INFO in routes: Dashboard access by Doctor 1
+[2025-12-26 15:56:18,671] ERROR in routes: Error accessing doctor dashboard for user 1: (sqlite3.OperationalError) no such column: appointments.price_paid
+[SQL: SELECT count(*) AS count_1
+FROM (SELECT appointments.id AS appointments_id, appointments.patient_id AS appointments_patient_id, appointments.doctor_id AS appointments_doctor_id, appointments.status AS appointments_status, appointments.queue_number AS appointments_queue_number, appointments.is_urgent AS appointments_is_urgent, appointments.created_at AS appointments_created_at, appointments.appointment_date AS appointments_appointment_date, appointments.appointment_time AS appointments_appointment_time, appointments.booking_type AS appointments_booking_type, appointments.consultation_reason AS appointments_consultation_reason, appointments.consultation_type_id AS appointments_consultation_type_id, appointments.emergency_type_id AS appointments_emergency_type_id, appointments.relative_id AS appointments_relative_id, appointments.doctor_notes AS appointments_doctor_notes, appointments.is_shadow_slot AS appointments_is_shadow_slot, appointments.urgency_level AS appointments_urgency_level, appointments.arrival_time AS appointments_arrival_time, appointments.check_in_time AS appointments_check_in_time, appointments.price_paid AS appointments_price_paid, appointments.payment_method AS appointments_payment_method
+FROM appointments
+WHERE appointments.doctor_id = ? AND appointments.appointment_date = ? AND appointments.queue_number IS NOT NULL AND appointments.status IN (?, ?)) AS anon_1]
+[parameters: (1, '2025-12-26', 'confirmed', 'waiting')]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+Traceback (most recent call last):
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1967, in _exec_single_context
+    self.dialect.do_execute(
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/engine/default.py", line 952, in do_execute
+    cursor.execute(statement, parameters)
+sqlite3.OperationalError: no such column: appointments.price_paid
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/app/TBIB/routes.py", line 647, in doctor_dashboard
+    ).count()
+      ^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/orm/query.py", line 3146, in count
+    self._legacy_from_self(col).enable_eagerloads(False).scalar()
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/orm/query.py", line 2835, in scalar
+    ret = self.one()
+          ^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/orm/query.py", line 2808, in one
+    return self._iter().one()  # type: ignore
+           ^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/orm/query.py", line 2857, in _iter
+    result: Union[ScalarResult[_T], Result[_T]] = self.session.execute(
+                                                  ^^^^^^^^^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py", line 2351, in execute
+    return self._execute_internal(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py", line 2249, in _execute_internal
+    result: Result[Any] = compile_state_cls.orm_execute_statement(
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/orm/context.py", line 306, in orm_execute_statement
+    result = conn.execute(
+             ^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1419, in execute
+    return meth(
+           ^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/sql/elements.py", line 527, in _execute_on_connection
+    return connection._execute_clauseelement(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1641, in _execute_clauseelement
+    ret = self._execute_context(
+          ^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1846, in _execute_context
+    return self._exec_single_context(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1986, in _exec_single_context
+    self._handle_dbapi_exception(
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 2363, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1967, in _exec_single_context
+    self.dialect.do_execute(
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/engine/default.py", line 952, in do_execute
+    cursor.execute(statement, parameters)
+sqlalchemy.exc.OperationalError: (sqlite3.OperationalError) no such column: appointments.price_paid
+[SQL: SELECT count(*) AS count_1
+FROM (SELECT appointments.id AS appointments_id, appointments.patient_id AS appointments_patient_id, appointments.doctor_id AS appointments_doctor_id, appointments.status AS appointments_status, appointments.queue_number AS appointments_queue_number, appointments.is_urgent AS appointments_is_urgent, appointments.created_at AS appointments_created_at, appointments.appointment_date AS appointments_appointment_date, appointments.appointment_time AS appointments_appointment_time, appointments.booking_type AS appointments_booking_type, appointments.consultation_reason AS appointments_consultation_reason, appointments.consultation_type_id AS appointments_consultation_type_id, appointments.emergency_type_id AS appointments_emergency_type_id, appointments.relative_id AS appointments_relative_id, appointments.doctor_notes AS appointments_doctor_notes, appointments.is_shadow_slot AS appointments_is_shadow_slot, appointments.urgency_level AS appointments_urgency_level, appointments.arrival_time AS appointments_arrival_time, appointments.check_in_time AS appointments_check_in_time, appointments.price_paid AS appointments_price_paid, appointments.payment_method AS appointments_payment_method
+FROM appointments
+WHERE appointments.doctor_id = ? AND appointments.appointment_date = ? AND appointments.queue_number IS NOT NULL AND appointments.status IN (?, ?)) AS anon_1]
+[parameters: (1, '2025-12-26', 'confirmed', 'waiting')]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+127.0.0.1 - - [26/Dec/2025 15:56:18] "[32mGET /doctor/dashboard HTTP/1.1[0m" 302 -
+127.0.0.1 - - [26/Dec/2025 15:56:18] "[32mGET / HTTP/1.1[0m" 302 -
+[2025-12-26 15:56:18,682] INFO in routes: Dashboard access by Doctor 1
+[2025-12-26 15:56:18,684] ERROR in routes: Error accessing doctor dashboard for user 1: (sqlite3.OperationalError) no such column: appointments.price_paid
+[SQL: SELECT count(*) AS count_1
+FROM (SELECT appointments.id AS appointments_id, appointments.patient_id AS appointments_patient_id, appointments.doctor_id AS appointments_doctor_id, appointments.status AS appointments_status, appointments.queue_number AS appointments_queue_number, appointments.is_urgent AS appointments_is_urgent, appointments.created_at AS appointments_created_at, appointments.appointment_date AS appointments_appointment_date, appointments.appointment_time AS appointments_appointment_time, appointments.booking_type AS appointments_booking_type, appointments.consultation_reason AS appointments_consultation_reason, appointments.consultation_type_id AS appointments_consultation_type_id, appointments.emergency_type_id AS appointments_emergency_type_id, appointments.relative_id AS appointments_relative_id, appointments.doctor_notes AS appointments_doctor_notes, appointments.is_shadow_slot AS appointments_is_shadow_slot, appointments.urgency_level AS appointments_urgency_level, appointments.arrival_time AS appointments_arrival_time, appointments.check_in_time AS appointments_check_in_time, appointments.price_paid AS appointments_price_paid, appointments.payment_method AS appointments_payment_method
+FROM appointments
+WHERE appointments.doctor_id = ? AND appointments.appointment_date = ? AND appointments.queue_number IS NOT NULL AND appointments.status IN (?, ?)) AS anon_1]
+[parameters: (1, '2025-12-26', 'confirmed', 'waiting')]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+Traceback (most recent call last):
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1967, in _exec_single_context
+    self.dialect.do_execute(
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/engine/default.py", line 952, in do_execute
+    cursor.execute(statement, parameters)
+sqlite3.OperationalError: no such column: appointments.price_paid
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/app/TBIB/routes.py", line 647, in doctor_dashboard
+    ).count()
+      ^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/orm/query.py", line 3146, in count
+    self._legacy_from_self(col).enable_eagerloads(False).scalar()
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/orm/query.py", line 2835, in scalar
+    ret = self.one()
+          ^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/orm/query.py", line 2808, in one
+    return self._iter().one()  # type: ignore
+           ^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/orm/query.py", line 2857, in _iter
+    result: Union[ScalarResult[_T], Result[_T]] = self.session.execute(
+                                                  ^^^^^^^^^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py", line 2351, in execute
+    return self._execute_internal(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py", line 2249, in _execute_internal
+    result: Result[Any] = compile_state_cls.orm_execute_statement(
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/orm/context.py", line 306, in orm_execute_statement
+    result = conn.execute(
+             ^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1419, in execute
+    return meth(
+           ^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/sql/elements.py", line 527, in _execute_on_connection
+    return connection._execute_clauseelement(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1641, in _execute_clauseelement
+    ret = self._execute_context(
+          ^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1846, in _execute_context
+    return self._exec_single_context(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1986, in _exec_single_context
+    self._handle_dbapi_exception(
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 2363, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1967, in _exec_single_context
+    self.dialect.do_execute(
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/engine/default.py", line 952, in do_execute
+    cursor.execute(statement, parameters)
+sqlalchemy.exc.OperationalError: (sqlite3.OperationalError) no such column: appointments.price_paid
+[SQL: SELECT count(*) AS count_1
+FROM (SELECT appointments.id AS appointments_id, appointments.patient_id AS appointments_patient_id, appointments.doctor_id AS appointments_doctor_id, appointments.status AS appointments_status, appointments.queue_number AS appointments_queue_number, appointments.is_urgent AS appointments_is_urgent, appointments.created_at AS appointments_created_at, appointments.appointment_date AS appointments_appointment_date, appointments.appointment_time AS appointments_appointment_time, appointments.booking_type AS appointments_booking_type, appointments.consultation_reason AS appointments_consultation_reason, appointments.consultation_type_id AS appointments_consultation_type_id, appointments.emergency_type_id AS appointments_emergency_type_id, appointments.relative_id AS appointments_relative_id, appointments.doctor_notes AS appointments_doctor_notes, appointments.is_shadow_slot AS appointments_is_shadow_slot, appointments.urgency_level AS appointments_urgency_level, appointments.arrival_time AS appointments_arrival_time, appointments.check_in_time AS appointments_check_in_time, appointments.price_paid AS appointments_price_paid, appointments.payment_method AS appointments_payment_method
+FROM appointments
+WHERE appointments.doctor_id = ? AND appointments.appointment_date = ? AND appointments.queue_number IS NOT NULL AND appointments.status IN (?, ?)) AS anon_1]
+[parameters: (1, '2025-12-26', 'confirmed', 'waiting')]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+127.0.0.1 - - [26/Dec/2025 15:56:18] "[32mGET /doctor/dashboard HTTP/1.1[0m" 302 -
+127.0.0.1 - - [26/Dec/2025 15:56:18] "[32mGET / HTTP/1.1[0m" 302 -
+[2025-12-26 15:56:18,694] INFO in routes: Dashboard access by Doctor 1
+[2025-12-26 15:56:18,696] ERROR in routes: Error accessing doctor dashboard for user 1: (sqlite3.OperationalError) no such column: appointments.price_paid
+[SQL: SELECT count(*) AS count_1
+FROM (SELECT appointments.id AS appointments_id, appointments.patient_id AS appointments_patient_id, appointments.doctor_id AS appointments_doctor_id, appointments.status AS appointments_status, appointments.queue_number AS appointments_queue_number, appointments.is_urgent AS appointments_is_urgent, appointments.created_at AS appointments_created_at, appointments.appointment_date AS appointments_appointment_date, appointments.appointment_time AS appointments_appointment_time, appointments.booking_type AS appointments_booking_type, appointments.consultation_reason AS appointments_consultation_reason, appointments.consultation_type_id AS appointments_consultation_type_id, appointments.emergency_type_id AS appointments_emergency_type_id, appointments.relative_id AS appointments_relative_id, appointments.doctor_notes AS appointments_doctor_notes, appointments.is_shadow_slot AS appointments_is_shadow_slot, appointments.urgency_level AS appointments_urgency_level, appointments.arrival_time AS appointments_arrival_time, appointments.check_in_time AS appointments_check_in_time, appointments.price_paid AS appointments_price_paid, appointments.payment_method AS appointments_payment_method
+FROM appointments
+WHERE appointments.doctor_id = ? AND appointments.appointment_date = ? AND appointments.queue_number IS NOT NULL AND appointments.status IN (?, ?)) AS anon_1]
+[parameters: (1, '2025-12-26', 'confirmed', 'waiting')]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+Traceback (most recent call last):
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1967, in _exec_single_context
+    self.dialect.do_execute(
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/engine/default.py", line 952, in do_execute
+    cursor.execute(statement, parameters)
+sqlite3.OperationalError: no such column: appointments.price_paid
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/app/TBIB/routes.py", line 647, in doctor_dashboard
+    ).count()
+      ^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/orm/query.py", line 3146, in count
+    self._legacy_from_self(col).enable_eagerloads(False).scalar()
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/orm/query.py", line 2835, in scalar
+    ret = self.one()
+          ^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/orm/query.py", line 2808, in one
+    return self._iter().one()  # type: ignore
+           ^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/orm/query.py", line 2857, in _iter
+    result: Union[ScalarResult[_T], Result[_T]] = self.session.execute(
+                                                  ^^^^^^^^^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py", line 2351, in execute
+    return self._execute_internal(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py", line 2249, in _execute_internal
+    result: Result[Any] = compile_state_cls.orm_execute_statement(
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/orm/context.py", line 306, in orm_execute_statement
+    result = conn.execute(
+             ^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1419, in execute
+    return meth(
+           ^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/sql/elements.py", line 527, in _execute_on_connection
+    return connection._execute_clauseelement(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1641, in _execute_clauseelement
+    ret = self._execute_context(
+          ^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1846, in _execute_context
+    return self._exec_single_context(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1986, in _exec_single_context
+    self._handle_dbapi_exception(
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 2363, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1967, in _exec_single_context
+    self.dialect.do_execute(
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/engine/default.py", line 952, in do_execute
+    cursor.execute(statement, parameters)
+sqlalchemy.exc.OperationalError: (sqlite3.OperationalError) no such column: appointments.price_paid
+[SQL: SELECT count(*) AS count_1
+FROM (SELECT appointments.id AS appointments_id, appointments.patient_id AS appointments_patient_id, appointments.doctor_id AS appointments_doctor_id, appointments.status AS appointments_status, appointments.queue_number AS appointments_queue_number, appointments.is_urgent AS appointments_is_urgent, appointments.created_at AS appointments_created_at, appointments.appointment_date AS appointments_appointment_date, appointments.appointment_time AS appointments_appointment_time, appointments.booking_type AS appointments_booking_type, appointments.consultation_reason AS appointments_consultation_reason, appointments.consultation_type_id AS appointments_consultation_type_id, appointments.emergency_type_id AS appointments_emergency_type_id, appointments.relative_id AS appointments_relative_id, appointments.doctor_notes AS appointments_doctor_notes, appointments.is_shadow_slot AS appointments_is_shadow_slot, appointments.urgency_level AS appointments_urgency_level, appointments.arrival_time AS appointments_arrival_time, appointments.check_in_time AS appointments_check_in_time, appointments.price_paid AS appointments_price_paid, appointments.payment_method AS appointments_payment_method
+FROM appointments
+WHERE appointments.doctor_id = ? AND appointments.appointment_date = ? AND appointments.queue_number IS NOT NULL AND appointments.status IN (?, ?)) AS anon_1]
+[parameters: (1, '2025-12-26', 'confirmed', 'waiting')]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+127.0.0.1 - - [26/Dec/2025 15:56:18] "[32mGET /doctor/dashboard HTTP/1.1[0m" 302 -
+127.0.0.1 - - [26/Dec/2025 15:56:18] "[32mGET / HTTP/1.1[0m" 302 -
+[2025-12-26 15:56:18,707] INFO in routes: Dashboard access by Doctor 1
+[2025-12-26 15:56:18,709] ERROR in routes: Error accessing doctor dashboard for user 1: (sqlite3.OperationalError) no such column: appointments.price_paid
+[SQL: SELECT count(*) AS count_1
+FROM (SELECT appointments.id AS appointments_id, appointments.patient_id AS appointments_patient_id, appointments.doctor_id AS appointments_doctor_id, appointments.status AS appointments_status, appointments.queue_number AS appointments_queue_number, appointments.is_urgent AS appointments_is_urgent, appointments.created_at AS appointments_created_at, appointments.appointment_date AS appointments_appointment_date, appointments.appointment_time AS appointments_appointment_time, appointments.booking_type AS appointments_booking_type, appointments.consultation_reason AS appointments_consultation_reason, appointments.consultation_type_id AS appointments_consultation_type_id, appointments.emergency_type_id AS appointments_emergency_type_id, appointments.relative_id AS appointments_relative_id, appointments.doctor_notes AS appointments_doctor_notes, appointments.is_shadow_slot AS appointments_is_shadow_slot, appointments.urgency_level AS appointments_urgency_level, appointments.arrival_time AS appointments_arrival_time, appointments.check_in_time AS appointments_check_in_time, appointments.price_paid AS appointments_price_paid, appointments.payment_method AS appointments_payment_method
+FROM appointments
+WHERE appointments.doctor_id = ? AND appointments.appointment_date = ? AND appointments.queue_number IS NOT NULL AND appointments.status IN (?, ?)) AS anon_1]
+[parameters: (1, '2025-12-26', 'confirmed', 'waiting')]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+Traceback (most recent call last):
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1967, in _exec_single_context
+    self.dialect.do_execute(
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/engine/default.py", line 952, in do_execute
+    cursor.execute(statement, parameters)
+sqlite3.OperationalError: no such column: appointments.price_paid
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/app/TBIB/routes.py", line 647, in doctor_dashboard
+    ).count()
+      ^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/orm/query.py", line 3146, in count
+    self._legacy_from_self(col).enable_eagerloads(False).scalar()
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/orm/query.py", line 2835, in scalar
+    ret = self.one()
+          ^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/orm/query.py", line 2808, in one
+    return self._iter().one()  # type: ignore
+           ^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/orm/query.py", line 2857, in _iter
+    result: Union[ScalarResult[_T], Result[_T]] = self.session.execute(
+                                                  ^^^^^^^^^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py", line 2351, in execute
+    return self._execute_internal(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py", line 2249, in _execute_internal
+    result: Result[Any] = compile_state_cls.orm_execute_statement(
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/orm/context.py", line 306, in orm_execute_statement
+    result = conn.execute(
+             ^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1419, in execute
+    return meth(
+           ^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/sql/elements.py", line 527, in _execute_on_connection
+    return connection._execute_clauseelement(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1641, in _execute_clauseelement
+    ret = self._execute_context(
+          ^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1846, in _execute_context
+    return self._exec_single_context(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1986, in _exec_single_context
+    self._handle_dbapi_exception(
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 2363, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1967, in _exec_single_context
+    self.dialect.do_execute(
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/engine/default.py", line 952, in do_execute
+    cursor.execute(statement, parameters)
+sqlalchemy.exc.OperationalError: (sqlite3.OperationalError) no such column: appointments.price_paid
+[SQL: SELECT count(*) AS count_1
+FROM (SELECT appointments.id AS appointments_id, appointments.patient_id AS appointments_patient_id, appointments.doctor_id AS appointments_doctor_id, appointments.status AS appointments_status, appointments.queue_number AS appointments_queue_number, appointments.is_urgent AS appointments_is_urgent, appointments.created_at AS appointments_created_at, appointments.appointment_date AS appointments_appointment_date, appointments.appointment_time AS appointments_appointment_time, appointments.booking_type AS appointments_booking_type, appointments.consultation_reason AS appointments_consultation_reason, appointments.consultation_type_id AS appointments_consultation_type_id, appointments.emergency_type_id AS appointments_emergency_type_id, appointments.relative_id AS appointments_relative_id, appointments.doctor_notes AS appointments_doctor_notes, appointments.is_shadow_slot AS appointments_is_shadow_slot, appointments.urgency_level AS appointments_urgency_level, appointments.arrival_time AS appointments_arrival_time, appointments.check_in_time AS appointments_check_in_time, appointments.price_paid AS appointments_price_paid, appointments.payment_method AS appointments_payment_method
+FROM appointments
+WHERE appointments.doctor_id = ? AND appointments.appointment_date = ? AND appointments.queue_number IS NOT NULL AND appointments.status IN (?, ?)) AS anon_1]
+[parameters: (1, '2025-12-26', 'confirmed', 'waiting')]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+127.0.0.1 - - [26/Dec/2025 15:56:18] "[32mGET /doctor/dashboard HTTP/1.1[0m" 302 -
+127.0.0.1 - - [26/Dec/2025 15:56:18] "[32mGET / HTTP/1.1[0m" 302 -
+[2025-12-26 15:56:18,719] INFO in routes: Dashboard access by Doctor 1
+[2025-12-26 15:56:18,721] ERROR in routes: Error accessing doctor dashboard for user 1: (sqlite3.OperationalError) no such column: appointments.price_paid
+[SQL: SELECT count(*) AS count_1
+FROM (SELECT appointments.id AS appointments_id, appointments.patient_id AS appointments_patient_id, appointments.doctor_id AS appointments_doctor_id, appointments.status AS appointments_status, appointments.queue_number AS appointments_queue_number, appointments.is_urgent AS appointments_is_urgent, appointments.created_at AS appointments_created_at, appointments.appointment_date AS appointments_appointment_date, appointments.appointment_time AS appointments_appointment_time, appointments.booking_type AS appointments_booking_type, appointments.consultation_reason AS appointments_consultation_reason, appointments.consultation_type_id AS appointments_consultation_type_id, appointments.emergency_type_id AS appointments_emergency_type_id, appointments.relative_id AS appointments_relative_id, appointments.doctor_notes AS appointments_doctor_notes, appointments.is_shadow_slot AS appointments_is_shadow_slot, appointments.urgency_level AS appointments_urgency_level, appointments.arrival_time AS appointments_arrival_time, appointments.check_in_time AS appointments_check_in_time, appointments.price_paid AS appointments_price_paid, appointments.payment_method AS appointments_payment_method
+FROM appointments
+WHERE appointments.doctor_id = ? AND appointments.appointment_date = ? AND appointments.queue_number IS NOT NULL AND appointments.status IN (?, ?)) AS anon_1]
+[parameters: (1, '2025-12-26', 'confirmed', 'waiting')]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+Traceback (most recent call last):
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1967, in _exec_single_context
+    self.dialect.do_execute(
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/engine/default.py", line 952, in do_execute
+    cursor.execute(statement, parameters)
+sqlite3.OperationalError: no such column: appointments.price_paid
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/app/TBIB/routes.py", line 647, in doctor_dashboard
+    ).count()
+      ^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/orm/query.py", line 3146, in count
+    self._legacy_from_self(col).enable_eagerloads(False).scalar()
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/orm/query.py", line 2835, in scalar
+    ret = self.one()
+          ^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/orm/query.py", line 2808, in one
+    return self._iter().one()  # type: ignore
+           ^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/orm/query.py", line 2857, in _iter
+    result: Union[ScalarResult[_T], Result[_T]] = self.session.execute(
+                                                  ^^^^^^^^^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py", line 2351, in execute
+    return self._execute_internal(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py", line 2249, in _execute_internal
+    result: Result[Any] = compile_state_cls.orm_execute_statement(
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/orm/context.py", line 306, in orm_execute_statement
+    result = conn.execute(
+             ^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1419, in execute
+    return meth(
+           ^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/sql/elements.py", line 527, in _execute_on_connection
+    return connection._execute_clauseelement(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1641, in _execute_clauseelement
+    ret = self._execute_context(
+          ^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1846, in _execute_context
+    return self._exec_single_context(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1986, in _exec_single_context
+    self._handle_dbapi_exception(
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 2363, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1967, in _exec_single_context
+    self.dialect.do_execute(
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/engine/default.py", line 952, in do_execute
+    cursor.execute(statement, parameters)
+sqlalchemy.exc.OperationalError: (sqlite3.OperationalError) no such column: appointments.price_paid
+[SQL: SELECT count(*) AS count_1
+FROM (SELECT appointments.id AS appointments_id, appointments.patient_id AS appointments_patient_id, appointments.doctor_id AS appointments_doctor_id, appointments.status AS appointments_status, appointments.queue_number AS appointments_queue_number, appointments.is_urgent AS appointments_is_urgent, appointments.created_at AS appointments_created_at, appointments.appointment_date AS appointments_appointment_date, appointments.appointment_time AS appointments_appointment_time, appointments.booking_type AS appointments_booking_type, appointments.consultation_reason AS appointments_consultation_reason, appointments.consultation_type_id AS appointments_consultation_type_id, appointments.emergency_type_id AS appointments_emergency_type_id, appointments.relative_id AS appointments_relative_id, appointments.doctor_notes AS appointments_doctor_notes, appointments.is_shadow_slot AS appointments_is_shadow_slot, appointments.urgency_level AS appointments_urgency_level, appointments.arrival_time AS appointments_arrival_time, appointments.check_in_time AS appointments_check_in_time, appointments.price_paid AS appointments_price_paid, appointments.payment_method AS appointments_payment_method
+FROM appointments
+WHERE appointments.doctor_id = ? AND appointments.appointment_date = ? AND appointments.queue_number IS NOT NULL AND appointments.status IN (?, ?)) AS anon_1]
+[parameters: (1, '2025-12-26', 'confirmed', 'waiting')]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+127.0.0.1 - - [26/Dec/2025 15:56:18] "[32mGET /doctor/dashboard HTTP/1.1[0m" 302 -
+127.0.0.1 - - [26/Dec/2025 15:56:18] "[32mGET / HTTP/1.1[0m" 302 -
+[2025-12-26 15:56:18,732] INFO in routes: Dashboard access by Doctor 1
+[2025-12-26 15:56:18,733] ERROR in routes: Error accessing doctor dashboard for user 1: (sqlite3.OperationalError) no such column: appointments.price_paid
+[SQL: SELECT count(*) AS count_1
+FROM (SELECT appointments.id AS appointments_id, appointments.patient_id AS appointments_patient_id, appointments.doctor_id AS appointments_doctor_id, appointments.status AS appointments_status, appointments.queue_number AS appointments_queue_number, appointments.is_urgent AS appointments_is_urgent, appointments.created_at AS appointments_created_at, appointments.appointment_date AS appointments_appointment_date, appointments.appointment_time AS appointments_appointment_time, appointments.booking_type AS appointments_booking_type, appointments.consultation_reason AS appointments_consultation_reason, appointments.consultation_type_id AS appointments_consultation_type_id, appointments.emergency_type_id AS appointments_emergency_type_id, appointments.relative_id AS appointments_relative_id, appointments.doctor_notes AS appointments_doctor_notes, appointments.is_shadow_slot AS appointments_is_shadow_slot, appointments.urgency_level AS appointments_urgency_level, appointments.arrival_time AS appointments_arrival_time, appointments.check_in_time AS appointments_check_in_time, appointments.price_paid AS appointments_price_paid, appointments.payment_method AS appointments_payment_method
+FROM appointments
+WHERE appointments.doctor_id = ? AND appointments.appointment_date = ? AND appointments.queue_number IS NOT NULL AND appointments.status IN (?, ?)) AS anon_1]
+[parameters: (1, '2025-12-26', 'confirmed', 'waiting')]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+Traceback (most recent call last):
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1967, in _exec_single_context
+    self.dialect.do_execute(
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/engine/default.py", line 952, in do_execute
+    cursor.execute(statement, parameters)
+sqlite3.OperationalError: no such column: appointments.price_paid
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/app/TBIB/routes.py", line 647, in doctor_dashboard
+    ).count()
+      ^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/orm/query.py", line 3146, in count
+    self._legacy_from_self(col).enable_eagerloads(False).scalar()
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/orm/query.py", line 2835, in scalar
+    ret = self.one()
+          ^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/orm/query.py", line 2808, in one
+    return self._iter().one()  # type: ignore
+           ^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/orm/query.py", line 2857, in _iter
+    result: Union[ScalarResult[_T], Result[_T]] = self.session.execute(
+                                                  ^^^^^^^^^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py", line 2351, in execute
+    return self._execute_internal(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py", line 2249, in _execute_internal
+    result: Result[Any] = compile_state_cls.orm_execute_statement(
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/orm/context.py", line 306, in orm_execute_statement
+    result = conn.execute(
+             ^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1419, in execute
+    return meth(
+           ^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/sql/elements.py", line 527, in _execute_on_connection
+    return connection._execute_clauseelement(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1641, in _execute_clauseelement
+    ret = self._execute_context(
+          ^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1846, in _execute_context
+    return self._exec_single_context(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1986, in _exec_single_context
+    self._handle_dbapi_exception(
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 2363, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1967, in _exec_single_context
+    self.dialect.do_execute(
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/engine/default.py", line 952, in do_execute
+    cursor.execute(statement, parameters)
+sqlalchemy.exc.OperationalError: (sqlite3.OperationalError) no such column: appointments.price_paid
+[SQL: SELECT count(*) AS count_1
+FROM (SELECT appointments.id AS appointments_id, appointments.patient_id AS appointments_patient_id, appointments.doctor_id AS appointments_doctor_id, appointments.status AS appointments_status, appointments.queue_number AS appointments_queue_number, appointments.is_urgent AS appointments_is_urgent, appointments.created_at AS appointments_created_at, appointments.appointment_date AS appointments_appointment_date, appointments.appointment_time AS appointments_appointment_time, appointments.booking_type AS appointments_booking_type, appointments.consultation_reason AS appointments_consultation_reason, appointments.consultation_type_id AS appointments_consultation_type_id, appointments.emergency_type_id AS appointments_emergency_type_id, appointments.relative_id AS appointments_relative_id, appointments.doctor_notes AS appointments_doctor_notes, appointments.is_shadow_slot AS appointments_is_shadow_slot, appointments.urgency_level AS appointments_urgency_level, appointments.arrival_time AS appointments_arrival_time, appointments.check_in_time AS appointments_check_in_time, appointments.price_paid AS appointments_price_paid, appointments.payment_method AS appointments_payment_method
+FROM appointments
+WHERE appointments.doctor_id = ? AND appointments.appointment_date = ? AND appointments.queue_number IS NOT NULL AND appointments.status IN (?, ?)) AS anon_1]
+[parameters: (1, '2025-12-26', 'confirmed', 'waiting')]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+127.0.0.1 - - [26/Dec/2025 15:56:18] "[32mGET /doctor/dashboard HTTP/1.1[0m" 302 -
+127.0.0.1 - - [26/Dec/2025 15:56:18] "[32mGET / HTTP/1.1[0m" 302 -
+[2025-12-26 15:56:18,743] INFO in routes: Dashboard access by Doctor 1
+[2025-12-26 15:56:18,745] ERROR in routes: Error accessing doctor dashboard for user 1: (sqlite3.OperationalError) no such column: appointments.price_paid
+[SQL: SELECT count(*) AS count_1
+FROM (SELECT appointments.id AS appointments_id, appointments.patient_id AS appointments_patient_id, appointments.doctor_id AS appointments_doctor_id, appointments.status AS appointments_status, appointments.queue_number AS appointments_queue_number, appointments.is_urgent AS appointments_is_urgent, appointments.created_at AS appointments_created_at, appointments.appointment_date AS appointments_appointment_date, appointments.appointment_time AS appointments_appointment_time, appointments.booking_type AS appointments_booking_type, appointments.consultation_reason AS appointments_consultation_reason, appointments.consultation_type_id AS appointments_consultation_type_id, appointments.emergency_type_id AS appointments_emergency_type_id, appointments.relative_id AS appointments_relative_id, appointments.doctor_notes AS appointments_doctor_notes, appointments.is_shadow_slot AS appointments_is_shadow_slot, appointments.urgency_level AS appointments_urgency_level, appointments.arrival_time AS appointments_arrival_time, appointments.check_in_time AS appointments_check_in_time, appointments.price_paid AS appointments_price_paid, appointments.payment_method AS appointments_payment_method
+FROM appointments
+WHERE appointments.doctor_id = ? AND appointments.appointment_date = ? AND appointments.queue_number IS NOT NULL AND appointments.status IN (?, ?)) AS anon_1]
+[parameters: (1, '2025-12-26', 'confirmed', 'waiting')]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+Traceback (most recent call last):
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1967, in _exec_single_context
+    self.dialect.do_execute(
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/engine/default.py", line 952, in do_execute
+    cursor.execute(statement, parameters)
+sqlite3.OperationalError: no such column: appointments.price_paid
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/app/TBIB/routes.py", line 647, in doctor_dashboard
+    ).count()
+      ^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/orm/query.py", line 3146, in count
+    self._legacy_from_self(col).enable_eagerloads(False).scalar()
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/orm/query.py", line 2835, in scalar
+    ret = self.one()
+          ^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/orm/query.py", line 2808, in one
+    return self._iter().one()  # type: ignore
+           ^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/orm/query.py", line 2857, in _iter
+    result: Union[ScalarResult[_T], Result[_T]] = self.session.execute(
+                                                  ^^^^^^^^^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py", line 2351, in execute
+    return self._execute_internal(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py", line 2249, in _execute_internal
+    result: Result[Any] = compile_state_cls.orm_execute_statement(
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/orm/context.py", line 306, in orm_execute_statement
+    result = conn.execute(
+             ^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1419, in execute
+    return meth(
+           ^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/sql/elements.py", line 527, in _execute_on_connection
+    return connection._execute_clauseelement(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1641, in _execute_clauseelement
+    ret = self._execute_context(
+          ^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1846, in _execute_context
+    return self._exec_single_context(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1986, in _exec_single_context
+    self._handle_dbapi_exception(
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 2363, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1967, in _exec_single_context
+    self.dialect.do_execute(
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/engine/default.py", line 952, in do_execute
+    cursor.execute(statement, parameters)
+sqlalchemy.exc.OperationalError: (sqlite3.OperationalError) no such column: appointments.price_paid
+[SQL: SELECT count(*) AS count_1
+FROM (SELECT appointments.id AS appointments_id, appointments.patient_id AS appointments_patient_id, appointments.doctor_id AS appointments_doctor_id, appointments.status AS appointments_status, appointments.queue_number AS appointments_queue_number, appointments.is_urgent AS appointments_is_urgent, appointments.created_at AS appointments_created_at, appointments.appointment_date AS appointments_appointment_date, appointments.appointment_time AS appointments_appointment_time, appointments.booking_type AS appointments_booking_type, appointments.consultation_reason AS appointments_consultation_reason, appointments.consultation_type_id AS appointments_consultation_type_id, appointments.emergency_type_id AS appointments_emergency_type_id, appointments.relative_id AS appointments_relative_id, appointments.doctor_notes AS appointments_doctor_notes, appointments.is_shadow_slot AS appointments_is_shadow_slot, appointments.urgency_level AS appointments_urgency_level, appointments.arrival_time AS appointments_arrival_time, appointments.check_in_time AS appointments_check_in_time, appointments.price_paid AS appointments_price_paid, appointments.payment_method AS appointments_payment_method
+FROM appointments
+WHERE appointments.doctor_id = ? AND appointments.appointment_date = ? AND appointments.queue_number IS NOT NULL AND appointments.status IN (?, ?)) AS anon_1]
+[parameters: (1, '2025-12-26', 'confirmed', 'waiting')]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+127.0.0.1 - - [26/Dec/2025 15:56:18] "[32mGET /doctor/dashboard HTTP/1.1[0m" 302 -
+127.0.0.1 - - [26/Dec/2025 15:56:18] "[32mGET / HTTP/1.1[0m" 302 -
+[2025-12-26 15:56:18,756] INFO in routes: Dashboard access by Doctor 1
+[2025-12-26 15:56:18,757] ERROR in routes: Error accessing doctor dashboard for user 1: (sqlite3.OperationalError) no such column: appointments.price_paid
+[SQL: SELECT count(*) AS count_1
+FROM (SELECT appointments.id AS appointments_id, appointments.patient_id AS appointments_patient_id, appointments.doctor_id AS appointments_doctor_id, appointments.status AS appointments_status, appointments.queue_number AS appointments_queue_number, appointments.is_urgent AS appointments_is_urgent, appointments.created_at AS appointments_created_at, appointments.appointment_date AS appointments_appointment_date, appointments.appointment_time AS appointments_appointment_time, appointments.booking_type AS appointments_booking_type, appointments.consultation_reason AS appointments_consultation_reason, appointments.consultation_type_id AS appointments_consultation_type_id, appointments.emergency_type_id AS appointments_emergency_type_id, appointments.relative_id AS appointments_relative_id, appointments.doctor_notes AS appointments_doctor_notes, appointments.is_shadow_slot AS appointments_is_shadow_slot, appointments.urgency_level AS appointments_urgency_level, appointments.arrival_time AS appointments_arrival_time, appointments.check_in_time AS appointments_check_in_time, appointments.price_paid AS appointments_price_paid, appointments.payment_method AS appointments_payment_method
+FROM appointments
+WHERE appointments.doctor_id = ? AND appointments.appointment_date = ? AND appointments.queue_number IS NOT NULL AND appointments.status IN (?, ?)) AS anon_1]
+[parameters: (1, '2025-12-26', 'confirmed', 'waiting')]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+Traceback (most recent call last):
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1967, in _exec_single_context
+    self.dialect.do_execute(
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/engine/default.py", line 952, in do_execute
+    cursor.execute(statement, parameters)
+sqlite3.OperationalError: no such column: appointments.price_paid
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/app/TBIB/routes.py", line 647, in doctor_dashboard
+    ).count()
+      ^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/orm/query.py", line 3146, in count
+    self._legacy_from_self(col).enable_eagerloads(False).scalar()
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/orm/query.py", line 2835, in scalar
+    ret = self.one()
+          ^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/orm/query.py", line 2808, in one
+    return self._iter().one()  # type: ignore
+           ^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/orm/query.py", line 2857, in _iter
+    result: Union[ScalarResult[_T], Result[_T]] = self.session.execute(
+                                                  ^^^^^^^^^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py", line 2351, in execute
+    return self._execute_internal(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py", line 2249, in _execute_internal
+    result: Result[Any] = compile_state_cls.orm_execute_statement(
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/orm/context.py", line 306, in orm_execute_statement
+    result = conn.execute(
+             ^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1419, in execute
+    return meth(
+           ^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/sql/elements.py", line 527, in _execute_on_connection
+    return connection._execute_clauseelement(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1641, in _execute_clauseelement
+    ret = self._execute_context(
+          ^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1846, in _execute_context
+    return self._exec_single_context(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1986, in _exec_single_context
+    self._handle_dbapi_exception(
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 2363, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1967, in _exec_single_context
+    self.dialect.do_execute(
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/engine/default.py", line 952, in do_execute
+    cursor.execute(statement, parameters)
+sqlalchemy.exc.OperationalError: (sqlite3.OperationalError) no such column: appointments.price_paid
+[SQL: SELECT count(*) AS count_1
+FROM (SELECT appointments.id AS appointments_id, appointments.patient_id AS appointments_patient_id, appointments.doctor_id AS appointments_doctor_id, appointments.status AS appointments_status, appointments.queue_number AS appointments_queue_number, appointments.is_urgent AS appointments_is_urgent, appointments.created_at AS appointments_created_at, appointments.appointment_date AS appointments_appointment_date, appointments.appointment_time AS appointments_appointment_time, appointments.booking_type AS appointments_booking_type, appointments.consultation_reason AS appointments_consultation_reason, appointments.consultation_type_id AS appointments_consultation_type_id, appointments.emergency_type_id AS appointments_emergency_type_id, appointments.relative_id AS appointments_relative_id, appointments.doctor_notes AS appointments_doctor_notes, appointments.is_shadow_slot AS appointments_is_shadow_slot, appointments.urgency_level AS appointments_urgency_level, appointments.arrival_time AS appointments_arrival_time, appointments.check_in_time AS appointments_check_in_time, appointments.price_paid AS appointments_price_paid, appointments.payment_method AS appointments_payment_method
+FROM appointments
+WHERE appointments.doctor_id = ? AND appointments.appointment_date = ? AND appointments.queue_number IS NOT NULL AND appointments.status IN (?, ?)) AS anon_1]
+[parameters: (1, '2025-12-26', 'confirmed', 'waiting')]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+127.0.0.1 - - [26/Dec/2025 15:56:18] "[32mGET /doctor/dashboard HTTP/1.1[0m" 302 -
+127.0.0.1 - - [26/Dec/2025 15:56:18] "[32mGET / HTTP/1.1[0m" 302 -
+[2025-12-26 15:56:18,767] INFO in routes: Dashboard access by Doctor 1
+[2025-12-26 15:56:18,769] ERROR in routes: Error accessing doctor dashboard for user 1: (sqlite3.OperationalError) no such column: appointments.price_paid
+[SQL: SELECT count(*) AS count_1
+FROM (SELECT appointments.id AS appointments_id, appointments.patient_id AS appointments_patient_id, appointments.doctor_id AS appointments_doctor_id, appointments.status AS appointments_status, appointments.queue_number AS appointments_queue_number, appointments.is_urgent AS appointments_is_urgent, appointments.created_at AS appointments_created_at, appointments.appointment_date AS appointments_appointment_date, appointments.appointment_time AS appointments_appointment_time, appointments.booking_type AS appointments_booking_type, appointments.consultation_reason AS appointments_consultation_reason, appointments.consultation_type_id AS appointments_consultation_type_id, appointments.emergency_type_id AS appointments_emergency_type_id, appointments.relative_id AS appointments_relative_id, appointments.doctor_notes AS appointments_doctor_notes, appointments.is_shadow_slot AS appointments_is_shadow_slot, appointments.urgency_level AS appointments_urgency_level, appointments.arrival_time AS appointments_arrival_time, appointments.check_in_time AS appointments_check_in_time, appointments.price_paid AS appointments_price_paid, appointments.payment_method AS appointments_payment_method
+FROM appointments
+WHERE appointments.doctor_id = ? AND appointments.appointment_date = ? AND appointments.queue_number IS NOT NULL AND appointments.status IN (?, ?)) AS anon_1]
+[parameters: (1, '2025-12-26', 'confirmed', 'waiting')]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+Traceback (most recent call last):
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1967, in _exec_single_context
+    self.dialect.do_execute(
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/engine/default.py", line 952, in do_execute
+    cursor.execute(statement, parameters)
+sqlite3.OperationalError: no such column: appointments.price_paid
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/app/TBIB/routes.py", line 647, in doctor_dashboard
+    ).count()
+      ^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/orm/query.py", line 3146, in count
+    self._legacy_from_self(col).enable_eagerloads(False).scalar()
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/orm/query.py", line 2835, in scalar
+    ret = self.one()
+          ^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/orm/query.py", line 2808, in one
+    return self._iter().one()  # type: ignore
+           ^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/orm/query.py", line 2857, in _iter
+    result: Union[ScalarResult[_T], Result[_T]] = self.session.execute(
+                                                  ^^^^^^^^^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py", line 2351, in execute
+    return self._execute_internal(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py", line 2249, in _execute_internal
+    result: Result[Any] = compile_state_cls.orm_execute_statement(
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/orm/context.py", line 306, in orm_execute_statement
+    result = conn.execute(
+             ^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1419, in execute
+    return meth(
+           ^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/sql/elements.py", line 527, in _execute_on_connection
+    return connection._execute_clauseelement(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1641, in _execute_clauseelement
+    ret = self._execute_context(
+          ^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1846, in _execute_context
+    return self._exec_single_context(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1986, in _exec_single_context
+    self._handle_dbapi_exception(
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 2363, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1967, in _exec_single_context
+    self.dialect.do_execute(
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/engine/default.py", line 952, in do_execute
+    cursor.execute(statement, parameters)
+sqlalchemy.exc.OperationalError: (sqlite3.OperationalError) no such column: appointments.price_paid
+[SQL: SELECT count(*) AS count_1
+FROM (SELECT appointments.id AS appointments_id, appointments.patient_id AS appointments_patient_id, appointments.doctor_id AS appointments_doctor_id, appointments.status AS appointments_status, appointments.queue_number AS appointments_queue_number, appointments.is_urgent AS appointments_is_urgent, appointments.created_at AS appointments_created_at, appointments.appointment_date AS appointments_appointment_date, appointments.appointment_time AS appointments_appointment_time, appointments.booking_type AS appointments_booking_type, appointments.consultation_reason AS appointments_consultation_reason, appointments.consultation_type_id AS appointments_consultation_type_id, appointments.emergency_type_id AS appointments_emergency_type_id, appointments.relative_id AS appointments_relative_id, appointments.doctor_notes AS appointments_doctor_notes, appointments.is_shadow_slot AS appointments_is_shadow_slot, appointments.urgency_level AS appointments_urgency_level, appointments.arrival_time AS appointments_arrival_time, appointments.check_in_time AS appointments_check_in_time, appointments.price_paid AS appointments_price_paid, appointments.payment_method AS appointments_payment_method
+FROM appointments
+WHERE appointments.doctor_id = ? AND appointments.appointment_date = ? AND appointments.queue_number IS NOT NULL AND appointments.status IN (?, ?)) AS anon_1]
+[parameters: (1, '2025-12-26', 'confirmed', 'waiting')]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+127.0.0.1 - - [26/Dec/2025 15:56:18] "[32mGET /doctor/dashboard HTTP/1.1[0m" 302 -
+127.0.0.1 - - [26/Dec/2025 15:56:18] "[32mGET / HTTP/1.1[0m" 302 -
+[2025-12-26 15:56:18,781] INFO in routes: Dashboard access by Doctor 1
+[2025-12-26 15:56:18,783] ERROR in routes: Error accessing doctor dashboard for user 1: (sqlite3.OperationalError) no such column: appointments.price_paid
+[SQL: SELECT count(*) AS count_1
+FROM (SELECT appointments.id AS appointments_id, appointments.patient_id AS appointments_patient_id, appointments.doctor_id AS appointments_doctor_id, appointments.status AS appointments_status, appointments.queue_number AS appointments_queue_number, appointments.is_urgent AS appointments_is_urgent, appointments.created_at AS appointments_created_at, appointments.appointment_date AS appointments_appointment_date, appointments.appointment_time AS appointments_appointment_time, appointments.booking_type AS appointments_booking_type, appointments.consultation_reason AS appointments_consultation_reason, appointments.consultation_type_id AS appointments_consultation_type_id, appointments.emergency_type_id AS appointments_emergency_type_id, appointments.relative_id AS appointments_relative_id, appointments.doctor_notes AS appointments_doctor_notes, appointments.is_shadow_slot AS appointments_is_shadow_slot, appointments.urgency_level AS appointments_urgency_level, appointments.arrival_time AS appointments_arrival_time, appointments.check_in_time AS appointments_check_in_time, appointments.price_paid AS appointments_price_paid, appointments.payment_method AS appointments_payment_method
+FROM appointments
+WHERE appointments.doctor_id = ? AND appointments.appointment_date = ? AND appointments.queue_number IS NOT NULL AND appointments.status IN (?, ?)) AS anon_1]
+[parameters: (1, '2025-12-26', 'confirmed', 'waiting')]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+Traceback (most recent call last):
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1967, in _exec_single_context
+    self.dialect.do_execute(
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/engine/default.py", line 952, in do_execute
+    cursor.execute(statement, parameters)
+sqlite3.OperationalError: no such column: appointments.price_paid
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/app/TBIB/routes.py", line 647, in doctor_dashboard
+    ).count()
+      ^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/orm/query.py", line 3146, in count
+    self._legacy_from_self(col).enable_eagerloads(False).scalar()
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/orm/query.py", line 2835, in scalar
+    ret = self.one()
+          ^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/orm/query.py", line 2808, in one
+    return self._iter().one()  # type: ignore
+           ^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/orm/query.py", line 2857, in _iter
+    result: Union[ScalarResult[_T], Result[_T]] = self.session.execute(
+                                                  ^^^^^^^^^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py", line 2351, in execute
+    return self._execute_internal(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py", line 2249, in _execute_internal
+    result: Result[Any] = compile_state_cls.orm_execute_statement(
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/orm/context.py", line 306, in orm_execute_statement
+    result = conn.execute(
+             ^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1419, in execute
+    return meth(
+           ^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/sql/elements.py", line 527, in _execute_on_connection
+    return connection._execute_clauseelement(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1641, in _execute_clauseelement
+    ret = self._execute_context(
+          ^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1846, in _execute_context
+    return self._exec_single_context(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1986, in _exec_single_context
+    self._handle_dbapi_exception(
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 2363, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1967, in _exec_single_context
+    self.dialect.do_execute(
+  File "/app/.venv/lib/python3.12/site-packages/sqlalchemy/engine/default.py", line 952, in do_execute
+    cursor.execute(statement, parameters)
+sqlalchemy.exc.OperationalError: (sqlite3.OperationalError) no such column: appointments.price_paid
+[SQL: SELECT count(*) AS count_1
+FROM (SELECT appointments.id AS appointments_id, appointments.patient_id AS appointments_patient_id, appointments.doctor_id AS appointments_doctor_id, appointments.status AS appointments_status, appointments.queue_number AS appointments_queue_number, appointments.is_urgent AS appointments_is_urgent, appointments.created_at AS appointments_created_at, appointments.appointment_date AS appointments_appointment_date, appointments.appointment_time AS appointments_appointment_time, appointments.booking_type AS appointments_booking_type, appointments.consultation_reason AS appointments_consultation_reason, appointments.consultation_type_id AS appointments_consultation_type_id, appointments.emergency_type_id AS appointments_emergency_type_id, appointments.relative_id AS appointments_relative_id, appointments.doctor_notes AS appointments_doctor_notes, appointments.is_shadow_slot AS appointments_is_shadow_slot, appointments.urgency_level AS appointments_urgency_level, appointments.arrival_time AS appointments_arrival_time, appointments.check_in_time AS appointments_check_in_time, appointments.price_paid AS appointments_price_paid, appointments.payment_method AS appointments_payment_method
+FROM appointments
+WHERE appointments.doctor_id = ? AND appointments.appointment_date = ? AND appointments.queue_number IS NOT NULL AND appointments.status IN (?, ?)) AS anon_1]
+[parameters: (1, '2025-12-26', 'confirmed', 'waiting')]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+127.0.0.1 - - [26/Dec/2025 15:56:18] "[32mGET /doctor/dashboard HTTP/1.1[0m" 302 -
+127.0.0.1 - - [26/Dec/2025 15:57:20] "GET /admin/seed_lite HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 15:57:22] "GET /login HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 15:57:22] "GET /static/img/Logo_SVG.svg HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 15:57:22] "GET /static/img/logo_final.png HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 15:57:22] "GET /static/css/navigation.css HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 15:57:22] "GET /static/css/style.css HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 15:57:22] "GET /static/css/tokens.css HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 15:57:22] "GET /static/css/animations.css HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 15:57:22] "GET /static/img/logo_accueil.png HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 15:57:22] "GET /static/img/logo_final.png HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 15:57:22] "GET /static/sw.js HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 15:57:25] "[32mPOST /login HTTP/1.1[0m" 302 -
+[2025-12-26 15:57:25,227] INFO in routes: Dashboard access by Doctor 1
+127.0.0.1 - - [26/Dec/2025 15:57:25] "GET /doctor/dashboard HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 15:57:25] "GET /static/css/tokens.css HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 15:57:25] "GET /static/img/logo_final.png HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 15:57:25] "GET /static/css/style.css HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 15:57:25] "GET /static/css/animations.css HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 15:57:25] "GET /api/doctor/appointments?start=2025-12-26&end=2025-12-26 HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 15:57:25] "GET /api/doctor/appointments?start=2025-12-26&end=2025-12-26 HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 15:57:25] "GET /api/queue_status/1 HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 15:57:25] "GET /api/queue_status/1 HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 15:57:25] "[32mPOST /doctor/walkin HTTP/1.1[0m" 302 -
+[2025-12-26 15:57:25,773] INFO in routes: Dashboard access by Doctor 1
+127.0.0.1 - - [26/Dec/2025 15:57:25] "GET /doctor/dashboard HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 15:57:27] "GET /patient/live/status/1 HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 15:57:27] "[35m[1mGET /patient/live/1 HTTP/1.1[0m" 500 -
+Traceback (most recent call last):
+  File "/app/.venv/lib/python3.12/site-packages/flask/app.py", line 1536, in __call__
+    return self.wsgi_app(environ, start_response)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/flask/app.py", line 1514, in wsgi_app
+    response = self.handle_exception(e)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/TBIB/routes.py", line 2356, in patient_live_ticket
+    return render_template('live_ticket.html',
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/flask/templating.py", line 150, in render_template
+    return _render(app, template, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/flask/templating.py", line 131, in _render
+    rv = template.render(context)
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/jinja2/environment.py", line 1295, in render
+    self.environment.handle_exception()
+  File "/app/.venv/lib/python3.12/site-packages/jinja2/environment.py", line 942, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "/app/TBIB/templates/live_ticket.html", line 75, in top-level template code
+    <p class="text-sm text-gray-600">Dr. {{ appointment.doctor.user.name }}</p>
+  File "/app/.venv/lib/python3.12/site-packages/jinja2/environment.py", line 490, in getattr
+    return getattr(obj, attribute)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+jinja2.exceptions.UndefinedError: 'models.Appointment object' has no attribute 'doctor'
+127.0.0.1 - - [26/Dec/2025 15:57:27] "GET /patient/live/1?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 15:57:27] "GET /patient/live/1?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 15:57:27] "GET /patient/live/1?__debugger__=yes&cmd=resource&f=console.png&s=QBBtfzWCV1ujbtaoz0TF HTTP/1.1" 200 -
+ * Detected change in '/app/TBIB/routes.py', reloading
+ * Restarting with stat
+[2025-12-26 15:59:13,081] INFO in app: TBIB startup
+ * Debugger is active!
+ * Debugger PIN: 553-258-307
+ * Detected change in '/app/TBIB/routes.py', reloading
+ * Restarting with stat
+[2025-12-26 15:59:38,203] INFO in app: TBIB startup
+ * Debugger is active!
+ * Debugger PIN: 553-258-307
+ * Detected change in '/app/TBIB/routes.py', reloading
+ * Restarting with stat
+[2025-12-26 16:00:38,474] INFO in app: TBIB startup
+ * Debugger is active!
+ * Debugger PIN: 553-258-307
+127.0.0.1 - - [26/Dec/2025 16:01:17] "GET /admin/seed_lite HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 16:01:20] "GET /login HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 16:01:20] "GET /static/css/tokens.css HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 16:01:20] "GET /static/css/animations.css HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 16:01:20] "GET /static/css/navigation.css HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 16:01:20] "GET /static/css/style.css HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 16:01:20] "GET /static/img/logo_final.png HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 16:01:20] "GET /static/img/Logo_SVG.svg HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 16:01:20] "GET /static/img/logo_accueil.png HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 16:01:20] "GET /static/img/logo_final.png HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 16:01:20] "GET /static/sw.js HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 16:01:23] "[32mPOST /login HTTP/1.1[0m" 302 -
+[2025-12-26 16:01:23,091] INFO in routes: Dashboard access by Doctor 1
+127.0.0.1 - - [26/Dec/2025 16:01:23] "GET /doctor/dashboard HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 16:01:23] "GET /static/css/style.css HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 16:01:23] "GET /static/css/animations.css HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 16:01:23] "GET /static/img/logo_final.png HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 16:01:23] "GET /static/css/tokens.css HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 16:01:23] "GET /api/doctor/appointments?start=2025-12-26&end=2025-12-26 HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 16:01:23] "GET /api/doctor/appointments?start=2025-12-26&end=2025-12-26 HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 16:01:23] "GET /api/queue_status/1 HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 16:01:23] "GET /api/queue_status/1 HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 16:01:23] "[32mPOST /doctor/walkin HTTP/1.1[0m" 302 -
+[2025-12-26 16:01:23,744] INFO in routes: Dashboard access by Doctor 1
+127.0.0.1 - - [26/Dec/2025 16:01:23] "GET /doctor/dashboard HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 16:01:25] "GET /patient/live/status/MQ.UmKrsLOTPKUvMr6yu6Dewsmpp3w HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 16:01:25] "[35m[1mGET /patient/live/MQ.UmKrsLOTPKUvMr6yu6Dewsmpp3w HTTP/1.1[0m" 500 -
+Traceback (most recent call last):
+  File "/app/.venv/lib/python3.12/site-packages/flask/app.py", line 1536, in __call__
+    return self.wsgi_app(environ, start_response)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/flask/app.py", line 1514, in wsgi_app
+    response = self.handle_exception(e)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/TBIB/routes.py", line 2363, in patient_live_ticket
+    return render_template('live_ticket.html',
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/flask/templating.py", line 150, in render_template
+    return _render(app, template, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/flask/templating.py", line 131, in _render
+    rv = template.render(context)
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/jinja2/environment.py", line 1295, in render
+    self.environment.handle_exception()
+  File "/app/.venv/lib/python3.12/site-packages/jinja2/environment.py", line 942, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "/app/TBIB/templates/live_ticket.html", line 75, in top-level template code
+    <p class="text-sm text-gray-600">Dr. {{ appointment.doctor.user.name }}</p>
+  File "/app/.venv/lib/python3.12/site-packages/jinja2/environment.py", line 490, in getattr
+    return getattr(obj, attribute)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+jinja2.exceptions.UndefinedError: 'models.Appointment object' has no attribute 'doctor'
+127.0.0.1 - - [26/Dec/2025 16:01:25] "GET /patient/live/MQ.UmKrsLOTPKUvMr6yu6Dewsmpp3w?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 16:01:25] "GET /patient/live/MQ.UmKrsLOTPKUvMr6yu6Dewsmpp3w?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 16:01:25] "GET /patient/live/MQ.UmKrsLOTPKUvMr6yu6Dewsmpp3w?__debugger__=yes&cmd=resource&f=console.png&s=AkotybNUWRUejaXMaCbn HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 16:02:30] "GET /admin/seed_lite HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 16:02:32] "GET /login HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 16:02:32] "GET /static/img/logo_final.png HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 16:02:32] "GET /static/css/tokens.css HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 16:02:32] "GET /static/img/Logo_SVG.svg HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 16:02:32] "GET /static/css/style.css HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 16:02:32] "GET /static/css/navigation.css HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 16:02:32] "GET /static/css/animations.css HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 16:02:32] "GET /static/img/logo_accueil.png HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 16:02:32] "GET /static/img/logo_final.png HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 16:02:32] "GET /static/sw.js HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 16:02:34] "[32mPOST /login HTTP/1.1[0m" 302 -
+[2025-12-26 16:02:34,985] INFO in routes: Dashboard access by Doctor 1
+127.0.0.1 - - [26/Dec/2025 16:02:34] "GET /doctor/dashboard HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 16:02:35] "GET /static/css/tokens.css HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 16:02:35] "GET /static/img/logo_final.png HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 16:02:35] "GET /static/css/animations.css HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 16:02:35] "GET /static/css/style.css HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 16:02:35] "GET /api/doctor/appointments?start=2025-12-26&end=2025-12-26 HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 16:02:35] "GET /api/queue_status/1 HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 16:02:35] "GET /api/doctor/appointments?start=2025-12-26&end=2025-12-26 HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 16:02:35] "GET /api/queue_status/1 HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 16:02:35] "[32mPOST /doctor/walkin HTTP/1.1[0m" 302 -
+[2025-12-26 16:02:35,434] INFO in routes: Dashboard access by Doctor 1
+127.0.0.1 - - [26/Dec/2025 16:02:35] "GET /doctor/dashboard HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 16:02:37] "GET /patient/live/status/MQ.UmKrsLOTPKUvMr6yu6Dewsmpp3w HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 16:02:37] "GET /patient/live/MQ.UmKrsLOTPKUvMr6yu6Dewsmpp3w HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 16:02:37] "GET /static/css/animations.css HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 16:02:37] "GET /static/css/style.css HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 16:02:37] "GET /static/css/tokens.css HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 16:03:25] "GET /admin/seed_lite HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 16:03:27] "GET /login HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 16:03:27] "GET /static/css/navigation.css HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 16:03:27] "GET /static/img/logo_final.png HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 16:03:27] "GET /static/css/animations.css HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 16:03:27] "GET /static/css/tokens.css HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 16:03:27] "GET /static/css/style.css HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 16:03:27] "GET /static/img/Logo_SVG.svg HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 16:03:27] "GET /static/img/logo_accueil.png HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 16:03:27] "GET /static/img/logo_final.png HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 16:03:27] "GET /static/sw.js HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 16:03:29] "[32mPOST /login HTTP/1.1[0m" 302 -
+[2025-12-26 16:03:29,918] INFO in routes: Dashboard access by Doctor 1
+127.0.0.1 - - [26/Dec/2025 16:03:29] "GET /doctor/dashboard HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 16:03:29] "GET /static/css/animations.css HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 16:03:29] "GET /static/css/tokens.css HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 16:03:29] "GET /static/css/style.css HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 16:03:29] "GET /static/img/logo_final.png HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 16:03:30] "GET /api/queue_status/1 HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 16:03:30] "GET /api/doctor/appointments?start=2025-12-26&end=2025-12-26 HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 16:03:30] "GET /api/queue_status/1 HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 16:03:30] "GET /api/doctor/appointments?start=2025-12-26&end=2025-12-26 HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 16:03:30] "[32mPOST /doctor/walkin HTTP/1.1[0m" 302 -
+[2025-12-26 16:03:30,383] INFO in routes: Dashboard access by Doctor 1
+127.0.0.1 - - [26/Dec/2025 16:03:30] "GET /doctor/dashboard HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 16:03:32] "GET /patient/live/status/MQ.UmKrsLOTPKUvMr6yu6Dewsmpp3w HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 16:03:32] "GET /patient/live/MQ.UmKrsLOTPKUvMr6yu6Dewsmpp3w HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 16:03:32] "GET /static/css/tokens.css HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 16:03:32] "GET /static/css/animations.css HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 16:03:32] "GET /static/css/style.css HTTP/1.1" 200 -
