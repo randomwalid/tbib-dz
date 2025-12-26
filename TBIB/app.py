@@ -57,21 +57,26 @@ def create_app():
 
     @app.errorhandler(404)
     def not_found_error(error):
+        from routes import get_t
         app.logger.error(f'Page not found: {request.url}')
         if request.path.startswith('/api/'):
             return jsonify({'error': 'Resource not found'}), 404
-        return render_template('404.html'), 404
+        return render_template('404.html', t=get_t(), lang=session.get('lang', 'fr')), 404
 
     @app.errorhandler(500)
     def internal_error(error):
+        from routes import get_t
         db.session.rollback()
         app.logger.error(f'Server Error: {error}', exc_info=True)
         if request.path.startswith('/api/'):
             return jsonify({'error': 'Internal Server Error'}), 500
-        return render_template('500.html'), 500
+        return render_template('500.html', t=get_t(), lang=session.get('lang', 'fr')), 500
 
     from routes import main_bp
     app.register_blueprint(main_bp)
+
+    from prescription_routes import prescription_bp
+    app.register_blueprint(prescription_bp)
 
     return app
 

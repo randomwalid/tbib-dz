@@ -722,6 +722,11 @@
                     class="px-6 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg transition font-bold">
                     Valider & Terminer
                 </button>
+                <button type="button"
+                        @click="openPrescriptionModal(selectedAppointmentId)"
+                        class="bg-teal-500 hover:bg-teal-600 text-white px-4 py-2 rounded-lg font-bold">
+                    📝 Générer E-Wassfa
+                </button>
             </div>
         </div>
     </div>
@@ -827,16 +832,14 @@
 
             async fetchQueueStatus() {
                 try {
-                    const doctorId = {{ doctor_profile.id if doctor_profile else 0
-        }
-    };
-    const response = await fetch(`/api/queue_status/${doctorId}`);
-    if (response.ok) {
-        this.queueStatus = await response.json();
-    }
+                    const doctorId = {{ doctor_profile.id if doctor_profile else 0 }};
+                    const response = await fetch(`/api/queue_status/${doctorId}`);
+                    if (response.ok) {
+                        this.queueStatus = await response.json();
+                    }
                 } catch (error) {
-        console.error('Error fetching queue status:', error);
-    }
+                    console.error('Error fetching queue status:', error);
+                }
             },
 
             async markPresent(appointmentId) {
@@ -957,5 +960,66 @@
     }
         }
     }
+</script>
+
+<!-- MODALE E-WASSFA -->
+<div id="prescriptionModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+    <div class="bg-white rounded-xl shadow-2xl p-6 w-full max-w-2xl">
+        <h3 class="text-2xl font-bold mb-4">📝 Créer une Ordonnance E-Wassfa</h3>
+
+        <form id="prescriptionForm" action="" method="POST">
+            <!-- Type d'ordonnance -->
+            <div class="mb-4">
+                <label class="block font-semibold mb-2">Type</label>
+                <select name="type" class="w-full border rounded-lg p-2" required>
+                    <option value="ACUTE">Aiguë (1 utilisation, 30 jours)</option>
+                    <option value="CHRONIC">Chronique (Usages multiples, 1 an)</option>
+                </select>
+            </div>
+
+            <!-- Médicaments -->
+            <div class="mb-4">
+                <label class="block font-semibold mb-2">Médicaments</label>
+                <textarea name="medications"
+                          class="w-full border rounded-lg p-2 h-32"
+                          placeholder="Ex: Amoxicilline 1g - 3x/jour - 7 jours&#10;Paracétamol 1000mg - Si fièvre"
+                          required></textarea>
+            </div>
+
+            <!-- Notes -->
+            <div class="mb-4">
+                <label class="block font-semibold mb-2">Notes additionnelles</label>
+                <textarea name="notes"
+                          class="w-full border rounded-lg p-2 h-20"
+                          placeholder="Instructions spécifiques..."></textarea>
+            </div>
+
+            <!-- Actions -->
+            <div class="flex gap-4">
+                <button type="submit" class="bg-teal-500 hover:bg-teal-600 text-white px-6 py-2 rounded-lg flex-1">
+                    Générer
+                </button>
+                <button type="button" onclick="closePrescriptionModal()" class="bg-gray-300 hover:bg-gray-400 px-6 py-2 rounded-lg">
+                    Annuler
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+function openPrescriptionModal(appointmentId) {
+    if (!appointmentId) {
+        alert("Erreur: Aucun rendez-vous sélectionné");
+        return;
+    }
+    const form = document.getElementById('prescriptionForm');
+    form.action = `/prescription/create/${appointmentId}`;
+    document.getElementById('prescriptionModal').classList.remove('hidden');
+}
+
+function closePrescriptionModal() {
+    document.getElementById('prescriptionModal').classList.add('hidden');
+}
 </script>
 {% endblock %}
