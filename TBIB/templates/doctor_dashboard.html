@@ -827,8 +827,10 @@
 
             async fetchQueueStatus() {
                 try {
-                    const doctorId = {{ doctor_profile.id if doctor_profile else 0 }};
-                    const response = await fetch(`/api/queue_status/${doctorId}`);
+                    const doctorId = {{ doctor_profile.id if doctor_profile else 0
+        }
+    };
+    const response = await fetch(`/api/queue_status/${doctorId}`);
     if (response.ok) {
         this.queueStatus = await response.json();
     }
