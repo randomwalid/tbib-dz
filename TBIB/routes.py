@@ -1,11 +1,8 @@
 from flask import Blueprint, render_template, redirect, url_for, request, flash, session, jsonify, current_app
 from flask_login import login_user, logout_user, login_required, current_user
 from extensions import db
-from models import User, DoctorProfile, Appointment, HealthRecord, DoctorAvailability, ConsultationType, DoctorAbsence, Relative, Referral, Prescription
+from models import User, DoctorProfile, Appointment, HealthRecord, DoctorAvailability, ConsultationType, DoctorAbsence, Relative, Referral
 from utils.engine import calculate_wait_time, shift_appointments, get_conflicting_appointments, cancel_appointments_in_range
-import qrcode
-from io import BytesIO
-import base64
 from utils.smart_engine import QueueOptimizer
 from datetime import date, datetime, timedelta, time
 
@@ -927,79 +924,6 @@ def mark_no_show(appointment_id):
         flash("Impossible de marquer l'absence.", "error")
 
     return redirect(url_for('main.doctor_dashboard'))
-
-@main_bp.route('/doctor/prescription/<int:appointment_id>')
-@login_required
-def generate_prescription(appointment_id):
-    if current_user.role != 'doctor':
-        return redirect(url_for('main.home'))
-
-    appointment = Appointment.query.get_or_404(appointment_id)
-    if appointment.doctor_id != current_user.doctor_profile.id:
-        flash("Accès non autorisé", "error")
-        return redirect(url_for('main.doctor_dashboard'))
-
-    # Check if prescription exists, if not create one
-    if not appointment.prescription:
-        # Default to acute, 1 usage, expires in 7 days
-        expiry = datetime.utcnow() + timedelta(days=7)
-        prescription = Prescription(
-            appointment_id=appointment.id,
-            type='acute',
-            max_usage=1,
-            expiry_date=expiry
-        )
-        db.session.add(prescription)
-        db.session.commit()
-    else:
-        prescription = appointment.prescription
-
-    # Generate QR Code
-    verify_url = url_for('main.verify_prescription', token=prescription.token, _external=True)
-
-    qr = qrcode.QRCode(
-        version=1,
-        error_correction=qrcode.constants.ERROR_CORRECT_L,
-        box_size=10,
-        border=4,
-    )
-    qr.add_data(verify_url)
-    qr.make(fit=True)
-
-    img = qr.make_image(fill_color="black", back_color="white")
-
-    buffered = BytesIO()
-    img.save(buffered)
-    img_str = base64.b64encode(buffered.getvalue()).decode('utf-8')
-
-    return render_template('prescription.html',
-                           appointment=appointment,
-                           prescription=prescription,
-                           qr_code=img_str,
-                           lang=session.get('lang', 'fr'))
-
-@main_bp.route('/verify/prescription/<token>')
-def verify_prescription(token):
-    prescription = Prescription.query.filter_by(token=token).first_or_404()
-
-    # Check validity
-    now = datetime.utcnow()
-    is_expired = prescription.expiry_date and prescription.expiry_date < now
-    is_valid = prescription.status == 'valid' and not is_expired and prescription.current_usage < prescription.max_usage
-
-    status_display = "VALIDE" if is_valid else "INVALIDE"
-    if is_expired:
-        status_display = "EXPIRÉE"
-    elif prescription.current_usage >= prescription.max_usage:
-        status_display = "DÉJÀ UTILISÉE"
-    elif prescription.status != 'valid':
-        status_display = prescription.status.upper()
-
-    return render_template('verify_prescription.html',
-                           prescription=prescription,
-                           status_display=status_display,
-                           is_valid=is_valid,
-                           lang=session.get('lang', 'fr'))
 
 @main_bp.route('/appointment/<int:appt_id>/present', methods=['POST'])
 @login_required
