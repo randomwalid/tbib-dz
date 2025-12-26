@@ -2330,3 +2330,100 @@ def add_walkin():
             break
 
     return redirect(url_for('main.doctor_dashboard'))
+from itsdangerous import URLSafeSerializer
+
+def get_serializer(secret_key=None):
+    if secret_key is None:
+        secret_key = current_app.secret_key
+    return URLSafeSerializer(secret_key)
+
+@main_bp.route('/patient/live/<token>')
+def patient_live_ticket(token):
+    s = get_serializer()
+    try:
+        appointment_id = s.loads(token)
+    except:
+        return render_template('404.html', t=get_t(), lang=session.get('lang', 'fr'))
+
+    appointment = Appointment.query.get_or_404(appointment_id)
+    today = date.today()
+
+    query = Appointment.query.filter(
+        Appointment.doctor_id == appointment.doctor_id,
+        Appointment.appointment_date == today,
+        Appointment.status == 'waiting'
+    )
+
+    if appointment.queue_number:
+        query = query.filter(Appointment.queue_number < appointment.queue_number)
+
+    waiting_ahead = query.count()
+    estimated_wait = waiting_ahead * 15
+
+    return render_template('live_ticket.html',
+                           appointment=appointment,
+                           waiting_ahead=waiting_ahead,
+                           estimated_wait=estimated_wait,
+                           t=get_t(),
+                           token=token,
+                           lang=session.get('lang', 'fr'))
+
+@main_bp.route('/patient/live/status/<token>')
+def patient_live_status(token):
+    s = get_serializer()
+    try:
+        appointment_id = s.loads(token)
+    except:
+        return jsonify({'error': 'Invalid token'}), 403
+
+    appointment = Appointment.query.get_or_404(appointment_id)
+    today = date.today()
+
+    query = Appointment.query.filter(
+        Appointment.doctor_id == appointment.doctor_id,
+        Appointment.appointment_date == today,
+        Appointment.status == 'waiting'
+    )
+
+    if appointment.queue_number:
+        query = query.filter(Appointment.queue_number < appointment.queue_number)
+
+    waiting_ahead = query.count()
+    estimated_wait = waiting_ahead * 15
+
+    return jsonify({
+        'success': True,
+        'status': appointment.status,
+        'waiting_ahead': waiting_ahead,
+        'estimated_wait': estimated_wait,
+        'queue_number': appointment.queue_number,
+        'patient_name': appointment.patient.name if appointment.patient else ""
+    })
+
+@main_bp.route('/patient/live/confirm/<token>', methods=['POST'])
+def patient_live_confirm(token):
+    s = get_serializer()
+    try:
+        appointment_id = s.loads(token)
+    except:
+        return jsonify({'error': 'Invalid token'}), 403
+
+    appointment = Appointment.query.get_or_404(appointment_id)
+
+    if appointment.status == 'waiting' and appointment.queue_number:
+         return jsonify({'success': True, 'message': 'Already checked in'})
+
+    max_queue = db.session.query(db.func.max(Appointment.queue_number)).filter(
+        Appointment.doctor_id == appointment.doctor_id,
+        Appointment.appointment_date == date.today()
+    ).scalar() or 0
+
+    appointment.queue_number = max_queue + 1
+    appointment.status = 'waiting'
+    try:
+        appointment.check_in_time = datetime.now()
+    except:
+        pass
+
+    db.session.commit()
+    return jsonify({'success': True})
