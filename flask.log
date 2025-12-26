@@ -1,0 +1,183 @@
+Using CPython 3.12.12 interpreter at: /home/jules/.pyenv/versions/3.12.12/bin/python3
+Creating virtual environment at: .venv
+Downloading babel (9.7MiB)
+Downloading sqlalchemy (3.2MiB)
+Downloading pillow (6.7MiB)
+Downloading psycopg2-binary (4.0MiB)
+ Downloading psycopg2-binary
+ Downloading pillow
+ Downloading sqlalchemy
+ Downloading babel
+Installed 26 packages in 104ms
+[2025-12-26 12:30:30,092] INFO in app: TBIB startup
+ * Serving Flask app 'app'
+ * Debug mode: on
+[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.0.2:5000
+[33mPress CTRL+C to quit[0m
+ * Restarting with stat
+[2025-12-26 12:30:31,954] INFO in app: TBIB startup
+ * Debugger is active!
+ * Debugger PIN: 435-484-703
+127.0.0.1 - - [26/Dec/2025 12:32:06] "[32mGET / HTTP/1.1[0m" 302 -
+Traceback (most recent call last):
+  File "/app/TBIB/.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1967, in _exec_single_context
+    self.dialect.do_execute(
+  File "/app/TBIB/.venv/lib/python3.12/site-packages/sqlalchemy/engine/default.py", line 952, in do_execute
+    cursor.execute(statement, parameters)
+sqlite3.IntegrityError: UNIQUE constraint failed: users.email
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/app/TBIB/.venv/lib/python3.12/site-packages/flask/app.py", line 1536, in __call__
+    return self.wsgi_app(environ, start_response)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/TBIB/.venv/lib/python3.12/site-packages/flask/app.py", line 1514, in wsgi_app
+    response = self.handle_exception(e)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/TBIB/.venv/lib/python3.12/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/TBIB/.venv/lib/python3.12/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/TBIB/.venv/lib/python3.12/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/TBIB/.venv/lib/python3.12/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/TBIB/routes.py", line 233, in home
+    initialize_demo_data()
+  File "/app/TBIB/routes.py", line 161, in initialize_demo_data
+    db.session.flush()
+  File "/app/TBIB/.venv/lib/python3.12/site-packages/sqlalchemy/orm/scoping.py", line 924, in flush
+    return self._proxied.flush(objects=objects)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/TBIB/.venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py", line 4331, in flush
+    self._flush(objects)
+  File "/app/TBIB/.venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py", line 4466, in _flush
+    with util.safe_reraise():
+         ^^^^^^^^^^^^^^^^^^^^
+  File "/app/TBIB/.venv/lib/python3.12/site-packages/sqlalchemy/util/langhelpers.py", line 224, in __exit__
+    raise exc_value.with_traceback(exc_tb)
+  File "/app/TBIB/.venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py", line 4427, in _flush
+    flush_context.execute()
+  File "/app/TBIB/.venv/lib/python3.12/site-packages/sqlalchemy/orm/unitofwork.py", line 466, in execute
+    rec.execute(self)
+  File "/app/TBIB/.venv/lib/python3.12/site-packages/sqlalchemy/orm/unitofwork.py", line 642, in execute
+    util.preloaded.orm_persistence.save_obj(
+  File "/app/TBIB/.venv/lib/python3.12/site-packages/sqlalchemy/orm/persistence.py", line 93, in save_obj
+    _emit_insert_statements(
+  File "/app/TBIB/.venv/lib/python3.12/site-packages/sqlalchemy/orm/persistence.py", line 1233, in _emit_insert_statements
+    result = connection.execute(
+             ^^^^^^^^^^^^^^^^^^^
+  File "/app/TBIB/.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1419, in execute
+    return meth(
+           ^^^^^
+  File "/app/TBIB/.venv/lib/python3.12/site-packages/sqlalchemy/sql/elements.py", line 527, in _execute_on_connection
+    return connection._execute_clauseelement(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/TBIB/.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1641, in _execute_clauseelement
+    ret = self._execute_context(
+          ^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/TBIB/.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1846, in _execute_context
+    return self._exec_single_context(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/TBIB/.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1986, in _exec_single_context
+    self._handle_dbapi_exception(
+  File "/app/TBIB/.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 2363, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "/app/TBIB/.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1967, in _exec_single_context
+    self.dialect.do_execute(
+  File "/app/TBIB/.venv/lib/python3.12/site-packages/sqlalchemy/engine/default.py", line 952, in do_execute
+    cursor.execute(statement, parameters)
+sqlalchemy.exc.IntegrityError: (sqlite3.IntegrityError) UNIQUE constraint failed: users.email
+[SQL: INSERT INTO users (email, password_hash, role, name, phone, birth_date, gender, address, city, created_at, no_show_count, is_blocked, reliability_score, linked_doctor_id, can_view_medical_records) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)]
+[parameters: ('doctor1@tbib.dz', 'pbkdf2:sha256:1000000$zLXtdteA6lI24yGB$37838454f3d547e6d939896d6b535c7f7fb3f2319396b76ca7ffba16e8a69abf', 'doctor', 'Dr. Amine Rahmouni', '0563918223', None, None, None, 'Bejaia', '2025-12-26 12:32:02.450845', 0, 0, 100.0, None, 0)]
+(Background on this error at: https://sqlalche.me/e/20/gkpj)
+127.0.0.1 - - [26/Dec/2025 12:32:06] "[35m[1mHEAD / HTTP/1.1[0m" 500 -
+ * Detected change in '/app/TBIB/routes.py', reloading
+⚠️ DATABASE EMPTY. INITIALIZING DEMO DATA...
+⚠️ DATABASE EMPTY. INITIALIZING DEMO DATA...
+✅ DATABASE INITIALIZED: 50 Doctors & Schedules Created!
+ * Restarting with stat
+[2025-12-26 12:32:45,463] INFO in app: TBIB startup
+ * Debugger is active!
+ * Debugger PIN: 435-484-703
+127.0.0.1 - - [26/Dec/2025 12:32:50] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 12:32:51] "GET /static/css/animations.css HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 12:32:51] "GET /static/css/tokens.css HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 12:32:51] "GET /static/css/navigation.css HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 12:32:51] "GET /static/img/Logo_SVG.svg HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 12:32:51] "GET /static/img/logo_final.png HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 12:32:51] "GET /static/css/style.css HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 12:32:51] "GET /static/img/logo_accueil_transparent.png HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 12:32:52] "GET /static/sw.js HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 12:33:10] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 12:33:10] "GET /static/css/tokens.css HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 12:33:10] "GET /static/css/animations.css HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 12:33:10] "GET /static/img/logo_final.png HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 12:33:10] "GET /static/img/Logo_SVG.svg HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 12:33:10] "GET /static/css/navigation.css HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 12:33:10] "GET /static/css/style.css HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 12:33:10] "GET /static/img/logo_accueil_transparent.png HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 12:33:10] "GET /static/sw.js HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 12:33:11] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 12:33:11] "GET /static/css/navigation.css HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 12:33:11] "GET /static/css/tokens.css HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 12:33:11] "GET /static/css/style.css HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 12:33:11] "GET /static/css/animations.css HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 12:33:11] "GET /static/img/Logo_SVG.svg HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 12:33:11] "GET /static/img/logo_final.png HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 12:33:11] "GET /static/img/logo_accueil_transparent.png HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 12:33:11] "GET /static/sw.js HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 12:33:11] "GET /legal/cgu HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 12:33:11] "GET /static/css/tokens.css HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 12:33:11] "GET /static/css/style.css HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 12:33:11] "GET /static/css/navigation.css HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 12:33:11] "GET /static/css/animations.css HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 12:33:11] "GET /static/img/Logo_SVG.svg HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 12:33:11] "GET /static/img/logo_final.png HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 12:33:12] "GET /legal/privacy HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 12:33:12] "GET /static/css/tokens.css HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 12:33:12] "GET /static/css/style.css HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 12:33:12] "GET /static/css/animations.css HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 12:33:12] "GET /static/img/Logo_SVG.svg HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 12:33:12] "GET /static/css/navigation.css HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 12:33:12] "GET /static/img/logo_final.png HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 12:34:10] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 12:34:10] "GET /static/css/tokens.css HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 12:34:10] "GET /static/img/logo_final.png HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 12:34:10] "GET /static/css/navigation.css HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 12:34:10] "GET /static/img/Logo_SVG.svg HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 12:34:10] "GET /static/css/style.css HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 12:34:10] "GET /static/css/animations.css HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 12:34:10] "GET /static/img/logo_accueil_transparent.png HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 12:34:10] "GET /static/sw.js HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 12:34:13] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 12:34:13] "GET /static/css/tokens.css HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 12:34:13] "GET /static/css/animations.css HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 12:34:13] "GET /static/css/navigation.css HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 12:34:13] "GET /static/img/Logo_SVG.svg HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 12:34:13] "GET /static/css/style.css HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 12:34:13] "GET /static/img/logo_final.png HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 12:34:13] "GET /static/img/logo_accueil_transparent.png HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 12:34:13] "GET /static/sw.js HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 12:34:15] "GET /legal/cgu HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 12:34:15] "GET /static/css/tokens.css HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 12:34:15] "GET /static/css/navigation.css HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 12:34:15] "GET /static/css/animations.css HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 12:34:15] "GET /static/css/style.css HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 12:34:15] "GET /static/img/Logo_SVG.svg HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 12:34:15] "GET /static/img/logo_final.png HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 12:34:17] "GET /legal/privacy HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 12:34:17] "GET /static/css/style.css HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 12:34:17] "GET /static/img/Logo_SVG.svg HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 12:34:17] "GET /static/css/navigation.css HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 12:34:17] "GET /static/css/animations.css HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 12:34:17] "GET /static/img/logo_final.png HTTP/1.1" 200 -
+127.0.0.1 - - [26/Dec/2025 12:34:17] "GET /static/css/tokens.css HTTP/1.1" 200 -

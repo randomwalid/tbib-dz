@@ -149,8 +149,12 @@ def initialize_demo_data():
         city_choice = random.choice(cities)
         specialty = random.choice(specialties)
 
+        email = f"doctor{i+1}@tbib.dz"
+        if User.query.filter_by(email=email).first():
+            continue
+
         user = User(
-            email=f"doctor{i+1}@tbib.dz",
+            email=email,
             role='doctor',
             name=full_name,
             phone=f"05{random.randint(10000000, 99999999)}",
