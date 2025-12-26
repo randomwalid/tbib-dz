@@ -1,67 +1,92 @@
 {% extends 'base.html' %}
 
-{% block title %}Conditions Générales d'Utilisation{% endblock %}
+{% block title %}{{ _('Conditions Générales d\'Utilisation') }}{% endblock %}
 
 {% block content %}
-<div class="container mx-auto px-4 py-8 max-w-4xl">
-    <div class="prose prose-lg prose-indigo mx-auto text-gray-700 bg-white p-8 rounded-xl shadow-sm border border-gray-100">
-        <h1 class="text-3xl font-bold text-gray-900 mb-8 pb-4 border-b border-gray-200">Conditions Générales d'Utilisation (CGU) - TBIB</h1>
+<div class="max-w-4xl mx-auto px-4 py-12">
+    <div class="prose prose-lg prose-teal max-w-none">
+        <h1 class="text-3xl font-bold mb-8">{{ _('Conditions Générales d\'Utilisation (CGU)') }}</h1>
+        <p class="text-sm text-gray-500 mb-8">{{ _('Dernière mise à jour : 2025') }}</p>
 
-        <div class="space-y-8">
-            <section>
-                <h2 class="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-                    <span class="bg-gray-100 text-gray-600 px-2 py-1 rounded text-sm">ARTICLE 1</span>
-                    OBJET
-                </h2>
-                <p class="text-gray-600 leading-relaxed">
-                    TBIB est une solution technique de prise de rendez-vous et de gestion de cabinet.
-                    <strong class="text-gray-900">TBIB N'EST PAS un prestataire de soins.</strong>
-                    Nous ne fournissons aucun conseil médical. Le service se limite à la mise en relation technique entre les patients et les professionnels de santé.
-                </p>
-            </section>
+        <section class="mb-8">
+            <h2 class="text-xl font-bold mb-4">{{ _('1. Préambule et Objet') }}</h2>
+            <p>
+                TBIB ("La Plateforme") est une solution technique de mise en relation entre patients et professionnels de santé.
+                L'utilisation de la Plateforme implique l'acceptation pleine et entière des présentes conditions générales.
+            </p>
+        </section>
 
-            <section>
-                <h2 class="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-                    <span class="bg-gray-100 text-gray-600 px-2 py-1 rounded text-sm">ARTICLE 2</span>
-                    RESPONSABILITÉ
-                </h2>
-                <p class="text-gray-600 leading-relaxed mb-4">
-                    L'Administrateur (TBIB) met en œuvre tous les moyens pour assurer la disponibilité du service. Toutefois, TBIB ne saurait être tenu responsable en cas de :
-                </p>
-                <ul class="list-disc pl-5 space-y-2 text-gray-600 bg-gray-50 p-4 rounded-lg">
-                    <li>Coupure d'internet ou panne serveur (obligation de moyens, non de résultat).</li>
-                    <li>Erreur de saisie par le médecin ou la secrétaire (contenu des rendez-vous, dossiers médicaux).</li>
-                    <li>Usage frauduleux des identifiants (vol de mot de passe, accès non autorisé dû à la négligence de l'utilisateur).</li>
-                    <li>Retards ou annulations de rendez-vous du fait du praticien.</li>
-                </ul>
-            </section>
+        <section class="mb-8">
+            <h2 class="text-xl font-bold mb-4">{{ _('2. Clause de Non-Responsabilité Médicale') }}</h2>
+            <div class="bg-red-50 border-l-4 border-red-500 p-4 mb-4">
+                <p class="font-bold text-red-700">IMPORTANT : TBIB EST UN INTERMÉDIAIRE TECHNIQUE PASSIF.</p>
+            </div>
+            <p>
+                TBIB n'exerce pas la médecine et ne fournit aucun conseil médical, diagnostic ou prescription.
+                La Plateforme se limite à faciliter la prise de rendez-vous et la gestion administrative.
+            </p>
+            <ul class="list-disc pl-5 mt-2">
+                <li>Toute décision médicale, prescription, diagnostic ou dosage relève de la responsabilité <strong>EXCLUSIVE</strong> du professionnel de santé.</li>
+                <li>L'Utilisateur reconnaît que TBIB ne peut être tenu responsable des actes médicaux ou des conseils prodigués par les professionnels de santé inscrits.</li>
+                <li>En cas d'urgence médicale, l'Utilisateur doit contacter immédiatement les services d'urgence (Protection Civile, SAMU) ou se rendre à l'hôpital le plus proche.</li>
+            </ul>
+        </section>
 
-            <section>
-                <h2 class="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-                    <span class="bg-gray-100 text-gray-600 px-2 py-1 rounded text-sm">ARTICLE 3</span>
-                    MODULE ORDONNANCE (E-WASSFA)
-                </h2>
-                <p class="text-gray-600 leading-relaxed">
-                    Le module de génération d'ordonnance est une aide à la rédaction. Le médecin reste
-                    <strong class="text-red-600">SEUL RESPONSABLE</strong> du contenu, des dosages et des interactions médicamenteuses prescrits.
-                    Le QR Code est un outil de sécurisation technique et ne remplace pas la vigilance du pharmacien lors de la délivrance.
-                </p>
-            </section>
+        <section class="mb-8">
+            <h2 class="text-xl font-bold mb-4">{{ _('3. Limitation de Responsabilité') }}</h2>
+            <p>
+                Dans les limites autorisées par la loi, ni le créateur (Walid), ni TBIB, ni ses fournisseurs ne pourront être tenus responsables :
+            </p>
+            <ul class="list-disc pl-5 mt-2">
+                <li>Des dommages indirects, accessoires, spéciaux ou consécutifs.</li>
+                <li>De toute perte de données, perte de profits, ou interruption d'activité.</li>
+                <li>Des erreurs, interruptions ou retards de service.</li>
+            </ul>
+            <p class="mt-4">
+                La responsabilité totale de TBIB envers l'Utilisateur, pour quelque cause que ce soit, est strictement plafonnée au montant total payé par l'Utilisateur pour l'utilisation du service au cours des 12 derniers mois (soit 0 DA pour l'utilisation gratuite).
+            </p>
+        </section>
 
-            <section>
-                <h2 class="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-                    <span class="bg-gray-100 text-gray-600 px-2 py-1 rounded text-sm">ARTICLE 4</span>
-                    ACCESSIBILITÉ
-                </h2>
-                <p class="text-gray-600 leading-relaxed">
-                    L'accès à la plateforme peut être interrompu pour maintenance, mise à jour ou pour toute autre raison technique, sans que cela puisse ouvrir droit à une quelconque indemnisation.
-                </p>
-            </section>
-        </div>
+        <section class="mb-8">
+            <h2 class="text-xl font-bold mb-4">{{ _('4. Propriété Intellectuelle') }}</h2>
+            <p>
+                L'ensemble des éléments constituant la Plateforme (textes, graphismes, logiciels, photographies, images, vidéos, sons, plans, noms, logos, marques, créations et œuvres protégeables diverses, bases de données, etc.) ainsi que la Plateforme elle-même, relèvent des législations algériennes et internationales sur le droit d'auteur et la propriété intellectuelle.
+            </p>
+            <p class="mt-2">
+                Ces éléments sont la propriété exclusive du créateur de TBIB. Toute reproduction, représentation, modification, publication, transmission, dénaturation, totale ou partielle du site ou de son contenu, par quelque procédé que ce soit, et sur quelque support que ce soit est interdite.
+            </p>
+        </section>
 
-        <div class="mt-12 pt-8 border-t border-gray-200 text-sm text-gray-500 text-center">
-            Dernière mise à jour : {{ today_date if today_date else '18 Octobre 2023' }}
-        </div>
+        <section class="mb-8">
+            <h2 class="text-xl font-bold mb-4">{{ _('5. Force Majeure') }}</h2>
+            <p>
+                TBIB ne pourra être tenu responsable de l'inexécution ou du retard dans l'exécution de l'une de ses obligations décrites dans les présentes CGU qui découlerait d'un cas de force majeure.
+            </p>
+            <p class="mt-2">
+                Sont considérés comme cas de force majeure, outre ceux habituellement retenus par la jurisprudence des cours et tribunaux algériens :
+            </p>
+            <ul class="list-disc pl-5 mt-2">
+                <li>Les pannes ou interruptions des réseaux de télécommunication ou du réseau Internet.</li>
+                <li>Les cyberattaques majeures, virus ou piratages informatiques.</li>
+                <li>Les décisions gouvernementales, émeutes, guerres, catastrophes naturelles.</li>
+            </ul>
+        </section>
+
+        <section class="mb-8">
+            <h2 class="text-xl font-bold mb-4">{{ _('6. Juridiction & Droit Applicable') }}</h2>
+            <p>
+                Les présentes CGU sont régies par le droit algérien.
+                Tout litige relève de la compétence exclusive des tribunaux d'Alger.
+            </p>
+        </section>
+
+        <section class="mb-8">
+            <h2 class="text-xl font-bold mb-4">{{ _('7. Conformité Ordinal') }}</h2>
+            <p>
+                Seuls les médecins inscrits à l'Ordre National des Médecins peuvent utiliser TBIB.
+                Toute exercice illégal sera signalé aux autorités compétentes.
+            </p>
+        </section>
     </div>
 </div>
 {% endblock %}
