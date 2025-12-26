@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vérification E-Wassfa</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gradient-to-br from-teal-500 to-cyan-600 min-h-screen flex items-center justify-center p-4">
+    <div class="bg-white rounded-xl shadow-2xl p-8 max-w-md w-full">
+
+        {% if is_valid %}
+        <!-- ORDONNANCE VALIDE -->
+        <div class="text-center">
+            <div class="text-6xl mb-4">✅</div>
+            <h2 class="text-2xl font-bold text-green-600 mb-4">Ordonnance Valide</h2>
+            <div class="text-left bg-gray-50 p-4 rounded-lg mb-6">
+                <p class="text-sm"><strong>Patient:</strong> {{ prescription.patient.name }}</p>
+                <p class="text-sm"><strong>Médecin:</strong> {{ prescription.doctor.name }}</p>
+                <p class="text-sm"><strong>Date:</strong> {{ prescription.created_at.strftime('%d/%m/%Y') }}</p>
+                <p class="text-sm"><strong>Type:</strong> {{ prescription.prescription_type }}</p>
+                <p class="text-sm"><strong>Utilisations:</strong> {{ prescription.usage_count }}/{{ prescription.max_usage }}</p>
+            </div>
+
+            <form method="POST">
+                <button type="submit" class="bg-teal-500 hover:bg-teal-600 text-white px-6 py-3 rounded-lg w-full">
+                    Marquer comme utilisée
+                </button>
+            </form>
+        </div>
+        {% else %}
+        <!-- ORDONNANCE INVALIDE -->
+        <div class="text-center">
+            <div class="text-6xl mb-4">❌</div>
+            <h2 class="text-2xl font-bold text-red-600 mb-4">Ordonnance Invalide</h2>
+            <p class="text-gray-700 mb-6">{{ error_message }}</p>
+            <a href="/" class="bg-gray-300 hover:bg-gray-400 px-6 py-3 rounded-lg inline-block">
+                Retour
+            </a>
+        </div>
+        {% endif %}
+
+    </div>
+</body>
+</html>

@@ -273,3 +273,37 @@ class Referral(db.Model):
     to_doctor = db.relationship('DoctorProfile', foreign_keys=[to_doctor_id], backref='referrals_received')
     patient = db.relationship('User', backref='referrals')
 
+
+class Prescription(db.Model):
+    __tablename__ = 'prescriptions'
+    __table_args__ = {'extend_existing': True}
+
+    id = db.Column(db.Integer, primary_key=True)
+    token = db.Column(db.String(64), unique=True, nullable=False, index=True)
+
+    # Relations
+    appointment_id = db.Column(db.Integer, db.ForeignKey('appointments.id'), nullable=False)
+    doctor_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    patient_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+
+    # Contenu médical (chiffré plus tard)
+    medications = db.Column(db.Text, nullable=True)
+    notes = db.Column(db.Text, nullable=True)
+
+    # Sécurité
+    prescription_type = db.Column(db.String(20), default='ACUTE')  # ACUTE ou CHRONIC
+    usage_count = db.Column(db.Integer, default=0)
+    max_usage = db.Column(db.Integer, default=1)
+    expiry_date = db.Column(db.DateTime, nullable=False)
+
+    # Audit
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    last_verified_at = db.Column(db.DateTime, nullable=True)
+
+    # Relations ORM
+    appointment = db.relationship('Appointment', backref='prescription', lazy=True)
+    doctor = db.relationship('User', foreign_keys=[doctor_id], backref='issued_prescriptions')
+    patient = db.relationship('User', foreign_keys=[patient_id], backref='received_prescriptions')
+
+    def __repr__(self):
+        return f'<Prescription {self.token}>'

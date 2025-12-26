@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E-Wassfa - Ordonnance Sécurisée</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50">
+    <div class="max-w-4xl mx-auto my-8 bg-white shadow-lg rounded-xl p-8">
+
+        <!-- HEADER -->
+        <div class="flex justify-between items-start mb-8 border-b pb-6">
+            <div>
+                <img src="{{ url_for('static', filename='img/logo_final.png') }}"
+                     alt="TBIB" class="h-16 mb-2">
+                <p class="text-sm text-gray-600">Ordonnance Numérique Sécurisée</p>
+            </div>
+            <div class="text-right">
+                <h2 class="font-bold text-lg">{{ prescription.doctor.name }}</h2>
+                <p class="text-sm text-gray-600">{{ prescription.doctor.doctor_profile.specialty }}</p>
+                <p class="text-sm text-gray-600">{{ prescription.doctor.phone }}</p>
+                <p class="text-sm text-gray-600">Date: {{ prescription.created_at.strftime('%d/%m/%Y') }}</p>
+            </div>
+        </div>
+
+        <!-- PATIENT -->
+        <div class="mb-6">
+            <h3 class="font-bold text-lg mb-2">PATIENT</h3>
+            <p><strong>Nom:</strong> {{ prescription.patient.name }}</p>
+            <p><strong>ID:</strong> {{ prescription.patient.id }}</p>
+        </div>
+
+        <!-- PRESCRIPTION -->
+        <div class="mb-6">
+            <h3 class="font-bold text-lg mb-2">PRESCRIPTION</h3>
+            <div class="bg-gray-50 p-4 rounded-lg whitespace-pre-line">
+                {{ prescription.medications or "Aucun médicament spécifique" }}
+            </div>
+        </div>
+
+        <!-- NOTES -->
+        {% if prescription.notes %}
+        <div class="mb-6">
+            <h3 class="font-bold text-lg mb-2">NOTES</h3>
+            <p class="text-gray-700">{{ prescription.notes }}</p>
+        </div>
+        {% endif %}
+
+        <!-- SÉCURITÉ -->
+        <div class="border-t pt-6 mt-8">
+            <div class="flex justify-between items-center">
+                <div>
+                    <p class="text-sm font-semibold">SÉCURITÉ</p>
+                    <p class="text-xs text-gray-600">TYPE: {{ prescription.prescription_type }}</p>
+                    <p class="text-xs text-gray-600">Token: {{ prescription.token }}</p>
+                    <p class="text-xs text-gray-600">Exp: {{ prescription.expiry_date.strftime('%d/%m/%Y') }}</p>
+                    <p class="text-xs text-gray-600">Usage: {{ prescription.usage_count }}/{{ prescription.max_usage }}</p>
+                </div>
+                <div class="text-center">
+                    <img src="data:image/png;base64,{{ qr_code }}"
+                         alt="QR Code" class="w-32 h-32 border-2 border-teal-500">
+                    <p class="text-xs text-gray-600 mt-2">Scanner pour vérifier</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ACTIONS -->
+        <div class="mt-8 flex gap-4">
+            <button onclick="window.print()" class="bg-teal-500 hover:bg-teal-600 text-white px-6 py-2 rounded-lg">
+                🖨️ Imprimer
+            </button>
+            <a href="{{ url_for('main.doctor_dashboard') }}" class="bg-gray-300 hover:bg-gray-400 px-6 py-2 rounded-lg inline-block">
+                ← Retour
+            </a>
+        </div>
+    </div>
+</body>
+</html>
