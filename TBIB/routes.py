@@ -217,6 +217,14 @@ def legal_cgu():
 def legal_privacy():
     return render_template('legal/privacy.html', t=get_t(), lang=session.get('lang', 'fr'))
 
+@main_bp.route('/contact', methods=['GET', 'POST'])
+def contact():
+    if request.method == 'POST':
+        # Ici on pourrait envoyer un email ou sauvegarder le message
+        flash('Votre message a bien été envoyé. Nous vous répondrons bientôt.', 'success')
+        return redirect(url_for('main.contact'))
+    return render_template('contact.html', t=get_t(), lang=session.get('lang', 'fr'))
+
 @main_bp.route('/')
 def home():
     if current_user.is_authenticated and current_user.role == 'doctor':
