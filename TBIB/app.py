@@ -85,8 +85,21 @@ if __name__ == '__main__':
 
     # ✅ CRÉATION AUTOMATIQUE DES TABLES MANQUANTES (FIX E-WASSFA)
     with app.app_context():
-        from models import Prescription  # Force la détection du modèle
+        from models import Prescription, Clinic  # Force la détection du modèle
         db.create_all()
-        print("✅ Tables vérifiées/créées (y compris prescriptions)")
+        print("✅ Tables vérifiées/créées (y compris prescriptions et clinics)")
+
+        # Clinic Mesh Migration Check: Add clinic_id to users if missing
+        try:
+            inspector = db.inspect(db.engine)
+            columns = [c['name'] for c in inspector.get_columns('users')]
+            if 'clinic_id' not in columns:
+                print("⚠ Migrating: Adding clinic_id to users table...")
+                with db.engine.connect() as conn:
+                    conn.execute(db.text("ALTER TABLE users ADD COLUMN clinic_id INTEGER REFERENCES clinics(id)"))
+                    conn.commit()
+                print("✅ Migration Complete: clinic_id added.")
+        except Exception as e:
+            print(f"❌ Migration Error (Clinic Mesh): {e}")
 
     app.run(host='0.0.0.0', port=5000, debug=True)
