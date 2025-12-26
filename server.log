@@ -1,0 +1,36 @@
+[2025-12-25 23:49:37,623] INFO in app: TBIB startup
+ * Serving Flask app 'app'
+ * Debug mode: on
+[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.0.2:5000
+[33mPress CTRL+C to quit[0m
+ * Restarting with stat
+[2025-12-25 23:49:38,866] INFO in app: TBIB startup
+ * Debugger is active!
+ * Debugger PIN: 435-484-703
+127.0.0.1 - - [25/Dec/2025 23:50:13] "GET /login HTTP/1.1" 200 -
+127.0.0.1 - - [25/Dec/2025 23:50:13] "GET /static/css/animations.css HTTP/1.1" 200 -
+127.0.0.1 - - [25/Dec/2025 23:50:13] "GET /static/css/style.css HTTP/1.1" 200 -
+127.0.0.1 - - [25/Dec/2025 23:50:13] "GET /static/css/navigation.css HTTP/1.1" 200 -
+127.0.0.1 - - [25/Dec/2025 23:50:13] "GET /static/css/tokens.css HTTP/1.1" 200 -
+127.0.0.1 - - [25/Dec/2025 23:50:13] "GET /static/img/Logo_SVG.svg HTTP/1.1" 200 -
+127.0.0.1 - - [25/Dec/2025 23:50:13] "GET /static/img/logo_final.png HTTP/1.1" 200 -
+127.0.0.1 - - [25/Dec/2025 23:50:13] "GET /static/img/logo_accueil.png HTTP/1.1" 200 -
+127.0.0.1 - - [25/Dec/2025 23:50:13] "GET /static/sw.js HTTP/1.1" 200 -
+127.0.0.1 - - [25/Dec/2025 23:50:16] "[32mPOST /login HTTP/1.1[0m" 302 -
+[2025-12-25 23:50:16,488] INFO in routes: Dashboard access by Doctor 1
+127.0.0.1 - - [25/Dec/2025 23:50:16] "GET /doctor/dashboard HTTP/1.1" 200 -
+127.0.0.1 - - [25/Dec/2025 23:50:16] "GET /static/css/style.css HTTP/1.1" 200 -
+127.0.0.1 - - [25/Dec/2025 23:50:16] "GET /static/img/logo_final.png HTTP/1.1" 200 -
+127.0.0.1 - - [25/Dec/2025 23:50:16] "GET /static/css/tokens.css HTTP/1.1" 200 -
+127.0.0.1 - - [25/Dec/2025 23:50:16] "GET /static/css/animations.css HTTP/1.1" 200 -
+127.0.0.1 - - [25/Dec/2025 23:50:16] "GET /api/doctor/appointments?start=2025-12-25&end=2025-12-25 HTTP/1.1" 200 -
+127.0.0.1 - - [25/Dec/2025 23:50:16] "GET /api/doctor/appointments?start=2025-12-25&end=2025-12-25 HTTP/1.1" 200 -
+127.0.0.1 - - [25/Dec/2025 23:50:16] "GET /api/queue_status/1 HTTP/1.1" 200 -
+127.0.0.1 - - [25/Dec/2025 23:50:16] "GET /api/queue_status/1 HTTP/1.1" 200 -
+127.0.0.1 - - [25/Dec/2025 23:50:17] "GET /doctor/prescription/1 HTTP/1.1" 200 -
+127.0.0.1 - - [25/Dec/2025 23:50:17] "GET /static/img/logo_final.png HTTP/1.1" 200 -
+127.0.0.1 - - [25/Dec/2025 23:50:17] "GET /verify/prescription/7dbe5d666b88466b83e24c01bcf91075 HTTP/1.1" 200 -
+127.0.0.1 - - [25/Dec/2025 23:50:17] "GET /static/img/logo_final.png HTTP/1.1" 200 -

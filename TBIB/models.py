@@ -1,4 +1,5 @@
 import enum
+import uuid
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime, date, time
@@ -159,6 +160,8 @@ class Appointment(db.Model):
 
     doctor_notes = db.Column(db.Text)
 
+    prescription = db.relationship('Prescription', backref='appointment', uselist=False)
+
     # === SmartFlow Fields ===
     # Shadow Slot: Surbooking sécurisé pour patients peu fiables (score < 50)
     is_shadow_slot = db.Column(db.Boolean, default=False)
@@ -273,3 +276,15 @@ class Referral(db.Model):
     to_doctor = db.relationship('DoctorProfile', foreign_keys=[to_doctor_id], backref='referrals_received')
     patient = db.relationship('User', backref='referrals')
 
+
+class Prescription(db.Model):
+    __tablename__ = 'prescriptions'
+
+    id = db.Column(db.Integer, primary_key=True)
+    appointment_id = db.Column(db.Integer, db.ForeignKey('appointments.id'), nullable=False)
+    token = db.Column(db.String(32), unique=True, index=True, default=lambda: uuid.uuid4().hex)
+    type = db.Column(db.String(20), default='acute')  # acute or chronic
+    max_usage = db.Column(db.Integer, default=1)
+    current_usage = db.Column(db.Integer, default=0)
+    expiry_date = db.Column(db.DateTime, nullable=True)
+    status = db.Column(db.String(20), default='valid')
