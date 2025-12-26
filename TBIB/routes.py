@@ -654,14 +654,10 @@ def doctor_dashboard():
             Appointment.price_paid.isnot(None)
         ).scalar() or 0
 
-        # Charger les secrétaires pour "Mon Équipe"
-        secretaries = User.query.filter_by(role='secretary', linked_doctor_id=doctor_profile.id).all()
-
         return render_template('doctor_dashboard.html',
                             doctor_profile=doctor_profile,
                             waiting_count=waiting_count,
                             today_revenue=today_revenue,
-                            secretaries=secretaries,
                             t=get_t(),
                             lang=session.get('lang', 'fr'))
     except Exception as e:
@@ -1816,50 +1812,22 @@ def delete_absence(absence_id):
 @main_bp.route('/doctor/settings/secretary', methods=['POST'])
 @login_required
 def add_secretary():
-    """Créer un compte secrétaire lié à ce médecin (Old endpoint - maintained for compatibility)."""
-    return create_secretary_internal()
-
-
-@main_bp.route('/doctor/staff/add', methods=['POST'])
-@login_required
-def add_staff():
-    """Route officielle 'Staff Commander' pour ajouter une secrétaire."""
-    return create_secretary_internal(redirect_to_dashboard=True)
-
-
-def create_secretary_internal(redirect_to_dashboard=False):
+    """Créer un compte secrétaire lié à ce médecin."""
     if current_user.role != 'doctor':
-        if redirect_to_dashboard:
-            flash("Accès non autorisé", "error")
-            return redirect(url_for('main.home'))
         return jsonify({'error': 'Unauthorized'}), 403
     
-    if request.is_json:
-        data = request.get_json()
-        name = data.get('name', '').strip()
-        email = data.get('username', '').strip() or data.get('email', '').strip()
-        password = data.get('password', '')
-    else:
-        name = request.form.get('name', '').strip()
-        email = request.form.get('username', '').strip()
-        password = request.form.get('password', '')
-
-    can_view_medical = False # Default safe
+    data = request.get_json()
+    name = data.get('name', '').strip()
+    email = data.get('email', '').strip()
+    password = data.get('password', '')
+    can_view_medical = data.get('can_view_medical', False)
     
     if not name or not email or not password:
-        msg = 'Tous les champs sont requis'
-        if redirect_to_dashboard:
-            flash(msg, 'error')
-            return redirect(url_for('main.doctor_dashboard'))
-        return jsonify({'error': msg}), 400
+        return jsonify({'error': 'Tous les champs sont requis'}), 400
     
     # Vérifier si l'email existe déjà
     if User.query.filter_by(email=email).first():
-        msg = 'Cet identifiant/email est déjà utilisé'
-        if redirect_to_dashboard:
-            flash(msg, 'error')
-            return redirect(url_for('main.doctor_dashboard'))
-        return jsonify({'error': msg}), 400
+        return jsonify({'error': 'Cet email est déjà utilisé'}), 400
     
     secretary = User(
         email=email,
@@ -1874,18 +1842,13 @@ def create_secretary_internal(redirect_to_dashboard=False):
     db.session.commit()
     
     current_app.logger.info(f"Secretary {secretary.id} created by doctor {current_user.id}")
-
-    if redirect_to_dashboard:
-        flash(f"Membre d'équipe ajouté : {name}", "success")
-        return redirect(url_for('main.doctor_dashboard'))
-
     return jsonify({'success': True, 'id': secretary.id})
 
 
 @main_bp.route('/doctor/settings/secretary/<int:secretary_id>', methods=['DELETE'])
 @login_required
 def delete_secretary(secretary_id):
-    """Supprimer un compte secrétaire (Old endpoint)."""
+    """Supprimer un compte secrétaire."""
     if current_user.role != 'doctor':
         return jsonify({'error': 'Unauthorized'}), 403
     
@@ -1897,28 +1860,6 @@ def delete_secretary(secretary_id):
     db.session.commit()
     
     return jsonify({'success': True})
-
-@main_bp.route('/doctor/staff/delete/<int:id>', methods=['POST', 'DELETE'])
-@login_required
-def delete_staff(id):
-    """Route officielle 'Staff Commander' pour révoquer un accès."""
-    if current_user.role != 'doctor':
-        flash("Accès non autorisé", "error")
-        return redirect(url_for('main.home'))
-
-    secretary = User.query.get_or_404(id)
-    if secretary.linked_doctor_id != current_user.doctor_profile.id:
-        flash("Accès non autorisé", "error")
-        return redirect(url_for('main.doctor_dashboard'))
-
-    db.session.delete(secretary)
-    db.session.commit()
-
-    if request.is_json or request.method == 'DELETE':
-         return jsonify({'success': True})
-
-    flash("Accès révoqué avec succès.", "success")
-    return redirect(url_for('main.doctor_dashboard'))
 
 
 @main_bp.route('/doctor/settings/secretary/<int:secretary_id>/delegation', methods=['POST'])
