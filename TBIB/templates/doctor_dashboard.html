@@ -794,12 +794,11 @@
                 diagnosis: '',
                 amount: '',
                 payment_method: 'Espèces',
-                notes: ''
-            },
-            toast: { show: false, message: '', type: 'success' },
-            todayRevenue: {{ today_revenue |default (0) | int }
-    },
-    buttonLoading: { },
+    notes: ''
+        },
+        toast: { show: false, message: '', type: 'success' },
+        todayRevenue: {{ today_revenue |default(0) | int }},
+        buttonLoading: { },
 
     init() {
         window.tbibDashboard = this;
@@ -812,14 +811,14 @@
         setTimeout(() => this.toast.show = false, 3000);
     },
 
-            async fetchData() {
+    async fetchData() {
         await Promise.all([
             this.fetchAppointments(),
             this.fetchQueueStatus()
         ]);
     },
 
-            async fetchAppointments() {
+    async fetchAppointments() {
         try {
             const today = new Date().toISOString().split('T')[0];
             const response = await fetch(`/api/doctor/appointments?start=${today}&end=${today}`);
@@ -832,21 +831,19 @@
         }
     },
 
-            async fetchQueueStatus() {
+    async fetchQueueStatus() {
         try {
-            const doctorId = {{ doctor_profile.id if doctor_profile else 0
+            const doctorId = {{ doctor_profile.id if doctor_profile else 0 }};
+            const response = await fetch(`/api/queue_status/${doctorId}`);
+            if (response.ok) {
+                this.queueStatus = await response.json();
+            }
+        } catch (error) {
+            console.error('Error fetching queue status:', error);
         }
-        };
-        const response = await fetch(`/api/queue_status/${doctorId}`);
-        if (response.ok) {
-            this.queueStatus = await response.json();
-        }
-    } catch (error) {
-        console.error('Error fetching queue status:', error);
-    }
-            },
+    },
 
-            async markPresent(appointmentId) {
+    async markPresent(appointmentId) {
         // Set loading state for this specific button
         this.buttonLoading[appointmentId] = true;
 
