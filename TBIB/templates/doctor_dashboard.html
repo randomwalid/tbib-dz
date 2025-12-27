@@ -174,7 +174,7 @@
             </div>
             <div class="bg-gradient-to-r from-emerald-500 to-green-600 p-4 rounded-xl shadow-sm text-white">
                 <p class="text-xs uppercase tracking-wider font-semibold opacity-80">💰 {{ _('Recette du jour') }}</p>
-                <p class="text-2xl font-bold">{{ today_revenue|default(0)|int }} <span
+                <p class="text-2xl font-bold"><span x-text="todayRevenue"></span> <span
                         class="text-sm font-normal">DA</span></p>
             </div>
         </div>
@@ -722,9 +722,8 @@
                     class="px-6 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg transition font-bold">
                     Valider & Terminer
                 </button>
-                <button type="button"
-                        @click="openPrescriptionModal(selectedAppointmentId)"
-                        class="bg-teal-500 hover:bg-teal-600 text-white px-4 py-2 rounded-lg font-bold">
+                <button type="button" @click="openPrescriptionModal(selectedAppointmentId)"
+                    class="bg-teal-500 hover:bg-teal-600 text-white px-4 py-2 rounded-lg font-bold">
                     📝 Générer E-Wassfa
                 </button>
             </div>
@@ -798,59 +797,102 @@
                 notes: ''
             },
             toast: { show: false, message: '', type: 'success' },
+            todayRevenue: {{ today_revenue |default (0) | int }
+    },
+    buttonLoading: { },
 
-            init() {
-                window.tbibDashboard = this;
-                this.fetchData();
-                setInterval(() => this.fetchData(), 30000);
-            },
+    init() {
+        window.tbibDashboard = this;
+        this.fetchData();
+        setInterval(() => this.fetchData(), 30000);
+    },
 
-            showToast(message, type = 'success') {
-                this.toast = { show: true, message, type };
-                setTimeout(() => this.toast.show = false, 3000);
-            },
+    showToast(message, type = 'success') {
+        this.toast = { show: true, message, type };
+        setTimeout(() => this.toast.show = false, 3000);
+    },
 
             async fetchData() {
-                await Promise.all([
-                    this.fetchAppointments(),
-                    this.fetchQueueStatus()
-                ]);
-            },
+        await Promise.all([
+            this.fetchAppointments(),
+            this.fetchQueueStatus()
+        ]);
+    },
 
             async fetchAppointments() {
-                try {
-                    const today = new Date().toISOString().split('T')[0];
-                    const response = await fetch(`/api/doctor/appointments?start=${today}&end=${today}`);
-                    if (response.ok) {
-                        const data = await response.json();
-                        this.appointments = data.sort((a, b) => new Date(a.start) - new Date(b.start));
-                    }
-                } catch (error) {
-                    console.error('Error fetching appointments:', error);
-                }
-            },
+        try {
+            const today = new Date().toISOString().split('T')[0];
+            const response = await fetch(`/api/doctor/appointments?start=${today}&end=${today}`);
+            if (response.ok) {
+                const data = await response.json();
+                this.appointments = data.sort((a, b) => new Date(a.start) - new Date(b.start));
+            }
+        } catch (error) {
+            console.error('Error fetching appointments:', error);
+        }
+    },
 
             async fetchQueueStatus() {
-                try {
-                    const doctorId = {{ doctor_profile.id if doctor_profile else 0 }};
-                    const response = await fetch(`/api/queue_status/${doctorId}`);
-                    if (response.ok) {
-                        this.queueStatus = await response.json();
-                    }
-                } catch (error) {
-                    console.error('Error fetching queue status:', error);
-                }
+        try {
+            const doctorId = {{ doctor_profile.id if doctor_profile else 0
+        }
+        };
+        const response = await fetch(`/api/queue_status/${doctorId}`);
+        if (response.ok) {
+            this.queueStatus = await response.json();
+        }
+    } catch (error) {
+        console.error('Error fetching queue status:', error);
+    }
             },
 
             async markPresent(appointmentId) {
+        // Set loading state for this specific button
+        this.buttonLoading[appointmentId] = true;
+
+        // Find the appointment in the local array
+        const appt = this.appointments.find(a => a.id === appointmentId);
+        if (!appt) return;
+
+        // Store original status for rollback
+        const originalStatus = appt.extendedProps.status;
+
+        // OPTIMISTIC UPDATE: Change status immediately
+        appt.extendedProps.status = 'checked_in';
+
+        // Update counters optimistically
+        if (originalStatus === 'confirmed') {
+            this.queueStatus.waiting_count = Math.max(0, (this.queueStatus.waiting_count || 0) - 1);
+            this.queueStatus.checked_in_count = (this.queueStatus.checked_in_count || 0) + 1;
+        }
+
         try {
             const response = await fetch(`/appointment/${appointmentId}/present`, { method: 'POST' });
             if (response.ok) {
                 this.showToast('Patient confirmé présent (+2 pts fiabilité)');
+                // Fetch real data  to ensure consistency
                 this.fetchData();
+            } else {
+                // Rollback on failure
+                appt.extendedProps.status = originalStatus;
+                if (originalStatus === 'confirmed') {
+                    this.queueStatus.waiting_count = (this.queueStatus.waiting_count || 0) + 1;
+                    this.queueStatus.checked_in_count = Math.max(0, (this.queueStatus.checked_in_count || 0) - 1);
+                }
+                this.showToast('Erreur lors de la confirmation', 'error');
             }
         } catch (error) {
             console.error('Error marking present:', error);
+            // Rollback on error
+            appt.extendedProps.status = originalStatus;
+            if (originalStatus === 'confirmed') {
+                this.queueStatus.waiting_count = (this.queueStatus.waiting_count || 0) + 1;
+                this.queueStatus.checked_in_count = Math.max(0, (this.queueStatus.checked_in_count || 0) - 1);
+            }
+            this.showToast('Erreur de connexion', 'error');
+        } finally {
+            // Remove loading state
+            delete this.buttonLoading[appointmentId];
         }
     },
 
@@ -861,17 +903,53 @@
 
             async confirmNoShow() {
         if (!this.pendingNoShowId) return;
+
+        // Find the appointment
+        const appt = this.appointments.find(a => a.id === this.pendingNoShowId);
+        if (!appt) {
+            this.showNoShowModal = false;
+            this.pendingNoShowId = null;
+            return;
+        }
+
+        // Store original status for rollback
+        const originalStatus = appt.extendedProps.status;
+
+        // OPTIMISTIC UPDATE: Mark as no-show immediately
+        appt.extendedProps.status = 'no_show';
+
+        // Update counters optimistically
+        if (originalStatus === 'confirmed' || originalStatus === 'waiting') {
+            this.queueStatus.waiting_count = Math.max(0, (this.queueStatus.waiting_count || 0) - 1);
+        }
+
+        // Close modal immediately for better UX
+        this.showNoShowModal = false;
+
         try {
             const response = await fetch(`/appointment/${this.pendingNoShowId}/noshow`, { method: 'POST' });
             if (response.ok) {
                 this.showToast('Absence confirmée (-20 pts fiabilité)', 'error');
                 this.fetchData();
+            } else {
+                // Rollback on failure
+                appt.extendedProps.status = originalStatus;
+                if (originalStatus === 'confirmed' || originalStatus === 'waiting') {
+                    this.queueStatus.waiting_count = (this.queueStatus.waiting_count || 0) + 1;
+                }
+                this.showToast('Erreur lors de la confirmation', 'error');
             }
         } catch (error) {
             console.error('Error marking no-show:', error);
+            // Rollback on error
+            appt.extendedProps.status = originalStatus;
+            if (originalStatus === 'confirmed' || originalStatus === 'waiting') {
+                this.queueStatus.waiting_count = (this.queueStatus.waiting_count || 0) + 1;
+            }
+            this.showToast('Erreur de connexion', 'error');
+        } finally {
+            this.pendingNoShowId = null;
         }
-        this.showNoShowModal = false;
-        this.pendingNoShowId = null;
     },
 
             async applyDelay(minutes) {
@@ -947,6 +1025,11 @@
                 body: JSON.stringify(this.completionData)
             });
             if (response.ok) {
+                // OPTIMISTIC UPDATE: Increment revenue immediately if payment was recorded
+                if (this.completionData.amount && !isNaN(parseFloat(this.completionData.amount))) {
+                    this.todayRevenue += parseFloat(this.completionData.amount);
+                }
+
                 this.showToast('Consultation terminée avec succès');
                 this.fetchData();
             }
@@ -980,18 +1063,16 @@
             <!-- Médicaments -->
             <div class="mb-4">
                 <label class="block font-semibold mb-2">Médicaments</label>
-                <textarea name="medications"
-                          class="w-full border rounded-lg p-2 h-32"
-                          placeholder="Ex: Amoxicilline 1g - 3x/jour - 7 jours&#10;Paracétamol 1000mg - Si fièvre"
-                          required></textarea>
+                <textarea name="medications" class="w-full border rounded-lg p-2 h-32"
+                    placeholder="Ex: Amoxicilline 1g - 3x/jour - 7 jours&#10;Paracétamol 1000mg - Si fièvre"
+                    required></textarea>
             </div>
 
             <!-- Notes -->
             <div class="mb-4">
                 <label class="block font-semibold mb-2">Notes additionnelles</label>
-                <textarea name="notes"
-                          class="w-full border rounded-lg p-2 h-20"
-                          placeholder="Instructions spécifiques..."></textarea>
+                <textarea name="notes" class="w-full border rounded-lg p-2 h-20"
+                    placeholder="Instructions spécifiques..."></textarea>
             </div>
 
             <!-- Actions -->
@@ -999,7 +1080,8 @@
                 <button type="submit" class="bg-teal-500 hover:bg-teal-600 text-white px-6 py-2 rounded-lg flex-1">
                     Générer
                 </button>
-                <button type="button" onclick="closePrescriptionModal()" class="bg-gray-300 hover:bg-gray-400 px-6 py-2 rounded-lg">
+                <button type="button" onclick="closePrescriptionModal()"
+                    class="bg-gray-300 hover:bg-gray-400 px-6 py-2 rounded-lg">
                     Annuler
                 </button>
             </div>
@@ -1008,18 +1090,18 @@
 </div>
 
 <script>
-function openPrescriptionModal(appointmentId) {
-    if (!appointmentId) {
-        alert("Erreur: Aucun rendez-vous sélectionné");
-        return;
+    function openPrescriptionModal(appointmentId) {
+        if (!appointmentId) {
+            alert("Erreur: Aucun rendez-vous sélectionné");
+            return;
+        }
+        const form = document.getElementById('prescriptionForm');
+        form.action = `/prescription/create/${appointmentId}`;
+        document.getElementById('prescriptionModal').classList.remove('hidden');
     }
-    const form = document.getElementById('prescriptionForm');
-    form.action = `/prescription/create/${appointmentId}`;
-    document.getElementById('prescriptionModal').classList.remove('hidden');
-}
 
-function closePrescriptionModal() {
-    document.getElementById('prescriptionModal').classList.add('hidden');
-}
+    function closePrescriptionModal() {
+        document.getElementById('prescriptionModal').classList.add('hidden');
+    }
 </script>
 {% endblock %}

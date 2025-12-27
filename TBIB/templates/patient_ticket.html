@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="{{ lang }}">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,7 +9,9 @@
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&family=Inter:wght@400;600;700&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/tokens.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/animations.css') }}">
     <script>
@@ -47,7 +50,9 @@
         }
     </script>
     <style>
-        body { font-family: 'Inter', sans-serif; }
+        body {
+            font-family: 'Inter', sans-serif;
+        }
 
         /* Circle Animation */
         .progress-ring__circle {
@@ -61,14 +66,24 @@
         }
 
         @keyframes breathe {
-            0%, 100% { stroke-opacity: 1; stroke-width: 12; }
-            50% { stroke-opacity: 0.8; stroke-width: 14; }
+
+            0%,
+            100% {
+                stroke-opacity: 1;
+                stroke-width: 12;
+            }
+
+            50% {
+                stroke-opacity: 0.8;
+                stroke-width: 14;
+            }
         }
     </style>
 </head>
-<body class="bg-[#F8F9FA] text-[#333333] min-h-screen flex flex-col items-center justify-center relative overflow-hidden"
-      x-data="{ mounted: false, progress: 0 }"
-      x-init="setTimeout(() => { mounted = true; progress = 250; }, 300)">
+
+<body
+    class="bg-[#F8F9FA] text-[#333333] min-h-screen flex flex-col items-center justify-center relative overflow-hidden"
+    x-data="patientTicketApp()" x-init="init()">
 
     <!-- Background Elements (optional subtle decoration) -->
     <div class="absolute top-0 left-0 w-full h-full overflow-hidden -z-10">
@@ -78,40 +93,24 @@
 
     <!-- Main Content Container -->
     <div class="flex flex-col items-center justify-center w-full max-w-md px-6 space-y-10 transition-all duration-700 ease-out transform"
-         :class="mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'">
+        :class="mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'">
 
         <!-- Circular Progress Indicator -->
         <div class="relative w-64 h-64 flex items-center justify-center">
             <!-- SVG Ring -->
             <svg class="w-full h-full">
                 <!-- Track -->
-                <circle
-                    cx="128"
-                    cy="128"
-                    r="120"
-                    fill="none"
-                    stroke="#e5e7eb"
-                    stroke-width="12"
-                    class="opacity-50"
-                />
+                <circle cx="128" cy="128" r="120" fill="none" stroke="#e5e7eb" stroke-width="12" class="opacity-50" />
                 <!-- Progress Arc -->
                 <!-- Circumference = 2 * PI * 120 ≈ 754 -->
-                <circle
-                    class="progress-ring__circle breathing-ring text-mint"
-                    cx="128"
-                    cy="128"
-                    r="120"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="12"
-                    stroke-linecap="round"
-                    stroke-dasharray="754"
-                    :stroke-dashoffset="754 - progress"
-                />
+                <circle class="progress-ring__circle breathing-ring text-mint" cx="128" cy="128" r="120" fill="none"
+                    stroke="currentColor" stroke-width="12" stroke-linecap="round" stroke-dasharray="754"
+                    :stroke-dashoffset="754 - progress" />
             </svg>
 
             <!-- Center Text -->
-            <div class="absolute inset-0 flex flex-col items-center justify-center text-center animate-fade-in" style="animation-delay: 0.5s;">
+            <div class="absolute inset-0 flex flex-col items-center justify-center text-center animate-fade-in"
+                style="animation-delay: 0.5s;">
                 <h2 class="text-xl font-bold text-gray-800 leading-tight" style="white-space: pre-line;">
                     {{ t.your_turn_message }}
                 </h2>
@@ -119,7 +118,8 @@
         </div>
 
         <!-- Time Estimate -->
-        <div class="text-center space-y-1 animate-slide-up" style="animation-delay: 0.7s; opacity: 0; animation-fill-mode: forwards;">
+        <div class="text-center space-y-1 animate-slide-up"
+            style="animation-delay: 0.7s; opacity: 0; animation-fill-mode: forwards;">
             <p class="text-gray-500 text-lg">{{ t.estimated_wait_time }}</p>
             <p class="text-5xl font-bold text-mint tracking-tight animate-pulse-slow">
                 {{ wait_time }}
@@ -130,13 +130,81 @@
 
     <!-- Bottom Action Button -->
     <div class="fixed bottom-0 left-0 w-full p-6 bg-white border-t border-gray-100 shadow-[0_-4px_20px_rgba(0,0,0,0.05)] animate-slide-up"
-         style="animation-delay: 1s; opacity: 0; animation-fill-mode: forwards; z-index: 50;">
+        style="animation-delay: 1s; opacity: 0; animation-fill-mode: forwards; z-index: 50;">
         <div class="max-w-md mx-auto">
-            <button class="w-full bg-[#3cc7a7] hover:bg-[#34b396] text-white font-bold text-lg py-4 rounded-xl shadow-lg shadow-mint/30 transform transition-all duration-200 active:scale-95 focus:outline-none focus:ring-4 focus:ring-mint/20">
-                {{ t.confirm_presence }}
+            <button @click="confirmPresence" :disabled="isConfirmed || loading"
+                :class="{'bg-gray-100 text-gray-400 border-gray-200': isConfirmed, 'bg-[#3cc7a7] hover:bg-[#34b396] text-white shadow-lg shadow-mint/30': !isConfirmed}"
+                class="w-full font-bold text-lg py-4 rounded-xl transform transition-all duration-200 active:scale-95 focus:outline-none focus:ring-4 focus:ring-mint/20 flex items-center justify-center gap-3 border">
+
+                <template x-if="loading">
+                    <svg class="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none"
+                        viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4">
+                        </circle>
+                        <path class="opacity-75" fill="currentColor"
+                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                        </path>
+                    </svg>
+                </template>
+
+                <template x-if="!loading && isConfirmed">
+                    <div class="flex items-center gap-2">
+                        <svg class="w-6 h-6 text-[#3cc7a7]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <span class="text-gray-600">Présence Confirmée</span>
+                    </div>
+                </template>
+
+                <template x-if="!loading && !isConfirmed">
+                    <span>{{ t.confirm_presence }}</span>
+                </template>
             </button>
         </div>
     </div>
 
+    <script>
+        function patientTicketApp() {
+            return {
+                mounted: false,
+                progress: 0,
+                loading: false,
+                isConfirmed: false,
+                waitTime: '{{ wait_time }}',
+
+                init() {
+                    // Initialize animations
+                    setTimeout(() => {
+                        this.mounted = true;
+                        this.progress = 250;
+                    }, 300);
+                },
+
+                async confirmPresence() {
+                    if (this.isConfirmed) return;
+
+                    this.loading = true;
+                    try {
+                        // Replace with actual endpoint when available
+                        // For now, simulate API call
+                        await new Promise(resolve => setTimeout(resolve, 800));
+
+                        this.isConfirmed = true;
+
+                        // Optional: Show success toast or redirect
+                        // window.location.href = '/my-appointments';
+                    } catch (error) {
+                        console.error('Error confirming presence:', error);
+                        alert('Erreur de connexion. Veuillez réessayer.');
+                    } finally {
+                        this.loading = false;
+                    }
+                }
+            }
+        }
+    </script>
+
 </body>
+
 </html>
