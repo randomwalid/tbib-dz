@@ -2,7 +2,7 @@ import os
 import logging
 from logging.handlers import RotatingFileHandler
 from flask import Flask, session, render_template, request, jsonify
-from extensions import db, migrate, login_manager, babel
+from extensions import db, migrate, login_manager, babel, csrf
 
 def get_locale():
     return session.get('lang', 'fr')
@@ -33,6 +33,7 @@ def create_app():
     migrate.init_app(app, db)
     login_manager.init_app(app)
     babel.init_app(app, locale_selector=get_locale)
+    csrf.init_app(app) # Enable CSRF protection
     login_manager.login_view = 'main.login'
 
     configure_logging(app)
