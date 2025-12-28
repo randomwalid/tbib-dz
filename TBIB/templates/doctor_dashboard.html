@@ -797,6 +797,7 @@
     notes: ''
         },
         toast: { show: false, message: '', type: 'success' },
+        undoToast: { show: false, appointmentId: null },
         todayRevenue: {{ today_revenue |default(0) | int }},
         buttonLoading: { },
 
@@ -931,7 +932,9 @@
         try {
             const response = await fetch(`/appointment/${this.pendingNoShowId}/noshow`, { method: 'POST' });
             if (response.ok) {
-                this.showToast('Absence confirmée (-20 pts fiabilité)', 'error');
+                // Show Undo Toast
+                this.undoToast = { show: true, appointmentId: this.pendingNoShowId };
+                setTimeout(() => this.undoToast.show = false, 10000);
                 this.fetchData();
             } else {
                 // Rollback on failure
@@ -951,6 +954,38 @@
             this.showToast('Erreur de connexion', 'error');
         } finally {
             this.pendingNoShowId = null;
+        }
+    },
+
+    async undoNoShow(reason) {
+        if (!this.undoToast.appointmentId) return;
+
+        this.undoToast.show = false; // Hide toast immediately
+
+        try {
+            const response = await fetch(`/appointment/${this.undoToast.appointmentId}/undo_noshow`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token() }}'
+                },
+                body: JSON.stringify({ reason: reason })
+            });
+
+            if (response.ok) {
+                 const data = await response.json();
+                 if (reason === 'error') {
+                     this.showToast('Erreur corrigée : Points rendus et statut restauré', 'success');
+                 } else {
+                     this.showToast('Patient marqué en retard (-5 pts)', 'warning');
+                 }
+                 this.fetchData();
+            } else {
+                this.showToast('Erreur lors de l\'annulation', 'error');
+            }
+        } catch (error) {
+            console.error('Error undoing no-show:', error);
+            this.showToast('Erreur de connexion', 'error');
         }
     },
 
