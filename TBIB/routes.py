@@ -1414,6 +1414,9 @@ def doctor_patients():
         'visit_count': p[2]
     } for p in patients_data]
 
+    if request.headers.get('HX-Request'):
+        return render_template('partials/patient_rows.html', patients=patients)
+
     return render_template('doctor_patients.html',
                            patients=patients,
                            search_query=search_query,
