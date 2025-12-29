@@ -129,6 +129,7 @@
                         </div>
                         
                         <form method="POST" action="{{ url_for('main.book_appointment', doctor_id=doctor.id) }}" id="booking-form">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                             <input type="hidden" name="appointment_date" id="input-date">
                             <input type="hidden" name="appointment_time" id="input-time">
                             <input type="hidden" name="consultation_reason" id="input-reason">
