@@ -951,7 +951,6 @@ def mark_patient_present(appt_id):
         if patient:
             current_score = patient.reliability_score if patient.reliability_score is not None else 100.0
             patient.reliability_score = min(100.0, current_score + 2.0)
-            patient.total_appointments = (patient.total_appointments or 0) + 1
         
         db.session.commit()
         current_app.logger.info(f"Appointment {appt_id} marked as present by doctor {current_user.id}")
@@ -1155,27 +1154,37 @@ def check_in_patient(appointment_id):
     if current_user.role != 'doctor':
         return jsonify({'error': 'Unauthorized'}), 403
 
-    appointment = Appointment.query.get_or_404(appointment_id)
+    # --- SMARTFLOW ACTIVÉ ---
+    # Import local pour éviter les soucis circulaires si besoin, 
+    # ou assure-toi que 'process_checkin' est importé en haut
+    from utils.smart_engine import process_checkin 
+    
+    result = process_checkin(appointment_id)
+    
+    if result.get('status') == 'error':
+        return jsonify(result), 404 if result.get('message') == 'RDV non trouvé' else 400
+        
+    # Force Refresh pour le Dashboard
+    appointment = Appointment.query.get(appointment_id)
+    db.session.expire(appointment)
+    
+    # Patch pour le Dashboard (Vert = waiting)
+    if appointment.status == 'checked_in':
+        appointment.status = 'waiting'
+        db.session.commit()
 
-    if appointment.doctor_id != current_user.doctor_profile.id:
-        return jsonify({'error': 'Unauthorized'}), 403
-
-    if appointment.queue_number is not None:
-        return jsonify({'error': 'Patient already checked in'}), 400
-
-    max_queue = db.session.query(db.func.max(Appointment.queue_number)).filter(
-        Appointment.doctor_id == current_user.doctor_profile.id,
-        Appointment.appointment_date == date.today()
-    ).scalar() or 0
-
-    appointment.queue_number = max_queue + 1
-    appointment.status = 'waiting'
-    db.session.commit()
+    message = "Patient enregistré."
+    shadow_info = result.get('shadow_resolution')
+    if shadow_info and shadow_info.get('status') != 'ok':
+         message = f"ATTENTION : {shadow_info.get('message')}"
 
     return jsonify({
         'success': True,
+        'status': 'ok',
         'queue_number': appointment.queue_number,
-        'patient_name': appointment.patient.name
+        'patient_name': appointment.patient.name,
+        'message': message,
+        'shadow_info': shadow_info
     })
 
 @main_bp.route('/api/doctors/<int:doctor_id>/slots')
