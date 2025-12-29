@@ -956,7 +956,10 @@
         this.showNoShowModal = false;
 
         try {
-            const response = await fetch(`/appointment/${this.pendingNoShowId}/noshow`, { method: 'POST' });
+     const response = await fetch(`/appointment/${this.pendingNoShowId}/noshow`, { 
+    method: 'POST',
+    headers: { 'X-CSRFToken': '{{ csrf_token() }}' } // ✅ LA CLÉ DE SÉCURITÉ
+});
             if (response.ok) {
                 // Show Undo Toast
                 this.undoToast = { show: true, appointmentId: this.pendingNoShowId };
