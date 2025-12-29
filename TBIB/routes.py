@@ -987,7 +987,6 @@ def mark_patient_noshow(appt_id):
             current_score = patient.reliability_score if patient.reliability_score is not None else 100.0
             patient.reliability_score = max(0.0, current_score - 20.0)
             patient.no_show_count = (patient.no_show_count or 0) + 1
-            patient.total_appointments = (patient.total_appointments or 0) + 1
         
         db.session.commit()
         current_app.logger.info(f"Appointment {appt_id} marked as no-show by doctor {current_user.id}")
@@ -1002,6 +1001,68 @@ def mark_patient_noshow(appt_id):
     except Exception as e:
         db.session.rollback()
         current_app.logger.error(f"Error marking appointment {appt_id} as no-show: {str(e)}", exc_info=True)
+        return jsonify({'error': 'Internal Server Error'}), 500
+
+@main_bp.route('/appointment/<int:appt_id>/undo_noshow', methods=['POST'])
+@login_required
+def undo_noshow(appt_id):
+    if current_user.role != 'doctor':
+        return jsonify({'error': 'Unauthorized'}), 403
+
+    try:
+        appointment = Appointment.query.get_or_404(appt_id)
+        if appointment.doctor_id != current_user.doctor_profile.id:
+            return jsonify({'error': 'Unauthorized'}), 403
+
+        data = request.get_json()
+        reason = data.get('reason') # 'error' or 'late'
+
+        if not reason:
+             return jsonify({'error': 'Reason required'}), 400
+
+        patient = appointment.patient
+
+        # Restore points (Reverse the -20 penalty)
+        if patient:
+            current_score = patient.reliability_score if patient.reliability_score is not None else 100.0
+            restored_score = min(100.0, current_score + 20.0)
+            patient.reliability_score = restored_score
+
+            # Decrement no_show_count (it was incremented in mark_patient_noshow)
+            if patient.no_show_count and patient.no_show_count > 0:
+                patient.no_show_count -= 1
+
+        if reason == 'error':
+             if appointment.appointment_date == date.today():
+                 appointment.status = 'waiting'
+             else:
+                 appointment.status = 'confirmed'
+
+             flash("Erreur corrigée : Points rendus et statut restauré.", "success")
+
+        elif reason == 'late':
+             appointment.status = 'waiting'
+             appointment.arrival_time = datetime.now()
+             appointment.check_in_time = datetime.now()
+
+             # Apply lighter penalty (-5)
+             if patient:
+                 patient.reliability_score = max(0.0, patient.reliability_score - 5.0)
+
+             flash("Patient marqué en retard. Pénalité ajustée (-5 pts).", "warning")
+
+        db.session.commit()
+
+        return jsonify({
+            'success': True,
+            'message': 'No-show undone',
+            'new_status': appointment.status,
+            'new_score': patient.reliability_score if patient else None
+        })
+
+    except Exception as e:
+        db.session.rollback()
+        current_app.logger.error(f"Error undoing no-show for appointment {appt_id}: {str(e)}", exc_info=True)
         return jsonify({'error': 'Internal Server Error'}), 500
 
 @main_bp.route('/cancel/<int:appointment_id>', methods=['POST'])
