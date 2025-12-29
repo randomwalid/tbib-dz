@@ -49,25 +49,47 @@
         }
     </style>
 </head>
-<body class="min-h-screen flex flex-col items-center justify-center p-6 relative overflow-hidden"
+<!DOCTYPE html>
+<html lang="{{ lang }}" {% if lang == 'ar' %}dir="rtl"{% endif %}>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Live Ticket - {{ appointment.patient.name }}</title>
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/logo_final.png') }}">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+    <style>
+        [x-cloak] { display: none !important; }
+        .blob { position: absolute; filter: blur(40px); z-index: 0; opacity: 0.5; }
+        .animate-pulse-slow { animation: pulse 6s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 0.5; } 50% { opacity: 0.8; } }
+        /* Animation du cercle */
+        .progress-ring__circle {
+            transition: stroke-dashoffset 1s ease-in-out, color 0.5s ease;
+            transform: rotate(-90deg);
+            transform-origin: 50% 50%;
+        }
+    </style>
+</head>
+
+<body class="min-h-screen flex flex-col items-center justify-center p-6 relative overflow-hidden font-sans bg-gray-50"
       x-data="liveTicket('{{ token }}')">
 
-    <!-- Offline Badge -->
-    <div x-show="!online"
-         x-transition.opacity
+    <div x-show="!online" x-cloak x-transition
          class="absolute top-0 left-0 right-0 bg-yellow-500 text-white text-center py-3 text-sm font-medium shadow-md z-50 flex items-center justify-center gap-2">
          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636a9 9 0 010 12.728m0 0l-2.829-2.829m2.829 2.829L21 21M15.536 8.464a5 5 0 010 7.072m0 0l-2.829-2.829m-4.243 2.829a4.978 4.978 0 01-1.414-2.83m-1.414 5.658a9 9 0 01-2.167-9.238m7.824 2.167a1 1 0 111.414 1.414m-1.414-1.414L3 3m8.293 8.293l1.414 1.414"/></svg>
-         Mode Hors-ligne - Ticket Sauvegardé
+         Mode Hors-ligne
     </div>
 
-    <!-- Decorative Blobs -->
     <div class="blob bg-teal-200 w-64 h-64 rounded-full -top-10 -left-10 animate-pulse-slow"></div>
-    <div class="blob bg-mint-100 w-64 h-64 rounded-full bottom-20 -right-10 animate-pulse-slow" style="animation-delay: 1s"></div>
+    <div class="blob bg-blue-100 w-64 h-64 rounded-full bottom-20 -right-10 animate-pulse-slow" style="animation-delay: 1s"></div>
 
-    <!-- Main Content -->
     <div class="w-full max-w-md space-y-8 z-10 pb-24">
 
-        <!-- Header -->
         <div class="text-center space-y-1">
             <h1 class="text-xl font-bold text-gray-800">Votre Ticket Live</h1>
             <div class="flex items-center justify-center gap-2 opacity-70">
@@ -76,39 +98,62 @@
             </div>
         </div>
 
-        <!-- Hero Circle -->
         <div class="relative">
-            <div class="circle-progress">
-                <!-- SVG Ring -->
-                <svg class="absolute inset-0 w-full h-full" viewBox="0 0 120 120">
-                    <circle class="text-gray-50" stroke-width="6" stroke="currentColor" fill="transparent" r="54" cx="60" cy="60" />
-                    <circle class="text-[#14b999] progress-ring__circle" stroke-width="6" stroke-dasharray="339.292" :stroke-dashoffset="progressOffset" stroke-linecap="round" stroke="currentColor" fill="transparent" r="54" cx="60" cy="60" />
-                </svg>
+            <div class="circle-progress flex justify-center">
+                <div class="relative w-[240px] h-[240px]">
+                    <svg class="absolute inset-0 w-full h-full" viewBox="0 0 120 120">
+                        <circle class="text-gray-200" stroke-width="6" stroke="currentColor" fill="transparent" r="54" cx="60" cy="60" />
+                        <circle class="progress-ring__circle" 
+                                :class="driftMinutes > 15 ? 'text-orange-500' : 'text-[#14b999]'"
+                                stroke-width="6" 
+                                stroke-dasharray="339.292" 
+                                :stroke-dashoffset="progressOffset" 
+                                stroke-linecap="round" 
+                                stroke="currentColor" 
+                                fill="white" r="54" cx="60" cy="60" />
+                    </svg>
 
-                <!-- Inner Text -->
-                <div class="flex flex-col items-center justify-center z-10 p-6 text-center w-full">
-                    <span class="text-gray-400 text-xs font-bold uppercase tracking-widest mb-2">Votre tour dans</span>
-                    <h2 class="text-5xl font-extrabold text-[#14b999] leading-none tracking-tight mb-2">
-                        <span x-text="estimatedWait"></span><span class="text-xl ml-1">min</span>
-                    </h2>
-                    <span class="px-3 py-1 bg-gray-50 rounded-full text-[10px] text-gray-400 font-medium border border-gray-100 uppercase tracking-wide">Estimé</span>
+                    <div class="absolute inset-0 flex flex-col items-center justify-center z-10 p-6 text-center">
+                        <span class="text-gray-400 text-xs font-bold uppercase tracking-widest mb-1">Attente estimée</span>
+                        
+                        <h2 class="text-6xl font-black leading-none tracking-tight mb-2"
+                            :class="driftMinutes > 15 ? 'text-orange-500' : 'text-[#14b999]'">
+                            <span x-text="estimatedWait">--</span><span class="text-xl ml-1 font-bold">min</span>
+                        </h2>
+
+                        <div x-show="driftMinutes > 10" x-transition 
+                             class="px-3 py-1 bg-orange-50 rounded-full border border-orange-200 flex items-center gap-1 mt-2">
+                            <span class="text-xs font-bold text-orange-600 flex items-center">
+                                ⚠️ Retard: +<span x-text="driftMinutes"></span> min
+                            </span>
+                        </div>
+                        
+                        <div x-show="driftMinutes <= 10" x-transition
+                             class="px-3 py-1 bg-green-50 rounded-full border border-green-100 mt-2">
+                             <span class="text-[10px] font-bold text-green-600 uppercase tracking-wide flex items-center gap-1">
+                                ☀️ À l'heure
+                             </span>
+                        </div>
+                    </div>
                 </div>
             </div>
 
             <div class="text-center mt-8">
                 <p class="text-gray-500 font-medium text-lg">
-                    Position : <strong class="text-gray-900 text-xl" x-text="waitingAhead + 1"></strong><span class="text-sm align-top">ème</span> dans la file
+                    Position : <strong class="text-gray-900 text-xl" x-text="waitingAhead"></strong><span class="text-sm align-top">e</span> dans la file
+                </p>
+                <p class="text-xs text-gray-400 mt-1 flex justify-center items-center gap-1">
+                    <svg class="w-3 h-3 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                    Mise à jour en temps réel
                 </p>
             </div>
         </div>
-
     </div>
 
-    <!-- Fixed Bottom Action -->
     <div class="fixed bottom-0 left-0 right-0 p-6 bg-white/90 backdrop-blur-xl border-t border-gray-100 z-40">
         <button @click="confirmPresence"
                 :disabled="isCheckedIn || loading"
-                :class="{'bg-gray-100 text-gray-400 border-gray-200': isCheckedIn, 'bg-[#14b999] text-white shadow-lg shadow-teal-500/30 hover:bg-[#0d9479]': !isCheckedIn}"
+                :class="{'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed': isCheckedIn, 'bg-[#14b999] text-white shadow-lg shadow-teal-500/30 hover:bg-[#0d9479]': !isCheckedIn}"
                 class="w-full max-w-md mx-auto py-4 rounded-2xl font-bold text-lg transform transition active:scale-95 flex items-center justify-center gap-3 border">
 
             <template x-if="loading">
@@ -120,13 +165,13 @@
 
             <template x-if="!loading && isCheckedIn">
                 <div class="flex items-center gap-2">
-                    <svg class="w-6 h-6 text-[#14b999]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                    <span class="text-gray-600">Présence Confirmée</span>
+                    <svg class="w-6 h-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                    <span>Vous êtes enregistré ✅</span>
                 </div>
             </template>
 
             <template x-if="!loading && !isCheckedIn">
-                <span>Je confirme ma présence</span>
+                <span>Je suis arrivé (Check-in) 👋</span>
             </template>
         </button>
     </div>
@@ -136,44 +181,50 @@
             return {
                 online: navigator.onLine,
                 loading: false,
+                // Données injectées par le Backend (Jinja2)
                 isCheckedIn: {{ 'true' if appointment.queue_number else 'false' }},
                 waitingAhead: {{ waiting_ahead }},
                 estimatedWait: {{ estimated_wait }},
+                driftMinutes: {{ drift_minutes }}, // <--- C'EST ICI QUE LE CERVEAU PARLE
                 status: '{{ appointment.status }}',
 
                 init() {
                     window.addEventListener('online', () => this.online = true);
                     window.addEventListener('offline', () => this.online = false);
 
-                    if ('serviceWorker' in navigator) {
-                        navigator.serviceWorker.register("{{ url_for('static', filename='sw.js') }}");
-                    }
-
-                    // Polling
+                    // Polling automatique toutes les 30 secondes
                     setInterval(() => {
                         if(this.online) this.refreshStatus();
                     }, 30000);
                 },
 
                 get progressOffset() {
-                    const maxWait = 60; // Base scale 60 mins
-                    const pct = Math.max(0, Math.min(1, (maxWait - this.estimatedWait) / maxWait));
-                    return 339.292 * (1 - pct); // 339.292 is full circumference
+                    // Cercle complet = 339.292 (2 * PI * r)
+                    // On définit une échelle max de 90 minutes pour la jauge
+                    const maxScale = 90; 
+                    const wait = this.estimatedWait || 0;
+                    const pct = Math.max(0, Math.min(1, (maxScale - wait) / maxScale));
+                    return 339.292 * (1 - pct);
                 },
 
                 async confirmPresence() {
                     if(this.isCheckedIn) return;
                     this.loading = true;
                     try {
-                        const res = await fetch(`/patient/live/confirm/${token}`, { method: 'POST' });
+                        const res = await fetch(`/patient/live/confirm/${token}`, { 
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRFToken': '{{ csrf_token() }}' // ✅ LE SESAME
+                            }
+                        });
                         const data = await res.json();
                         if(data.success) {
                             this.isCheckedIn = true;
-                            this.refreshStatus();
+                            this.refreshStatus(); // Rafraîchir immédiatement
                         }
                     } catch(e) {
-                        console.error(e);
-                        alert("Erreur de connexion. Veuillez réessayer.");
+                        alert("Erreur de connexion. Vérifiez votre réseau.");
                     } finally {
                         this.loading = false;
                     }
@@ -184,13 +235,15 @@
                         const res = await fetch(`/patient/live/status/${token}`);
                         const data = await res.json();
                         if(data.success) {
+                            // Mise à jour des variables réactives AlpineJS
                             this.waitingAhead = data.waiting_ahead;
                             this.estimatedWait = data.estimated_wait;
+                            this.driftMinutes = data.drift_minutes; // Mise à jour du retard
                             this.status = data.status;
                             if(data.queue_number) this.isCheckedIn = true;
                         }
                     } catch(e) {
-                        // Silent fail for polling
+                        console.log("Polling error (silent)");
                     }
                 }
             }

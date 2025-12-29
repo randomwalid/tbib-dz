@@ -474,12 +474,17 @@ def my_appointments():
         patient_id=current_user.id
     ).order_by(Appointment.created_at.desc()).all()
 
+    # --- AJOUT: Générateur de Token pour le Ticket Live ---
+    s = get_serializer()
+    def get_token(appt_id):
+        return s.dumps(appt_id)
+
     return render_template('my_appointments.html', 
                            appointments=appointments,
+                           get_token=get_token,  # <--- On passe la clé ici
                            today=date.today(),
                            t=get_t(), 
                            lang=session.get('lang', 'fr'))
-
 @main_bp.route('/patient/profile', methods=['GET', 'POST'])
 @main_bp.route('/patient/profile/<section>', methods=['GET', 'POST'])
 @login_required
@@ -1151,41 +1156,34 @@ def get_queue_status(doctor_id):
 @main_bp.route('/api/check_in/<int:appointment_id>', methods=['POST'])
 @login_required
 def check_in_patient(appointment_id):
-    if current_user.role != 'doctor':
-        return jsonify({'error': 'Unauthorized'}), 403
+        if current_user.role != 'doctor':
+            return jsonify({'error': 'Unauthorized'}), 403
 
-    # --- SMARTFLOW ACTIVÉ ---
-    # Import local pour éviter les soucis circulaires si besoin, 
-    # ou assure-toi que 'process_checkin' est importé en haut
-    from utils.smart_engine import process_checkin 
-    
-    result = process_checkin(appointment_id)
-    
-    if result.get('status') == 'error':
-        return jsonify(result), 404 if result.get('message') == 'RDV non trouvé' else 400
-        
-    # Force Refresh pour le Dashboard
-    appointment = Appointment.query.get(appointment_id)
-    db.session.expire(appointment)
-    
-    # Patch pour le Dashboard (Vert = waiting)
-    if appointment.status == 'checked_in':
+        appointment = Appointment.query.get_or_404(appointment_id)
+
+        # ✅ FIX : On force 'waiting' explicitement
         appointment.status = 'waiting'
+
+        # Logique SmartFlow (Queue Number)
+        if not appointment.queue_number:
+            # Assigner un numéro s'il n'en a pas
+            max_queue = db.session.query(func.max(Appointment.queue_number))\
+                .filter(Appointment.doctor_id == current_user.doctor_profile.id, 
+                        Appointment.appointment_date == date.today()).scalar() or 0
+            appointment.queue_number = max_queue + 1
+
+        if not appointment.arrival_time:
+            appointment.arrival_time = datetime.now()
+
         db.session.commit()
 
-    message = "Patient enregistré."
-    shadow_info = result.get('shadow_resolution')
-    if shadow_info and shadow_info.get('status') != 'ok':
-         message = f"ATTENTION : {shadow_info.get('message')}"
-
-    return jsonify({
-        'success': True,
-        'status': 'ok',
-        'queue_number': appointment.queue_number,
-        'patient_name': appointment.patient.name,
-        'message': message,
-        'shadow_info': shadow_info
-    })
+        return jsonify({
+            'success': True,
+            'status': 'waiting', # Le frontend doit voir du Vert
+            'queue_number': appointment.queue_number,
+            'patient_name': appointment.patient.name,
+            'message': "Patient en salle d'attente."
+        })
 
 @main_bp.route('/api/doctors/<int:doctor_id>/slots')
 def get_doctor_slots(doctor_id):
@@ -2412,66 +2410,103 @@ def get_serializer(secret_key=None):
 
 @main_bp.route('/patient/live/<token>')
 def patient_live_ticket(token):
-    s = get_serializer()
-    try:
-        appointment_id = s.loads(token)
-    except:
-        return render_template('404.html', t=get_t(), lang=session.get('lang', 'fr'))
+        s = get_serializer()
+        try:
+            appointment_id = s.loads(token)
+        except:
+            return render_template('404.html', t=get_t(), lang=session.get('lang', 'fr'))
 
-    appointment = Appointment.query.get_or_404(appointment_id)
-    today = date.today()
+        appointment = Appointment.query.get_or_404(appointment_id)
 
-    query = Appointment.query.filter(
-        Appointment.doctor_id == appointment.doctor_id,
-        Appointment.appointment_date == today,
-        Appointment.status == 'waiting'
-    )
+        # 1. Récupérer les patients DEVANT (pas juste le nombre, mais les objets)
+        query = Appointment.query.filter(
+            Appointment.doctor_id == appointment.doctor_id,
+            Appointment.appointment_date == date.today(),
+            Appointment.status.in_(['waiting', 'confirmed'])
+        )
 
-    if appointment.queue_number:
-        query = query.filter(Appointment.queue_number < appointment.queue_number)
+        if appointment.queue_number:
+            # Si j'ai un ticket, je compte ceux qui ont un numéro plus petit
+            query = query.filter(Appointment.queue_number < appointment.queue_number)
+        else:
+            # Sinon, je compte ceux qui ont une heure prévue avant moi
+            query = query.filter(Appointment.appointment_time < appointment.appointment_time)
 
-    waiting_ahead = query.count()
-    estimated_wait = waiting_ahead * 15
+        appointments_ahead = query.all()
+        waiting_ahead = len(appointments_ahead)
 
-    return render_template('live_ticket.html',
-                           appointment=appointment,
-                           waiting_ahead=waiting_ahead,
-                           estimated_wait=estimated_wait,
-                           t=get_t(),
-                           token=token,
-                           lang=session.get('lang', 'fr'))
+        # 2. CALCUL PRÉCIS : Somme des durées réelles
+        base_wait = 0
+        for appt in appointments_ahead:
+            # Si le RDV a un type spécifique (ex: "Consultation longue"), on prend sa durée
+            # Sinon, on prend 30 min par défaut
+            duration = appt.consultation_type.duration if appt.consultation_type else 30
+            base_wait += duration
+
+        # 3. INTELLIGENCE SMARTFLOW : Ajout du "Météo Drift"
+        optimizer = QueueOptimizer()
+        drift_data = optimizer.detect_drift(appointment.doctor_id)
+        drift_minutes = drift_data.get('drift_minutes', 0)
+
+        # Temps Total = Somme des durées devant + Retard accumulé
+        estimated_wait = max(0, base_wait + drift_minutes)
+
+        return render_template('live_ticket.html',
+                               appointment=appointment,
+                               waiting_ahead=waiting_ahead,
+                               estimated_wait=int(estimated_wait),
+                               drift_minutes=int(drift_minutes),
+                               t=get_t(),
+                               token=token,
+                               lang=session.get('lang', 'fr'))
 
 @main_bp.route('/patient/live/status/<token>')
 def patient_live_status(token):
-    s = get_serializer()
-    try:
-        appointment_id = s.loads(token)
-    except:
-        return jsonify({'error': 'Invalid token'}), 403
+        s = get_serializer()
+        try:
+            appointment_id = s.loads(token)
+        except:
+            return jsonify({'error': 'Invalid token'}), 403
 
-    appointment = Appointment.query.get_or_404(appointment_id)
-    today = date.today()
+        appointment = Appointment.query.get_or_404(appointment_id)
 
-    query = Appointment.query.filter(
-        Appointment.doctor_id == appointment.doctor_id,
-        Appointment.appointment_date == today,
-        Appointment.status == 'waiting'
-    )
+        # Même logique de requête
+        query = Appointment.query.filter(
+            Appointment.doctor_id == appointment.doctor_id,
+            Appointment.appointment_date == date.today(),
+            Appointment.status.in_(['waiting', 'confirmed'])
+        )
 
-    if appointment.queue_number:
-        query = query.filter(Appointment.queue_number < appointment.queue_number)
+        if appointment.queue_number:
+            query = query.filter(Appointment.queue_number < appointment.queue_number)
+        else:
+            query = query.filter(Appointment.appointment_time < appointment.appointment_time)
 
-    waiting_ahead = query.count()
-    estimated_wait = waiting_ahead * 15
+        appointments_ahead = query.all()
+        waiting_ahead = len(appointments_ahead)
 
-    return jsonify({
-        'success': True,
-        'status': appointment.status,
-        'waiting_ahead': waiting_ahead,
-        'estimated_wait': estimated_wait,
-        'queue_number': appointment.queue_number,
-        'patient_name': appointment.patient.name if appointment.patient else ""
-    })
+        # Calcul précis
+        base_wait = 0
+        for appt in appointments_ahead:
+            duration = appt.consultation_type.duration if appt.consultation_type else 30
+            base_wait += duration
+
+        # Ajout du Drift
+        optimizer = QueueOptimizer()
+        drift_data = optimizer.detect_drift(appointment.doctor_id)
+        drift_minutes = drift_data.get('drift_minutes', 0)
+
+        estimated_wait = max(0, base_wait + drift_minutes)
+
+        return jsonify({
+            'success': True,
+            'status': appointment.status,
+            'waiting_ahead': waiting_ahead,
+            'estimated_wait': int(estimated_wait),
+            'drift_minutes': int(drift_minutes),
+            'queue_number': appointment.queue_number,
+            'patient_name': appointment.patient.name
+        })
 
 @main_bp.route('/patient/live/confirm/<token>', methods=['POST'])
 def patient_live_confirm(token):
@@ -2479,24 +2514,33 @@ def patient_live_confirm(token):
     try:
         appointment_id = s.loads(token)
     except:
-        return jsonify({'error': 'Invalid token'}), 403
+        return jsonify({'error': 'Token invalide'}), 400
 
     appointment = Appointment.query.get_or_404(appointment_id)
 
+    # 1. Vérification : Si déjà en salle d'attente, on ne fait rien
     if appointment.status == 'waiting' and appointment.queue_number:
-         return jsonify({'success': True, 'message': 'Already checked in'})
+         return jsonify({'success': True, 'message': 'Déjà enregistré'})
 
-    max_queue = db.session.query(db.func.max(Appointment.queue_number)).filter(
-        Appointment.doctor_id == appointment.doctor_id,
-        Appointment.appointment_date == date.today()
-    ).scalar() or 0
+    # 2. Génération du Numéro de Passage (S'il n'en a pas)
+    if not appointment.queue_number:
+        max_queue = db.session.query(db.func.max(Appointment.queue_number)).filter(
+            Appointment.doctor_id == appointment.doctor_id,
+            Appointment.appointment_date == date.today()
+        ).scalar() or 0
+        appointment.queue_number = max_queue + 1
 
-    appointment.queue_number = max_queue + 1
-    appointment.status = 'waiting'
-    try:
-        appointment.check_in_time = datetime.now()
-    except:
-        pass
+    # 3. MISE À JOUR CRITIQUE (Le Fix)
+    appointment.status = 'waiting'  # Force le vert (Salle d'attente)
+
+    # On utilise 'arrival_time' qui est utilisé par le Smart Engine
+    if not appointment.arrival_time:
+        appointment.arrival_time = datetime.now()
 
     db.session.commit()
-    return jsonify({'success': True})
+
+    return jsonify({
+        'success': True,
+        'status': 'waiting',
+        'queue_number': appointment.queue_number
+    })
