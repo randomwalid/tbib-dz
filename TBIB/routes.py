@@ -2377,10 +2377,12 @@ def add_walkin():
                 db.session.flush()
                 print(f"DEBUG: New patient created with ID: {existing_patient.id}")
 
-            queue_number = Appointment.query.filter_by(
-                doctor_id=doctor_profile.id,
-                appointment_date=date.today()
-            ).count() + 1
+            # Calcul du dernier ticket (Ticket Max + 1)
+            max_q = db.session.query(db.func.max(Appointment.queue_number)).filter(
+                Appointment.doctor_id == doctor_profile.id,
+                Appointment.appointment_date == date.today()
+            ).scalar() or 0
+            queue_number = max_q + 1
 
             print(f"DEBUG: Creating appointment. Doctor ID: {doctor_profile.id}, Queue: {queue_number}")
 
@@ -2392,7 +2394,8 @@ def add_walkin():
                 status='waiting',
                 queue_number=queue_number,
                 urgency_level=urgency_level,
-                consultation_reason='Walk-in / Urgence'
+                consultation_reason='Walk-in / Urgence',
+                arrival_time=datetime.now()
             )
             db.session.add(appointment)
             db.session.commit()
