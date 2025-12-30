@@ -2343,19 +2343,27 @@ def add_walkin():
     from werkzeug.security import generate_password_hash
     from sqlalchemy.exc import IntegrityError
 
+    print("DEBUG: Entering add_walkin")  # DEBUG
     max_retries = 3
     for retry in range(max_retries):
         try:
             doctor_profile = current_user.doctor_profile
             patient_name = request.form.get('patient_name', 'Walk-in Patient')
-            phone = request.form.get('phone', '')
+            phone = request.form.get('phone', '').strip()
             urgency_level = int(request.form.get('urgency_level', 1))
+
+            print(f"DEBUG: Form data - Name: {patient_name}, Phone: '{phone}', Urgency: {urgency_level}")
 
             existing_patient = User.query.filter_by(phone=phone).first() if phone else None
 
+            if existing_patient:
+                print(f"DEBUG: Found existing patient ID: {existing_patient.id}")
+
             if not existing_patient:
+                print("DEBUG: Creating new ghost patient...")
                 temp_email = f"walkin_{uuid.uuid4().hex}@temp.tbib.dz"
                 secure_random_password = secrets.token_urlsafe(32)
+
                 existing_patient = User(
                     name=patient_name,
                     email=temp_email,
@@ -2364,13 +2372,17 @@ def add_walkin():
                     password_hash=generate_password_hash(secure_random_password),
                     reliability_score=100.0
                 )
+
                 db.session.add(existing_patient)
                 db.session.flush()
+                print(f"DEBUG: New patient created with ID: {existing_patient.id}")
 
             queue_number = Appointment.query.filter_by(
                 doctor_id=doctor_profile.id,
                 appointment_date=date.today()
             ).count() + 1
+
+            print(f"DEBUG: Creating appointment. Doctor ID: {doctor_profile.id}, Queue: {queue_number}")
 
             appointment = Appointment(
                 patient_id=existing_patient.id,
@@ -2385,16 +2397,19 @@ def add_walkin():
             db.session.add(appointment)
             db.session.commit()
 
+            print("DEBUG: Appointment committed successfully.")
             flash(f"Patient {patient_name} ajouté en urgence (Ticket #{queue_number}).", "success")
             break
 
-        except IntegrityError:
+        except IntegrityError as e:
+            print(f"DEBUG: IntegrityError: {e}")
             db.session.rollback()
             if retry == max_retries - 1:
                 current_app.logger.error("Failed to create walk-in patient after retries")
                 flash("Erreur lors de l'ajout du patient. Veuillez réessayer.", "error")
             continue
         except Exception as e:
+            print(f"DEBUG: Exception: {e}")
             db.session.rollback()
             current_app.logger.error(f"Error adding walk-in: {str(e)}", exc_info=True)
             flash("Erreur lors de l'ajout du patient.", "error")
