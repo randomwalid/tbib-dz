@@ -29,9 +29,19 @@ def configure_logging(app):
 def create_app():
     app = Flask(__name__)
 
+    # Ensure instance folder exists
+    try:
+        os.makedirs(app.instance_path, exist_ok=True)
+    except OSError:
+        pass
+
+    # Construct absolute path for default SQLite DB in instance folder
+    db_path = os.path.join(app.instance_path, 'tbib.db')
+    default_db_uri = f'sqlite:///{db_path}'
+
     # Configuration sécurisée via variables d'environnement
     app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'tbib-secret-key-2024')
-    app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///tbib.db')
+    app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', default_db_uri)
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {'pool_pre_ping': True}
 
