@@ -3,6 +3,10 @@ import logging
 from logging.handlers import RotatingFileHandler
 from flask import Flask, session, render_template, request, jsonify
 from extensions import db, migrate, login_manager, babel, csrf
+from dotenv import load_dotenv
+
+# Charge les variables d'environnement depuis le fichier .env
+load_dotenv()
 
 def get_locale():
     return session.get('lang', 'fr')
@@ -24,10 +28,21 @@ def configure_logging(app):
 
 def create_app():
     app = Flask(__name__)
+
+    # Configuration sécurisée via variables d'environnement
     app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'tbib-secret-key-2024')
     app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///tbib.db')
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {'pool_pre_ping': True}
+
+    # Gestion du mode DEBUG
+    app.config['DEBUG'] = os.environ.get('DEBUG', 'False').lower() in ('true', '1', 't')
+
+    # Configuration sécurisée des cookies
+    app.config['SESSION_COOKIE_HTTPONLY'] = True
+    app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
+    # SESSION_COOKIE_SECURE doit être True SEULEMENT si DEBUG est False (pour HTTPS en prod)
+    app.config['SESSION_COOKIE_SECURE'] = not app.config['DEBUG']
 
     db.init_app(app)
     migrate.init_app(app, db)
@@ -90,4 +105,4 @@ if __name__ == '__main__':
         db.create_all()
         print("✅ Tables vérifiées/créées (y compris prescriptions)")
 
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    app.run(host='0.0.0.0', port=5000)
