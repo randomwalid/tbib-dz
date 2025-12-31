@@ -94,7 +94,8 @@ def create_prescription(appointment_id):
         max_usage=max_usage,
         expiry_date=expiry,
         created_at=creation_time,
-        security_hash=signature
+        security_hash=signature,
+        status='pending'
     )
 
     db.session.add(prescription)
@@ -112,7 +113,11 @@ def view_prescription(token):
     # Générer le QR Code
     verify_url = url_for('prescription.verify_prescription', token=token, _external=True)
     qr = qrcode.QRCode(version=1, box_size=10, border=2)
-    qr.add_data(verify_url)
+
+    # Secure E-Wassfa QR data: token|hash|timestamp
+    qr_data = f"{prescription.token}|{prescription.security_hash}|{int(prescription.created_at.timestamp())}"
+    qr.add_data(qr_data)
+
     qr.make(fit=True)
 
     img = qr.make_image(fill_color="black", back_color="white")

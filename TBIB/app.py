@@ -104,6 +104,9 @@ def create_app():
     from prescription_routes import prescription_bp
     app.register_blueprint(prescription_bp)
 
+    from pharmacy_routes import pharmacy_bp
+    app.register_blueprint(pharmacy_bp)
+
     return app
 
 if __name__ == '__main__':

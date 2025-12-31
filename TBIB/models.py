@@ -291,6 +291,7 @@ class Prescription(db.Model):
     notes = db.Column(db.Text, nullable=True)
 
     # Sécurité
+    status = db.Column(db.String(20), default='pending', nullable=False, server_default='pending')
     security_hash = db.Column(db.String(64), nullable=True)
     prescription_type = db.Column(db.String(20), default='ACUTE')  # ACUTE ou CHRONIC
     usage_count = db.Column(db.Integer, default=0)
