@@ -5,8 +5,7 @@ from models import User, DoctorProfile, Appointment, HealthRecord, DoctorAvailab
 from utils.engine import calculate_wait_time, shift_appointments, get_conflicting_appointments, cancel_appointments_in_range
 from utils.smart_engine import QueueOptimizer
 from datetime import date, datetime, timedelta, time
-import uuid
-from datetime import datetime
+
 main_bp = Blueprint('main', __name__)
 
 TRANSLATIONS = {
@@ -2335,57 +2334,90 @@ def doctor_public_profile():
 @main_bp.route('/doctor/walkin', methods=['POST'])
 @login_required
 def add_walkin():
-    print("\n🚨 --- DEBUG START: TENTATIVE WALKIN ---")
-    
-    try:
-        # 1. Récupération du nom
-        patient_name = request.form.get('patient_name')
-        
-        if not patient_name:
-            flash("Erreur: Le nom du patient est obligatoire.", "error")
-            return redirect(url_for('main.doctor_dashboard'))
+    """Add a walk-in or emergency patient."""
+    if current_user.role != 'doctor':
+        return redirect(url_for('main.home'))
 
-        # 2. Création du Patient "Invité"
-        unique_email = f"walkin_{uuid.uuid4().hex[:8]}@temp.loc"
-        
-        new_patient = User(
-            name=patient_name,
-            email=unique_email,
-            role='patient'
-            # J'ai retiré is_walkin=True pour éviter le crash SQL
-        )
-        new_patient.set_password("WalkinPass123!")
-        
-        db.session.add(new_patient)
-        db.session.flush() # Force la création de l'ID
-        
-        print(f"🚨 DEBUG: Patient créé avec ID: {new_patient.id}")
+    import uuid
+    import secrets
+    from werkzeug.security import generate_password_hash
+    from sqlalchemy.exc import IntegrityError
 
-        print("🚨 DEBUG: Création du RDV...")
-        new_appointment = Appointment(
-        patient_id=new_patient.id,
-        doctor_id=current_user.id,
-        
-        # 👇 C'EST ICI QU'ON A CORRIGÉ LES NOMS
-        appointment_date=datetime.now().date(),
-        appointment_time=datetime.now().time(),
-        
-        status='confirmed',
-       
-    )
+    print("DEBUG: Entering add_walkin")  # DEBUG
+    max_retries = 3
+    for retry in range(max_retries):
+        try:
+            doctor_profile = current_user.doctor_profile
+            patient_name = request.form.get('patient_name', 'Walk-in Patient')
+            phone = request.form.get('phone', '').strip()
+            urgency_level = int(request.form.get('urgency_level', 1))
 
-        db.session.add(new_appointment)
-        db.session.commit()
-        print("🚨 DEBUG: COMMIT RÉUSSI ! RDV ENREGISTRÉ.")
-        
-        flash("Patient sans RDV ajouté avec succès !", "success")
+            print(f"DEBUG: Form data - Name: {patient_name}, Phone: '{phone}', Urgency: {urgency_level}")
 
-    except Exception as e:
-        db.session.rollback()
-        print(f"🚨 ❌ DEBUG ERREUR CRITIQUE: {e}")
-        flash(f"Erreur technique: {str(e)}", "error")
+            existing_patient = User.query.filter_by(phone=phone).first() if phone else None
 
-    print("🚨 --- DEBUG END ---\n")
+            if existing_patient:
+                print(f"DEBUG: Found existing patient ID: {existing_patient.id}")
+
+            if not existing_patient:
+                print("DEBUG: Creating new ghost patient...")
+                temp_email = f"walkin_{uuid.uuid4().hex}@temp.tbib.dz"
+                secure_random_password = secrets.token_urlsafe(32)
+
+                existing_patient = User(
+                    name=patient_name,
+                    email=temp_email,
+                    phone=phone if phone else None,
+                    role='patient',
+                    password_hash=generate_password_hash(secure_random_password),
+                    reliability_score=100.0
+                )
+
+                db.session.add(existing_patient)
+                db.session.flush()
+                print(f"DEBUG: New patient created with ID: {existing_patient.id}")
+
+            # Calcul du dernier ticket (Ticket Max + 1)
+            max_q = db.session.query(db.func.max(Appointment.queue_number)).filter(
+                Appointment.doctor_id == doctor_profile.id,
+                Appointment.appointment_date == date.today()
+            ).scalar() or 0
+            queue_number = max_q + 1
+
+            print(f"DEBUG: Creating appointment. Doctor ID: {doctor_profile.id}, Queue: {queue_number}")
+
+            appointment = Appointment(
+                patient_id=existing_patient.id,
+                doctor_id=doctor_profile.id,
+                appointment_date=date.today(),
+                appointment_time=datetime.now().time(),
+                status='waiting',
+                queue_number=queue_number,
+                urgency_level=urgency_level,
+                consultation_reason='Walk-in / Urgence',
+                arrival_time=datetime.now()
+            )
+            db.session.add(appointment)
+            db.session.commit()
+
+            print("DEBUG: Appointment committed successfully.")
+            flash(f"Patient {patient_name} ajouté en urgence (Ticket #{queue_number}).", "success")
+            break
+
+        except IntegrityError as e:
+            print(f"DEBUG: IntegrityError: {e}")
+            db.session.rollback()
+            if retry == max_retries - 1:
+                current_app.logger.error("Failed to create walk-in patient after retries")
+                flash("Erreur lors de l'ajout du patient. Veuillez réessayer.", "error")
+            continue
+        except Exception as e:
+            print(f"DEBUG: Exception: {e}")
+            db.session.rollback()
+            current_app.logger.error(f"Error adding walk-in: {str(e)}", exc_info=True)
+            flash("Erreur lors de l'ajout du patient.", "error")
+            break
+
     return redirect(url_for('main.doctor_dashboard'))
 from itsdangerous import URLSafeSerializer
 
