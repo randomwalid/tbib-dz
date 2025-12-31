@@ -438,6 +438,12 @@ def book_appointment(doctor_id):
                 return redirect(url_for('main.doctor_profile', doctor_id=doctor_id))
         else:
             # 3. Créneau libre : réservation standard
+            # STOP TIME TRAVEL: Vérification stricte
+            appt_datetime = datetime.combine(new_appointment.appointment_date, new_appointment.appointment_time)
+            if appt_datetime < datetime.now():
+                flash('Impossible de réserver dans le passé.', 'error')
+                return redirect(url_for('main.doctor_profile', doctor_id=doctor_id))
+
             db.session.add(new_appointment)
             db.session.commit()
             flash('Rendez-vous confirmé.', 'success')
@@ -701,6 +707,7 @@ def api_secretary_appointments():
     if current_user.role != 'secretary':
         return jsonify({'error': 'Unauthorized'}), 403
     
+    # CLOISONNEMENT STRICT: La secrétaire ne voit QUE son médecin lié
     doctor = current_user.linked_doctor
     if not doctor:
         return jsonify({'error': 'No linked doctor'}), 400
@@ -711,6 +718,7 @@ def api_secretary_appointments():
     except ValueError:
         target_date = date.today()
     
+    # Filtre STRICT par doctor.id
     appointments = Appointment.query.filter(
         Appointment.doctor_id == doctor.id,
         Appointment.appointment_date == target_date
@@ -736,7 +744,7 @@ def api_secretary_appointments():
                 'wait_time': wait_mins
             })
     
-    return jsonify({
+    response = jsonify({
         'appointments': [{
             'id': a.id,
             'patient_name': a.patient.name if a.patient else 'Patient',
@@ -747,6 +755,10 @@ def api_secretary_appointments():
         'waiting_room': waiting_room,
         'stats': stats
     })
+
+    # FORCE REFRESH
+    response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+    return response
 
 
 @main_bp.route('/api/secretary/checkin/<int:appointment_id>', methods=['POST'])
@@ -1140,7 +1152,7 @@ def get_queue_status(doctor_id):
     optimizer = QueueOptimizer()
     drift_info = optimizer.detect_drift(doctor_id)
 
-    return jsonify({
+    response = jsonify({
         'current_serving': doctor.waiting_room_count,
         'waiting_count': waiting_count,
         'checked_in_count': checked_in_count,
@@ -1152,6 +1164,10 @@ def get_queue_status(doctor_id):
         'compression_suggestion': drift_info.get('compression_suggestion'),
         'remaining_appointments': drift_info.get('remaining_appointments', 0)
     })
+
+    # FORCE REFRESH: Données Live
+    response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+    return response
 
 @main_bp.route('/api/check_in/<int:appointment_id>', methods=['POST'])
 @login_required
@@ -1235,7 +1251,8 @@ def get_doctor_slots(doctor_id):
         while current_time < end_datetime:
             time_str = current_time.strftime('%H:%M')
 
-            if current_date == date.today() and current_time <= now:
+            # HIDE PAST SLOTS: Si c'est aujourd'hui, on ignore les créneaux passés
+            if current_date == date.today() and current_time <= datetime.now():
                 current_time += timedelta(minutes=30)
                 continue
 
@@ -1246,7 +1263,10 @@ def get_doctor_slots(doctor_id):
 
         slots[current_date.isoformat()] = day_slots
 
-    return jsonify(slots)
+    response = jsonify(slots)
+    # FORCE REFRESH: Horaires Temps Réel
+    response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+    return response
 
 @main_bp.route('/doctor/<int:doctor_id>')
 def doctor_profile(doctor_id):
@@ -2074,7 +2094,8 @@ def get_smart_slots(doctor_id):
         while current_time + timedelta(minutes=duration) <= end_datetime:
             slot_end = current_time + timedelta(minutes=duration)
 
-            if current_date == date.today() and current_time <= now:
+            # HIDE PAST SLOTS: Filtrage strict pour le dashboard
+            if current_date == date.today() and current_time <= datetime.now():
                 current_time += timedelta(minutes=15)
                 continue
 
@@ -2091,7 +2112,10 @@ def get_smart_slots(doctor_id):
 
         slots[current_date.isoformat()] = day_slots
 
-    return jsonify({'slots': slots})
+    response = jsonify({'slots': slots})
+    # FORCE REFRESH: Horaires Temps Réel
+    response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+    return response
 
 
 @main_bp.route('/admin/initialize_db')
