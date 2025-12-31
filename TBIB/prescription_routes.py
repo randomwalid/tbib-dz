@@ -1,5 +1,8 @@
-from flask import Blueprint, render_template, request, jsonify, url_for, redirect, flash
+from flask import Blueprint, render_template, request, jsonify, url_for, redirect, flash, current_app
 import secrets
+import hmac
+import hashlib
+import json
 from datetime import datetime, timedelta
 import qrcode
 import io
@@ -43,6 +46,11 @@ def create_prescription(appointment_id):
 
     # Récupérer les données du formulaire
     medications = request.form.get('medications', '')
+
+    # Validation stricte
+    if not medications or medications.strip() == '':
+        return jsonify({'error': 'Medications list cannot be empty'}), 400
+
     notes = request.form.get('notes', appointment.doctor_notes or '')
     prescription_type = request.form.get('type', 'ACUTE')
 
@@ -57,6 +65,23 @@ def create_prescription(appointment_id):
         expiry = datetime.utcnow() + timedelta(days=365)
         max_usage = 999
 
+    # Signature HMAC-SHA256
+    creation_time = datetime.utcnow()
+    # Use integer timestamp for stability (ignoring microseconds)
+    timestamp_int = int(creation_time.timestamp())
+    payload = {
+        'doctor_id': current_user.id,
+        'patient_id': appointment.patient_id,
+        'medications': medications,
+        'timestamp': timestamp_int
+    }
+    payload_str = json.dumps(payload, sort_keys=True)
+    signature = hmac.new(
+        current_app.config['SECRET_KEY'].encode(),
+        payload_str.encode(),
+        hashlib.sha256
+    ).hexdigest()
+
     # Créer l'ordonnance
     prescription = Prescription(
         token=token,
@@ -67,7 +92,9 @@ def create_prescription(appointment_id):
         notes=notes,
         prescription_type=prescription_type,
         max_usage=max_usage,
-        expiry_date=expiry
+        expiry_date=expiry,
+        created_at=creation_time,
+        security_hash=signature
     )
 
     db.session.add(prescription)
