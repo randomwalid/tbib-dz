@@ -54,6 +54,15 @@ def create_app():
     # SESSION_COOKIE_SECURE doit être True SEULEMENT si DEBUG est False (pour HTTPS en prod)
     app.config['SESSION_COOKIE_SECURE'] = not app.config['DEBUG']
 
+    # Désactive CSRF pour les routes API publiques (scan QR pharmacie)
+    # Sécurité assurée par HMAC (pharmacy_routes.py) + API Key + expiration DB
+    # Note: Flask-WTF requires endpoint names, not URL patterns.
+    app.config['WTF_CSRF_EXEMPT_LIST'] = ['pharmacy_routes.verify_prescription', 'pharmacy_routes.dispense_prescription', 'prescription_routes.verify_prescription']
+    # Manually exempt views because installed Flask-WTF ignores the config list.
+    # We use module paths (e.g. 'prescription_routes.verify_prescription') because csrf.exempt(str) expects 'module.function'.
+    for view_location in app.config['WTF_CSRF_EXEMPT_LIST']:
+        csrf.exempt(view_location)
+
     db.init_app(app)
     migrate.init_app(app, db)
     login_manager.init_app(app)
