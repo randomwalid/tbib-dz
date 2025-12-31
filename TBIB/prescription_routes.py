@@ -115,7 +115,9 @@ def view_prescription(token):
     qr = qrcode.QRCode(version=1, box_size=10, border=2)
 
     # Secure E-Wassfa QR data: token|hash|timestamp
-    qr_data = f"{prescription.token}|{prescription.security_hash}|{int(prescription.created_at.timestamp())}"
+    # QR Code contient l'URL complète pour scan direct
+    # Le hash HMAC reste stocké en DB pour vérification serveur (pharmacy_routes.py ligne 18-37)
+    qr_data = verify_url
     qr.add_data(qr_data)
 
     qr.make(fit=True)
