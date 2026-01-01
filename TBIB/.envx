@@ -1,0 +1,5 @@
+SECRET_KEY=cle-secrete-locale-123456
+DEBUG=True
+DATABASE_URL=sqlite:///tbib.db
+FLASK_APP=main.py
+PHARMACY_API_KEY=IQCwV7yxNlaqKRVC5o_Oh0vhwLECeg7APx0rGfFoLcA

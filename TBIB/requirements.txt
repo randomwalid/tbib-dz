@@ -1,0 +1,42 @@
+cd TBIB
+
+cat > requirements.txt << 'EOF'
+# Core Framework
+Flask==3.0.0
+Flask-Login==0.6.3
+Flask-SQLAlchemy==3.1.1
+Flask-WTF==1.2.1
+Flask-Migrate==4.0.5
+
+# Database
+SQLAlchemy==2.0.23
+psycopg2-binary==2.9.9
+
+# Security
+argon2-cffi==23.1.0
+cryptography==41.0.7
+python-dotenv==1.0.0
+
+# Validation
+pydantic==2.5.2
+email-validator==2.1.0
+
+# ML (Online Learning)
+river==0.21.0
+spacy==3.7.2
+
+# Testing
+pytest==7.4.3
+pytest-flask==1.3.0
+playwright==1.40.0
+
+# Monitoring
+sentry-sdk==1.39.1
+
+# Utils
+python-dateutil==2.8.2
+pillow==10.1.0
+qrcode==7.4.2
+EOF
+
+echo "✅ requirements.txt créé"
