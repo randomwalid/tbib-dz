@@ -1023,7 +1023,10 @@
         try {
             const response = await fetch('/api/emergency/shift', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token() }}'
+                },
                 body: JSON.stringify({ urgency_duration: minutes })
             });
             if (response.ok) {
