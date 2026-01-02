@@ -1,12 +1,21 @@
 from flask import Blueprint, render_template, request, jsonify, url_for, redirect, flash, current_app
+import secrets
+import hmac
+import hashlib
+import json
 from datetime import datetime, timedelta
+import qrcode
+import io
+import base64
 from flask_login import login_required, current_user
 from models import Prescription, Appointment
 from extensions import db
 
-from SERVICES.ewassfa import EWassfaService
-
 prescription_bp = Blueprint('prescription', __name__, url_prefix='/prescription')
+
+def generate_prescription_token():
+    """Génère un token unique de 8 caractères"""
+    return secrets.token_hex(4)
 
 @prescription_bp.route('/create/<int:appointment_id>', methods=['POST'])
 @login_required
@@ -46,21 +55,32 @@ def create_prescription(appointment_id):
     prescription_type = request.form.get('type', 'ACUTE')
 
     # Créer le token
-    token = EWassfaService.generate_token()
+    token = generate_prescription_token()
 
     # Définir la durée de validité
-    expiry, max_usage = EWassfaService.calculate_expiry_and_usage(prescription_type)
+    if prescription_type == 'ACUTE':
+        expiry = datetime.utcnow() + timedelta(days=30)
+        max_usage = 1
+    else:  # CHRONIC
+        expiry = datetime.utcnow() + timedelta(days=365)
+        max_usage = 999
 
     # Signature HMAC-SHA256
     creation_time = datetime.utcnow()
+    # Use integer timestamp for stability (ignoring microseconds)
     timestamp_int = int(creation_time.timestamp())
-
-    signature = EWassfaService.create_hmac_signature(
-        doctor_id=current_user.id,
-        patient_id=appointment.patient_id,
-        medications=medications,
-        timestamp=timestamp_int
-    )
+    payload = {
+        'doctor_id': current_user.id,
+        'patient_id': appointment.patient_id,
+        'medications': medications,
+        'timestamp': timestamp_int
+    }
+    payload_str = json.dumps(payload, sort_keys=True)
+    signature = hmac.new(
+        current_app.config['SECRET_KEY'].encode(),
+        payload_str.encode(),
+        hashlib.sha256
+    ).hexdigest()
 
     # Créer l'ordonnance
     prescription = Prescription(
@@ -92,7 +112,20 @@ def view_prescription(token):
 
     # Générer le QR Code
     verify_url = url_for('prescription.verify_prescription', token=token, _external=True)
-    qr_code_base64 = EWassfaService.generate_qr_code(verify_url)
+    qr = qrcode.QRCode(version=1, box_size=10, border=2)
+
+    # Secure E-Wassfa QR data: token|hash|timestamp
+    # QR Code contient l'URL complète pour scan direct
+    # Le hash HMAC reste stocké en DB pour vérification serveur (pharmacy_routes.py ligne 18-37)
+    qr_data = verify_url
+    qr.add_data(qr_data)
+
+    qr.make(fit=True)
+
+    img = qr.make_image(fill_color="black", back_color="white")
+    buf = io.BytesIO()
+    img.save(buf, format='PNG')
+    qr_code_base64 = base64.b64encode(buf.getvalue()).decode()
 
     return render_template('prescription.html',
                           prescription=prescription,
@@ -106,9 +139,16 @@ def verify_prescription(token):
     prescription = Prescription.query.filter_by(token=token).first_or_404()
 
     # Vérifier la validité
-    validation_result = EWassfaService.validate_prescription(prescription)
-    is_valid = validation_result['is_valid']
-    error_message = validation_result['error_message']
+    is_valid = True
+    error_message = None
+
+    if prescription.usage_count >= prescription.max_usage:
+        is_valid = False
+        error_message = "Ordonnance déjà utilisée (maximum atteint)"
+
+    if prescription.expiry_date < datetime.utcnow():
+        is_valid = False
+        error_message = "Ordonnance expirée"
 
     # Si POST = le pharmacien confirme l'utilisation
     if request.method == 'POST' and is_valid:

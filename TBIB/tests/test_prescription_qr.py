@@ -74,27 +74,17 @@ class TestSecureQRCode:
         assert expected == "abc|def|123456"
 
     def test_view_prescription_qr_content(self, client, app, appointment, monkeypatch):
-        """Test that the view adds the correct data to QRCode"""
+        """Test that the view calls EWassfaService.generate_qr_code with correct URL"""
 
-        # Mock qrcode.QRCode
-        mock_qr = MagicMock()
-        mock_qr_cls = MagicMock(return_value=mock_qr)
-
-        # Simulate make_image return
-        mock_img = MagicMock()
-        mock_buf = io.BytesIO(b"fakeimage")
-        mock_img.save.side_effect = lambda buf, format: buf.write(b"fakeimage")
-        mock_qr.make_image.return_value = mock_img
-
-        # Patch qrcode in prescription_routes
-        monkeypatch.setattr(prescription_routes.qrcode, 'QRCode', mock_qr_cls)
+        # Mock EWassfaService.generate_qr_code
+        mock_generate_qr = MagicMock(return_value="fake_base64_qr")
+        monkeypatch.setattr('SERVICES.ewassfa.EWassfaService.generate_qr_code', mock_generate_qr)
 
         with app.app_context():
             appt = db.session.merge(appointment)
             token = "testtoken"
             security_hash = "testhash"
             created_at = datetime.datetime(2025, 1, 1, 12, 0, 0)
-            timestamp = int(created_at.timestamp())
 
             presc = Prescription(
                 token=token,
@@ -113,15 +103,12 @@ class TestSecureQRCode:
             resp = client.get(f'/prescription/view/{token}')
             assert resp.status_code == 200
 
-            # Verify calls
-            expected_data = f"{token}|{security_hash}|{timestamp}"
-            mock_qr.add_data.assert_called_with(expected_data)
+            # Verify that generate_qr_code was called with the correct URL
+            # Expected URL end with /prescription/verify/testtoken
+            args, _ = mock_generate_qr.call_args
+            verify_url = args[0]
+            assert verify_url.endswith('/prescription/verify/testtoken')
+            assert 'http' in verify_url
 
-            # Also verify fallback URL is present in response (as verify_url)
-            # We can spy on render_template but since we already got 200,
-            # and we know the template expects verify_url, checking context would be ideal.
-            # But checking if the original logic for verify_url is maintained:
-            # verify_url = url_for('prescription.verify_prescription', token=token, _external=True)
-            # We can check if it is in the response text (HTML) if it's rendered.
-            # Assuming 'prescription.html' renders {{ verify_url }}
-            assert b'/prescription/verify/testtoken' in resp.data
+            # Verify that the response contains the mock QR code data
+            assert b'fake_base64_qr' in resp.data
