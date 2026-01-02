@@ -2384,12 +2384,13 @@ def add_walkin():
                 db.session.flush()
                 print(f"DEBUG: New patient created with ID: {existing_patient.id}")
 
-            # Calcul du dernier ticket (Ticket Max + 1)
-            max_q = db.session.query(db.func.max(Appointment.queue_number)).filter(
-                Appointment.doctor_id == doctor_profile.id,
-                Appointment.appointment_date == date.today()
-            ).scalar() or 0
-            queue_number = max_q + 1
+            # Calcul du dernier ticket via SmartFlowService
+            from SERVICES.smartflow import SmartFlowService
+
+            queue_number = SmartFlowService.assign_queue_number(
+                doctor_id=doctor_profile.id,
+                appointment_date=date.today()
+            )
 
             print(f"DEBUG: Creating appointment. Doctor ID: {doctor_profile.id}, Queue: {queue_number}")
 
