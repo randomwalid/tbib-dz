@@ -71,6 +71,7 @@
                             </div>
                         </div>
                         <form method="POST" action="{{ url_for('main.cancel_appointment', appointment_id=appt.id) }}">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                             <button type="submit" class="text-red-500 hover:text-red-600 text-sm font-medium">{{ t.cancel }}</button>
                         </form>
                     </div>
